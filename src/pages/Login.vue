@@ -125,7 +125,8 @@ export default {
   text-indent: 8px;
   margin: 10px 0 0 -16px;
 }
->>>.el-input__inner{
+/* 修改input样式 */
+  /deep/.el-input__inner{
   padding-left: 40px !important;
 }
 </style>
