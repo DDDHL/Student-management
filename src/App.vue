@@ -1,12 +1,12 @@
 <template>
-  <div>
-    <h3>{{data}}</h3>
-    <button @click="getData">点我发送请求</button>
+  <div id="app">
+    <!--登录组件-->
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import {test} from './api'
+import {Login} from './api'
 export default {
   name: 'App',
   data(){
@@ -17,7 +17,7 @@ export default {
   methods: {
     async getData(){
       try{
-        let a  = await test()
+        let a  = await Login()
         console.log(a);
         
       }catch{

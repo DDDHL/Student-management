@@ -2,9 +2,12 @@
 import requests from "./request";
 
 // 测试接口
-export const test = () => {
+export const Login = (account) => {
     return  requests({
-        url: '/psts',
-        method: 'GET'
+        url: '/account',
+        method: 'POST',
+        data:{
+            pwd:account
+        }
     })
 }

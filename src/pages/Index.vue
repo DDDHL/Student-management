@@ -1,11 +1,15 @@
 <template>
     <div>
-        <h1>我是Login组件</h1>
+        <h2>我是主页</h2>
     </div>
 </template>
 
 <script>
     export default {
-        name:'Login'
+        name:'Index'
     }
 </script>
+
+<style>
+
+</style>
