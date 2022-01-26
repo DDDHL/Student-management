@@ -6,3 +6,9 @@ body,
     margin: 0;
     height: 100%;
 }
+
+/* 面包屑 */
+.el-breadcrumb{
+    font-size: 15px;
+    margin-bottom: 20px;
+}

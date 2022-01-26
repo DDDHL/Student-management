@@ -1,3 +1,14 @@
+/* 表单样式 */
+.el-input {
+    width: 280px;
+    height: 30px;
+    text-indent: 8px;
+    margin: 10px 0 0 -16px;
+  }
+  /* 修改input样式 */
+    /deep/.el-input__inner{
+    padding-left: 40px !important;
+  }
 *{
     /* 初始化 */
     margin: 0;

@@ -11,3 +11,11 @@ export const Login = (account) => {
         }
     })
 }
+
+// 主页侧边栏接口
+export const navList =() => {
+    return requests({
+        url:'/navList',
+        method:'GET'
+    })
+}

@@ -107,6 +107,7 @@ export default {
       this.$refs.form.validate(async (valid)=>{
         if(valid){
           this.$Message.success('登录成功！')
+          this.$router.push("/index")
         }
         else this.$Message.error('登录失败！')
       })
@@ -115,18 +116,4 @@ export default {
 };
 </script>
 
-<style scoped>
-/* 总体样式 */
-@import url(../assets/css/login.css);
-/* 表单样式 */
-.el-input {
-  width: 280px;
-  height: 30px;
-  text-indent: 8px;
-  margin: 10px 0 0 -16px;
-}
-/* 修改input样式 */
-  /deep/.el-input__inner{
-  padding-left: 40px !important;
-}
-</style>
+<style src="../assets/css/login.css" scoped></style>

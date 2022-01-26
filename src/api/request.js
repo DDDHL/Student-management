@@ -12,6 +12,8 @@ const requests = axios.create({
 // 配置拦截器
 requests.interceptors.request.use(config => {
     nprogress.start()
+    // 请求带token
+    /* config.headers.Authorization = window.sessionStorage.getItem('token') */
     return config
 })
 
