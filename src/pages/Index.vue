@@ -34,7 +34,13 @@
           </el-header>
           <!-- 主体中心 -->
           <el-main>
-            <router-view></router-view>
+            <transition
+              name="animate__animated animate__bounce"
+              enter-active-class="animate__fadeInUp"
+              leave-active-class="animate__fadeInDown"
+            >
+              <router-view></router-view>
+            </transition>
           </el-main>
           <!-- 主体底部 -->
           <el-footer>Footer</el-footer>
@@ -46,27 +52,38 @@
 
 <script>
 import Aside from "../components/Aside.vue";
+import "animate.css";
 export default {
   name: "Index",
   data() {
     return {
       isCollapse: false,
-      screenWidth:''
+      screenWidth: 1,
     };
   },
-  watch:{
-    screenWidth(val){
-      if(val<'555') this.isCollapse=true
-      if(val>'812') this.isCollapse=false
-    }
+  watch: {
+    // 通过窗口大小判断是否要折叠侧边栏
+    screenWidth: {
+      handler(val) {
+        if (this.timer) clearTimeout(this.timer);
+        this.timer = setTimeout(() => {
+          if (val < 555) this.isCollapse = true;
+          if (val > 812) this.isCollapse = false;
+        }, 100);
+      },
+    },
   },
-  mounted () {
+  created() {
+    // 初始化时判断是否需要关闭侧边栏
+    if (document.body.clientWidth < 555) {
+      this.screenWidth = document.body.clientWidth;
+    }
     // 监听窗口大小
     window.onresize = () => {
       return (() => {
-        this.screenWidth = document.body.clientWidth
-      })()
-    }
+        this.screenWidth = document.body.clientWidth;
+      })();
+    };
   },
   components: { Aside },
   methods: {
@@ -96,7 +113,7 @@ export default {
   background-color: #f2f2f2;
 }
 .el-footer {
-  background-color: red;
+  background-color: #fff;
 }
 .el-menu-vertical-demo:not(.el-menu--collapse) {
   width: 200px;
@@ -122,5 +139,8 @@ export default {
   -webkit-transition: width 0.25s;
   -o-transition: width 0.25s;
 }
-
+/* 消失不占位 */
+.animate__fadeInDown{
+  display: none !important;
+}
 </style>

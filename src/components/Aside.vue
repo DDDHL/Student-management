@@ -72,7 +72,7 @@ export default {
   margin: 0;
   display: inline-block;
   padding-left: 10px;
-  --animate-duration: 0.2s;
+  --animate-duration: 0.8s;
 }
 
 .el-menu {
@@ -92,5 +92,9 @@ export default {
 }
 /deep/ .el-menu-item {
   padding-left: 0 !important;
+}
+/* 消失不占位 */
+.animate__zoomOut{
+  display: none !important;
 }
 </style>

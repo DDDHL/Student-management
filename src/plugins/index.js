@@ -27,6 +27,9 @@ import {Breadcrumb,BreadcrumbItem} from 'element-ui'
 Vue.use(Breadcrumb)
 Vue.use(BreadcrumbItem)
 
-// 卡片
-import { Card } from 'element-ui'
+// 卡片及表格
+import { Card,Table,TableColumn,Pagination } from 'element-ui'
 Vue.use(Card)
+Vue.use(Table)
+Vue.use(TableColumn)
+Vue.use(Pagination)

@@ -12,3 +12,8 @@ body,
     font-size: 15px;
     margin-bottom: 20px;
 }
+
+/* 学生组件Table */
+.el-table{
+    margin: 20px 0 20px 0;
+}

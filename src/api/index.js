@@ -19,3 +19,14 @@ export const navList =() => {
         method:'GET'
     })
 }
+
+// 学生列表接口
+export const students = (queryInfo) =>{
+    return requests({
+        url:'/students',
+        method:'GET',
+        params:{
+            _limit:queryInfo.pageSize
+        }
+    })
+}

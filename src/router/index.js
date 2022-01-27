@@ -1,10 +1,4 @@
 import VueRouter from "vue-router";
-import Login from "../pages/Login"
-import Index from "../pages/Index"
-import Welcome from '../pages/Welcome'
-import Student from '../pages/Student'
-import Vacation from '../pages/Vacation'
-import Log from '../pages/Log'
 
 const router = new VueRouter({
     routes:[
@@ -15,33 +9,33 @@ const router = new VueRouter({
         },
         {
             path:'/login',
-            component:Login,
+            component:()=>import('../pages/Login'),
             meta:{title:"系统登录页"}
         },
         {
             path:'/index',
-            component:Index,
+            component:()=>import('../pages/Index'),
             redirect:'/welcome',
             meta:{title:"后台管理系统"},
             children:[
                 {
                     path:'/welcome',
-                    component:Welcome,
+                    component:()=>import('../pages/Welcome'),
                     meta:{title:'后台管理系统主页'}
                 },
                 {
                     path:'/Student',
-                    component:Student,
+                    component:()=>import('../pages/Student'),
                     meta:{title:'学生管理'}
                 },
                 {
                     path:'/Vacation',
-                    component:Vacation,
+                    component:()=>import('../pages/Vacation'),
                     meta:{title:'休假管理'}
                 },
                 {
                     path:'/log',
-                    component:Log,
+                    component:()=>import('../pages/Log'),
                     meta:{title:'系统日志'}
                 },
             ]
