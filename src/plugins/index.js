@@ -33,3 +33,9 @@ Vue.use(Card)
 Vue.use(Table)
 Vue.use(TableColumn)
 Vue.use(Pagination)
+
+// 头部下拉菜单
+import {Dropdown,DropdownMenu,DropdownItem} from 'element-ui'
+Vue.use(Dropdown)
+Vue.use(DropdownMenu)
+Vue.use(DropdownItem)

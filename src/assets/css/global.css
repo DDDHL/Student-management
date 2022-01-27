@@ -8,12 +8,31 @@ body,
 }
 
 /* 面包屑 */
-.el-breadcrumb{
+.el-breadcrumb {
     font-size: 15px;
     margin-bottom: 20px;
 }
 
 /* 学生组件Table */
-.el-table{
+.el-table {
     margin: 20px 0 20px 0;
+}
+
+/* 主页用户信息 */
+.el-menu--popup>li {
+    text-align: center;
+}
+
+.el-menu--popup>li:hover {
+    background-color: rgb(230, 230, 230) !important;
+}
+
+.el-menu--popup {
+    min-width: 100px;
+    border-radius: 5px ;
+    margin-top: -12px ;
+    padding: 10px 0;
+}
+.el-submenu__title{
+    border: none !important;
 }

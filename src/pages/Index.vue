@@ -11,6 +11,7 @@
           <!-- 头部 -->
           <el-header>
             <el-row :gutter="20">
+              <!-- 折叠展开按钮 -->
               <el-col :span="4"
                 ><div class="grid-content bg-purple header-left">
                   <el-button
@@ -22,12 +23,21 @@
                     @click="closeNav"
                   ></el-button></div
               ></el-col>
-              <el-col :span="16"
+              <el-col :span="12"
                 ><div class="grid-content bg-purple"></div
               ></el-col>
-              <el-col :span="4"
-                ><div class="grid-content bg-purple header-right">
-                  admin
+              <!-- 右上角用户区域 -->
+              <el-col :span="8"
+                ><div class="grid-content bg-purple header-right userInfo">
+                  
+                    <el-menu mode="horizontal" @select='user'>
+                      <el-submenu index="1">
+                        <template slot="title">用户信息</template>
+                        <el-menu-item index="myInfo">个人中心</el-menu-item>
+                        <el-menu-item index="logout">退出登录</el-menu-item>
+                      </el-submenu>
+                    </el-menu>
+                  
                 </div></el-col
               >
             </el-row>
@@ -87,9 +97,20 @@ export default {
   },
   components: { Aside },
   methods: {
+    // 折叠侧边栏
     closeNav() {
       this.isCollapse = !this.isCollapse;
     },
+    // 右上角用户信息
+    user(index){
+      if(index=='myInfo') console.log('我的信息')
+      if(index=='logout'){
+        this.$Message.success('退出登录成功！')
+        setTimeout(()=>{
+          this.$router.push('/login')
+        },1000)
+      }
+    }
   },
 };
 </script>
@@ -140,7 +161,10 @@ export default {
   -o-transition: width 0.25s;
 }
 /* 消失不占位 */
-.animate__fadeInDown{
+.animate__fadeInDown {
   display: none !important;
+}
+.userInfo{
+  justify-content: end;
 }
 </style>

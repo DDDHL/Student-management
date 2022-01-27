@@ -18,6 +18,7 @@
             type="text"
             placeholder="账号"
             v-model="info.account"
+            class="first_input"
           ></el-input>
         </el-form-item>
       <el-form-item prop="pwd">
@@ -28,6 +29,7 @@
             @focus="focus"
             @blur="blur"
             v-model="info.pwd"
+            class="second_input"
           ></el-input>
         </el-form-item>
       </el-form>
