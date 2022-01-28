@@ -108,7 +108,11 @@ export default {
       }) */
       this.$refs.form.validate(async (valid)=>{
         if(valid){
-          this.$Message.success('登录成功！')
+          this.$Message({
+            message:'登录成功！',
+            type:'success',
+            center:true
+          })
           this.$router.push("/index")
         }
         else this.$Message.error('登录失败！')

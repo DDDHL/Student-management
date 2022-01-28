@@ -105,7 +105,11 @@ export default {
     user(index){
       if(index=='myInfo') console.log('我的信息')
       if(index=='logout'){
-        this.$Message.success('退出登录成功！')
+        this.$Message({
+            message:'退出登录成功！',
+            type:'success',
+            center:true
+          })
         setTimeout(()=>{
           this.$router.push('/login')
         },1000)
