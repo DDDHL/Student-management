@@ -57,7 +57,7 @@
 </template>
 
 <script>
-// import {Login} from "../api"
+/* import {Test} from "../api" */
 export default {
   name: "Login",
   data() {
@@ -117,6 +117,7 @@ export default {
         }
         else this.$Message.error('登录失败！')
       })
+      
     },
   },
 };

@@ -1,11 +1,6 @@
 module.exports = {
     /* lintOnSave:true, */
 	devServer:{
-        proxy: {
-                '/posts': {
-                target: 'http://localhost:5000',
-                changeOrigin: true,
-            }
-   	    }
+        proxy:'http://localhost:3000'
     }
 }

@@ -5,8 +5,10 @@ import "nprogress/nprogress.css"
 
 const requests = axios.create({
     // 基础路径
-    baseURL:'http://localhost:3000',
-    timeout:3000
+    baseURL:'http://localhost:8080',
+    timeout:3000,
+    // 请求头
+    /* headers:{} */
 })
 
 // 配置拦截器
@@ -24,7 +26,8 @@ requests.interceptors.response.use((res) => {
     return  res.data;
 },() => {
     //失败的回调函数
-    return Promise.reject(new Error('fail'))
+    nprogress.done()
+    return Promise.reject('fail')
 })
 //4、对外暴露
 export default requests;

@@ -2,13 +2,10 @@
 import requests from "./request";
 
 // 测试接口
-export const Login = (account) => {
+export const Test = () => {
     return  requests({
-        url: '/account',
+        url: '/post',
         method: 'POST',
-        data:{
-            pwd:account
-        }
     })
 }
 
