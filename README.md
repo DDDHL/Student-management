@@ -20,13 +20,18 @@
 
 -- 框架：Vue2 + elementUi <br>
 
----目前实现：<br>
+-- 使用到的插件：<br>
+nprogress
+element-resize-detector
+echarts
+
+---项目优化：<br>
 1.路由懒加载        --优化性能<br>
 2.接口封装          --方便管理接口<br>
-3.请求防抖          --优化性能<br>
-4.animate动画优化   --加入切换动画过渡<br>
-4.web端响应式       --窗口变化时布局改变，不影响操作<br>
-5.nprogress进度条   --请求时动画<br>
+3.防抖封装          --便于优化性能<br>
+4.animate动画       --优化elementUi的过渡动画<br>
+5.web端响应式       --窗口变化时布局改变，不影响操作<br>
+
 
 ### 当前进度
 
