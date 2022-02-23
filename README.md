@@ -36,4 +36,6 @@ echarts<br>
 ### 当前进度
 
 --1.登陆页已完成。<br>
+![Image text](https://gitee.com/donghe-li/images/raw/master/images/Student-system-index/Student-system-index.png)
 --2.主页大致布局已完成<br>
+![Image text](https://gitee.com/donghe-li/images/raw/master/images/Student-system-index/Student-system-login.png)
