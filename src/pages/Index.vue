@@ -29,15 +29,13 @@
               <!-- 右上角用户区域 -->
               <el-col :span="8"
                 ><div class="grid-content bg-purple header-right userInfo">
-                  
-                    <el-menu mode="horizontal" @select='user'>
-                      <el-submenu index="1">
-                        <template slot="title">用户信息</template>
-                        <el-menu-item index="myInfo">个人中心</el-menu-item>
-                        <el-menu-item index="logout">退出登录</el-menu-item>
-                      </el-submenu>
-                    </el-menu>
-                  
+                  <el-menu mode="horizontal" @select="user">
+                    <el-submenu index="1">
+                      <template slot="title">用户信息</template>
+                      <el-menu-item index="myInfo">个人中心</el-menu-item>
+                      <el-menu-item index="logout">退出登录</el-menu-item>
+                    </el-submenu>
+                  </el-menu>
                 </div></el-col
               >
             </el-row>
@@ -49,7 +47,9 @@
               enter-active-class="animate__fadeInUp"
               leave-active-class="animate__fadeInDown"
             >
-              <router-view></router-view>
+              <keep-alive>
+                <router-view></router-view>
+              </keep-alive>
             </transition>
           </el-main>
           <!-- 主体底部 -->
@@ -61,6 +61,10 @@
 </template>
 
 <script>
+let elementResizeDetectorMaker = require("element-resize-detector");
+import { resize } from "../echarts/online";
+import { Debounce } from "../utils/common";
+import "../assets/js/model";
 import Aside from "../components/Aside.vue";
 import "animate.css";
 export default {
@@ -88,33 +92,58 @@ export default {
     if (document.body.clientWidth < 555) {
       this.screenWidth = document.body.clientWidth;
     }
-    // 监听窗口大小
-    window.onresize = () => {
-      return (() => {
-        this.screenWidth = document.body.clientWidth;
-      })();
-    };
+  },
+  mounted() {
+
+    // 监听窗口大小,更改侧边栏状态
+    window.addEventListener(
+      "resize",
+      () => {
+        // 防抖修改侧边栏
+        this.Resize();
+        // 直接修改echarts
+        resize();
+      },
+      false
+    );
+    // 监听侧边栏动画结束，重新绘制echarts
+    let erd = elementResizeDetectorMaker();
+    let that = this;
+    erd.listenTo(document.querySelector("Aside"), function () {
+      that.$nextTick(function () {
+        //使echarts尺寸重置
+        resize();
+      });
+    });
+
   },
   components: { Aside },
   methods: {
+
+    // 防抖更改echarts和aside
+    Resize: Debounce(function () {
+      this.screenWidth = document.body.clientWidth;
+    }, 200),
+
     // 折叠侧边栏
     closeNav() {
       this.isCollapse = !this.isCollapse;
     },
+
     // 右上角用户信息
-    user(index){
-      if(index=='myInfo') console.log('我的信息')
-      if(index=='logout'){
+    user(index) {
+      if (index == "myInfo") console.log("我的信息");
+      if (index == "logout") {
         this.$Message({
-            message:'退出登录成功！',
-            type:'success',
-            center:true
-          })
-        setTimeout(()=>{
-          this.$router.push('/login')
-        },1000)
+          message: "退出登录成功！",
+          type: "success",
+          center: true,
+        });
+        setTimeout(() => {
+          this.$router.push("/login");
+        }, 1000);
       }
-    }
+    },
   },
 };
 </script>
@@ -168,7 +197,7 @@ export default {
 .animate__fadeInDown {
   display: none !important;
 }
-.userInfo{
+.userInfo {
   justify-content: end;
 }
 </style>

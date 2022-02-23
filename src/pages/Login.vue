@@ -12,7 +12,7 @@
       <div class="tit">休假管理系统</div>
 
       <el-form :rules="rules" :model="info" ref="form">
-        <el-form-item  prop="account">
+        <el-form-item prop="account">
           <el-input
             prefix-icon="el-icon-user-solid"
             type="text"
@@ -21,7 +21,7 @@
             class="first_input"
           ></el-input>
         </el-form-item>
-      <el-form-item prop="pwd">
+        <el-form-item prop="pwd">
           <el-input
             prefix-icon="el-icon-lock"
             type="password"
@@ -57,24 +57,35 @@
 </template>
 
 <script>
-/* import {Test} from "../api" */
+/* import { login } from "../api"; */
 export default {
   name: "Login",
   data() {
     return {
       className: "",
-      info:{
-         account: "",
-          pwd: "",
+      info: {
+        account: "",
+        pwd: "",
+        rememberMe: false,
       },
       rules: {
         account: [
           { required: true, message: "请输入账号", trigger: "blur" },
-          { min: 6, max: 15, message: "长度在 6 到 15 个字符", trigger: "blur" },
+          {
+            min: 6,
+            max: 15,
+            message: "长度在 6 到 15 个字符",
+            trigger: "blur",
+          },
         ],
         pwd: [
           { required: true, message: "请输入密码", trigger: "blur" },
-          { min: 6, max: 15, message: "长度在 6 到 15 个字符", trigger: "blur" },
+          {
+            min: 6,
+            max: 15,
+            message: "长度在 6 到 15 个字符",
+            trigger: "blur",
+          },
         ],
       },
     };
@@ -90,34 +101,36 @@ export default {
     },
     // 登录
     login() {
-      /* this.$refs.form.validate(async (valid)=>{
-        if(valid){
-          try{
+      /* this.$refs.form.validate(async (valid) => {
+        if (valid) {
+          try {
             // 请求登录成功
-            let a = await Login(this.info.account)
-            console.log(a)
+            let a = await login(this.info);
+            console.log(a);
             // 跳转
-
-          }catch{
-            // 请求登录失败
-            console.log('请求失败')
+            this.$Message({
+              message: "登录成功！",
+              type: "success",
+              center: true,
+            });
+            setTimeout(() => {
+              this.$router.push("/index");
+            }, 1000);
+          } catch (error) {
+            // 登录失败
+            this.$Message({
+              message: error,
+              type: "error",
+              center: true,
+            });
           }
-        }else{
-          console.log(valid);
         }
-      }) */
-      this.$refs.form.validate(async (valid)=>{
+      }); */
+      this.$refs.form.validate((valid) => {
         if(valid){
-          this.$Message({
-            message:'登录成功！',
-            type:'success',
-            center:true
-          })
-          this.$router.push("/index")
+          this.$router.push('/index')
         }
-        else this.$Message.error('登录失败！')
       })
-      
     },
   },
 };
