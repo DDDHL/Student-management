@@ -21,9 +21,9 @@
 -- 框架：Vue2 + elementUi <br>
 
 -- 使用到的插件：<br>
-nprogress
-element-resize-detector
-echarts
+nprogress<br>
+element-resize-detector<br>
+echarts<br>
 
 ---项目优化：<br>
 1.路由懒加载        --优化性能<br>
