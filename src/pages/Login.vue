@@ -57,6 +57,7 @@
 </template>
 
 <script>
+/* 登录接口 */
 /* import { login } from "../api"; */
 export default {
   name: "Login",
@@ -127,10 +128,10 @@ export default {
         }
       }); */
       this.$refs.form.validate((valid) => {
-        if(valid){
-          this.$router.push('/index')
+        if (valid) {
+          this.$router.push("/index");
         }
-      })
+      });
     },
   },
 };

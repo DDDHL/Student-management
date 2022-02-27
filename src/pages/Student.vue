@@ -47,13 +47,14 @@
         layout="total, sizes, prev, pager, next, jumper"
         :total="students.length"
       >
-      <!-- ↑需要返回总数量 -->
+        <!-- ↑需要返回总数量 -->
       </el-pagination>
     </el-card>
   </div>
 </template>
 
 <script>
+/* 获取学生列表接口 */
 import { students } from "../api";
 export default {
   name: "Student",
@@ -71,9 +72,9 @@ export default {
     };
   },
   watch: {
-    'queryInfo.query'(newValue, oldValue){
-      console.log(newValue,oldValue)
-    }
+    "queryInfo.query"(newValue, oldValue) {
+      console.log(newValue, oldValue);
+    },
   },
   created() {
     /* 初始化获取数据 */
