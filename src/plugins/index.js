@@ -39,3 +39,9 @@ import {Dropdown,DropdownMenu,DropdownItem} from 'element-ui'
 Vue.use(Dropdown)
 Vue.use(DropdownMenu)
 Vue.use(DropdownItem)
+
+// 修改用户信息弹窗
+import {Dialog,Select,Option} from 'element-ui'
+Vue.use(Dialog)
+Vue.use(Select)
+Vue.use(Option)
