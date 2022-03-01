@@ -3,17 +3,18 @@
     <!-- 侧边logo -->
     <div class="logo">
       <router-link to="/welcome">
-      <img src="../assets/images/logo.png" alt="logo" />
-      <transition
-        name="animate__animated animate__bounce"
-        enter-active-class="animate__fadeInLeft"
-        leave-active-class="animate__zoomOut"
-      >
-        <p v-show="!isCollapse">休假管理系统</p>
-      </transition>
+        <img src="../assets/images/logo.png" alt="logo" />
+        <transition
+          name="animate__animated animate__bounce"
+          enter-active-class="animate__fadeInLeft"
+          leave-active-class="animate__zoomOut"
+        >
+          <p v-show="!isCollapse">休假管理系统</p>
+        </transition>
       </router-link>
     </div>
-    <!-- 侧边导航栏 -->
+
+    <!-- 侧边栏 -->
     <el-menu
       background-color="#28333e"
       text-color="#fff"
@@ -23,20 +24,39 @@
       unique-opened
       :default-active="$route.path"
     >
-      <el-menu-item
-        :index="'/' + navItem.navPath"
-        v-for="navItem in navList"
-        :key="navItem.id"
-      >
-        <i class="el-icon-menu"></i>
-        <span slot="title">{{ navItem.navName }}</span>
-      </el-menu-item>
+      <fragment v-for="item in menus" :key="item.id">
+        <!-- 遍历生成一级菜单 -->
+        <fragment v-if="item.path">
+          <el-menu-item :index="item.path" >
+            <i :class="item.icon"></i>
+            <span slot="title" style="padding-right:5px">{{ item.menuName }}</span>
+          </el-menu-item>
+        </fragment>
+        <!-- 遍历生成二级菜单 -->
+        <fragment v-else>
+          <el-submenu :index="item.id + ''">
+            <template slot="title">
+              <i :class="item.icon"></i>
+              <span slot="title" style="padding-right:5px">{{ item.menuName }}</span>
+            </template>
+            <fragment v-for="subItem in item.children" :key="subItem.id">
+              <el-menu-item :index="subItem.path">
+                <template slot="title">
+                  <i :class="subItem.icon"></i>
+                  <span slot="title">{{ subItem.menuName }}</span>
+                </template>
+              </el-menu-item>
+            </fragment>
+          </el-submenu>
+        </fragment>
+      </fragment>
     </el-menu>
   </div>
 </template>
 
 <script>
 import { navList } from "../api";
+import { getMenus } from "../api";
 import "animate.css";
 export default {
   name: "Aside",
@@ -44,14 +64,17 @@ export default {
   data() {
     return {
       navList: {},
+      menus: {},
     };
   },
   async created() {
     /* 遍历左侧导航 */
     try {
       this.navList = await navList();
+      this.menus = await getMenus();
+      console.log(this.menus);
     } catch {
-      console.log("访问数据失败");
+      console.log("侧边栏访问数据失败");
     }
   },
 };
@@ -68,7 +91,7 @@ export default {
   align-items: center;
   overflow: hidden;
 }
-.logo >a> p {
+.logo > a > p {
   margin: 0;
   display: inline-block;
   padding-left: 10px;
@@ -77,24 +100,27 @@ export default {
 
 .el-menu {
   border: none;
-  padding-left: 0;
   transition: all 10ms;
 }
-.logo >a> img {
+.logo > a > img {
   width: 50px;
   height: 50px;
 }
-.logo>a{
+.logo > a {
   display: flex;
   align-items: center;
-  text-decoration: none;  
+  text-decoration: none;
   color: #fff;
 }
-/deep/ .el-menu-item {
-  padding-left: 0 !important;
+.el-menu-item span {
+  padding-left: -5px;
 }
 /* 消失不占位 */
-.animate__zoomOut{
+.animate__zoomOut {
   display: none !important;
+}
+/* 二级菜单缩进 */
+.el-submenu .el-menu-item{
+  padding-right:15px;
 }
 </style>

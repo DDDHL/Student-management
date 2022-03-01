@@ -12,17 +12,15 @@
           <el-header>
             <el-row :gutter="20">
               <!-- 折叠展开按钮 -->
-              <el-col :span="4"
-                ><div class="grid-content bg-purple header-left">
-                  <el-button
-                    type="primary"
-                    :icon="
-                      isCollapse ? 'el-icon-arrow-right' : 'el-icon-arrow-left'
-                    "
-                    circle
+              <el-col :span="4">
+                <div style="font-size: 28px; padding-top: 10px">
+                  <span
+                    style="cursor: pointer"
                     @click="closeNav"
-                  ></el-button></div
-              ></el-col>
+                    :class="isCollapse ? 'el-icon-s-unfold' : 'el-icon-s-fold'"
+                  ></span>
+                </div>
+              </el-col>
               <el-col :span="12"
                 ><div class="grid-content bg-purple"></div
               ></el-col>

@@ -11,11 +11,11 @@ export const Test = () => {
 }
 
 // 登录接口
-export const login = (query) => {
+export const login = (query,pwd) => {
     return  requests({
-        url: '/user/login',
+        url: '/admin/login',
         method: 'POST',
-        params:{userAccount:query.account,password:query.pwd,rememberMe:query.rememberMe}
+        data:{userAccount:query.account,password:pwd,rememberMe:query.rememberMe}
     })
 }
 
@@ -30,6 +30,14 @@ export const Test1 = () => {
 export const navList =() => {
     return requests({
         url:'/navList',
+        method:'GET'
+    })
+}
+
+// 侧边栏动态加载
+export const getMenus =() => {
+    return requests({
+        url:'/menus',
         method:'GET'
     })
 }

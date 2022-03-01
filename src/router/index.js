@@ -47,14 +47,13 @@ const router = new VueRouter({
 router.beforeEach((to,from,next)=>{
     // 拦截
     console.log('拦截器')
+    // 修改组件标题
     document.title = to.meta.title
-    next()
+    next();
 })
 
 router.afterEach((to,from)=>{
-    // 修改组件标题
     console.log(to,from)
-    
 })
 
 export default router

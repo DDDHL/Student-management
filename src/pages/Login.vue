@@ -57,8 +57,13 @@
 </template>
 
 <script>
+/* 加密 */
+/* import { Encrypt } from "../utils/secret"; */
 /* 登录接口 */
 /* import { login } from "../api"; */
+/* 路由接口 */
+/* import { setRoutes } from "../router/router"
+import { getMenus } from "../api" */
 export default {
   name: "Login",
   data() {
@@ -102,23 +107,32 @@ export default {
     },
     // 登录
     login() {
-      /* this.$refs.form.validate(async (valid) => {
+    /*   this.$refs.form.validate(async (valid) => {
         if (valid) {
+          let password = Encrypt(this.info.pwd);
           try {
-            // 请求登录成功
-            let a = await login(this.info);
-            console.log(a);
-            // 跳转
-            this.$Message({
-              message: "登录成功！",
-              type: "success",
-              center: true,
-            });
-            setTimeout(() => {
-              this.$router.push("/index");
-            }, 1000);
+            // 请求登录
+            let res = await login(this.info, password);
+            // 判断登录是否成功
+            if (res.code === "") {
+              this.$Message({
+                message: `${res.message}`,
+                type: "success",
+                center: true,
+              });
+              setTimeout(() => {
+                // 成功后跳转
+                //this.$router.push("/index");
+              }, 1000);
+            }
+            // 登录失败后显示
+             this.$Message({
+                message: `${res.message}`,
+                type: "error",
+                center: true,
+              });
           } catch (error) {
-            // 登录失败
+            // 登录请求失败
             this.$Message({
               message: error,
               type: "error",
@@ -127,8 +141,10 @@ export default {
           }
         }
       }); */
-      this.$refs.form.validate((valid) => {
+
+      this.$refs.form.validate( async (valid) => {
         if (valid) {
+          //setRoutes(await getMenus())
           this.$router.push("/index");
         }
       });

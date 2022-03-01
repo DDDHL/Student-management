@@ -23,26 +23,13 @@ requests.interceptors.request.use(config => {
 requests.interceptors.response.use((res) => {
     //成功的回调函数
     nprogress.done()
-    switch(res.data.code){
-        case '21001':
-            return Promise.reject('用户未注册')
-        case '21002':
-            return Promise.reject('用户已注册')
-        case '21003':
-            return Promise.reject('用户名或者密码错误')
-        case '21004':
-            return Promise.reject('用户状态已删除')
-        case '21005':
-            return Promise.reject('账户已停用')
-        case '21006':
-            return Promise.reject('账户已离职')
-        default:
+ 
             return res.data
-    }
+    
 },() => {
     //失败的回调函数
     nprogress.done()
-    return Promise.reject('fail')
+    return Promise.reject('服务器出错，请联系管理员')
 })
 //4、对外暴露
 export default requests;

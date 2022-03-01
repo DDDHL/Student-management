@@ -5,6 +5,9 @@ import router from './router'
 // 按需引入elementui
 import "./plugins"
 import "./assets/css/global.css"
+/* 不渲染标签 */
+import Fragment from 'vue-fragment'
+Vue.use(Fragment.Plugin)
 
 Vue.config.productionTip = false
 Vue.use(VueRouter)
