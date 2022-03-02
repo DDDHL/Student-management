@@ -7,10 +7,6 @@
 <script>
 export default {
     name:'Vacation',
-    created(){
-      console.log(this.$router.options)
-    }
-    
 }
 </script>
 

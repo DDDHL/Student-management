@@ -23,6 +23,7 @@
       :collapse="isCollapse"
       unique-opened
       :default-active="$route.path"
+      @select="handSelect"
     >
       <fragment v-for="item in menus" :key="item.id">
         <!-- 遍历生成一级菜单 -->
@@ -72,6 +73,13 @@ export default {
     /* 遍历左侧导航 */
     this.menus = JSON.parse(localStorage.getItem("menus"));
   },
+  methods:{
+    handSelect(index){
+      // this.$store.state.aside.name = index.name
+      console.log('index.name: ', index);
+      // console.log('this.$store.state.aside.name: ', this.$store.state.aside.name);
+    }
+  }
 };
 </script>
 

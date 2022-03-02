@@ -23,6 +23,7 @@
               </el-col>
               <el-col :span="14"
                 ><div class="grid-content">
+                  <!-- 面包屑 -->
                   <el-breadcrumb
                     separator-class="el-icon-arrow-right"
                     style="padding-top: 21px; font-size: 16px"
@@ -30,16 +31,28 @@
                     <el-breadcrumb-item :to="{ path: '/' }"
                       >首页</el-breadcrumb-item
                     >
-                    <el-breadcrumb-item>活动管理</el-breadcrumb-item>
+                    <el-breadcrumb-item>{{this.$store.state.aside.name}}</el-breadcrumb-item>
                   </el-breadcrumb>
                 </div></el-col
               >
               <!-- 右上角用户区域 -->
               <el-col :span="8"
                 ><div class="grid-content bg-purple header-right userInfo">
+                  <!-- 头像 -->
+                  <div class="demo-type" style="height: 40px; width: 40px">
+                    <el-avatar
+                      :size="40"
+                      src="https://empty"
+                      @error="errorHandler"
+                    >
+                      <img :src="dynamicValidateForm.avatarUrl" />
+                    </el-avatar>
+                  </div>
                   <el-menu mode="horizontal" @select="user">
                     <el-submenu index="1">
-                      <template slot="title">用户信息</template>
+                      <template slot="title">{{
+                        dynamicValidateForm.nickName
+                      }}</template>
                       <el-menu-item
                         index="myInfo"
                         @click="dialogFormVisible = true"
@@ -66,13 +79,26 @@
               style="margin-left: 0"
             >
               <el-tab-pane label="基本信息" name="first">
+                <!-- 头像修改 -->
+                <el-upload
+                  style="text-align: center"
+                  class="avatar-uploader"
+                  action="https://jsonplaceholder.typicode.com/posts/"
+                  :show-file-list="false"
+                  :on-success="handleAvatarSuccess"
+                  :before-upload="beforeAvatarUpload"
+                >
+                  <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+                  <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                </el-upload>
                 <!-- 基本信息修改 -->
                 <el-form
+                  :rules="rules"
                   :model="dynamicValidateForm"
                   ref="dynamicValidateForm"
                   label-width="100px"
                   class="demo-dynamic"
-                  style="margin: 20px 0 0 -43px"
+                  style="margin: 20px 0 0 -35px"
                 >
                   <el-form-item label="姓名">
                     <el-input
@@ -82,39 +108,31 @@
                   </el-form-item>
                   <el-form-item label="工号">
                     <el-input
-                      v-model="dynamicValidateForm.nickName"
+                      v-model="dynamicValidateForm.userAccount"
                       :disabled="true"
                     ></el-input>
                   </el-form-item>
                   <el-form-item label="院系">
                     <el-input
-                      v-model="dynamicValidateForm.nickName"
+                      v-model="dynamicValidateForm.department"
+                      :disabled="true"
+                    ></el-input>
+                  </el-form-item>
+                  <el-form-item label="年级">
+                    <el-input
+                      v-if="dynamicValidateForm.grade"
+                      v-model="dynamicValidateForm.grade"
                       :disabled="true"
                     ></el-input>
                   </el-form-item>
                   <el-form-item label="性别">
                     <el-input
-                      v-model="dynamicValidateForm.nickName"
+                      v-model="dynamicValidateForm.sex"
                       :disabled="true"
                     ></el-input>
                   </el-form-item>
-                  <el-form-item
-                    prop="email"
-                    label="手机号"
-                    :rules="[
-                      {
-                        required: true,
-                        message: '邮箱地址不能为空',
-                        trigger: 'blur',
-                      },
-                      {
-                        type: 'email',
-                        message: '请输入正确的邮箱地址',
-                        trigger: ['blur', 'change'],
-                      },
-                    ]"
-                  >
-                    <el-input v-model="dynamicValidateForm.email"></el-input>
+                  <el-form-item label="手机号" prop="phone">
+                    <el-input v-model="dynamicValidateForm.phone" />
                   </el-form-item>
                   <el-form-item
                     prop="email"
@@ -193,6 +211,8 @@
 </template>
 
 <script>
+/* API */
+import { getMyInfo } from "../api";
 /* 监视元素插件 */
 let elementResizeDetectorMaker = require("element-resize-detector");
 /* echarts动态修改大小 */
@@ -200,7 +220,7 @@ import { resize } from "../echarts/online";
 /* 防抖 */
 import { Debounce } from "../utils/common";
 /* 左下角模型 */
-import "../assets/js/model";
+/* import "../assets/js/model"; */
 /* 侧边栏接口 */
 import Aside from "../components/Aside.vue";
 /* 动画库 */
@@ -228,14 +248,24 @@ export default {
         callback();
       }
     };
+    /* 手机号规则 */
+    var validatorPhone = function (rule, value, callback) {
+      let phone =
+        /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/;
+      if (value === "") {
+        callback(new Error("手机号不能为空"));
+      } else if (!phone.test(value)) {
+        callback(new Error("手机号格式错误"));
+      } else {
+        callback();
+      }
+    };
     return {
       /* 用户信息弹窗 */
+      /* 头像 */
+      imageUrl: "",
       /* 基本信息 */
-      dynamicValidateForm: {
-        nickName: "里河东",
-        email: "2293725360@qq.com",
-        number: 123456789,
-      },
+      dynamicValidateForm: {},
       /* 密码 */
       ruleForm: {
         pass: "",
@@ -244,6 +274,13 @@ export default {
       rules: {
         pass: [{ validator: validatePass, trigger: "blur" }],
         checkPass: [{ validator: validatePass2, trigger: "blur" }],
+        phone: [
+          {
+            required: true,
+            validator: validatorPhone,
+            trigger: ["blur", "change"],
+          },
+        ],
       },
       activeName: "first",
       dialogFormVisible: false,
@@ -267,10 +304,13 @@ export default {
     },
   },
   created() {
+    console.log('index',this.$store.state.aside.name);
     // 初始化时判断是否需要关闭侧边栏
     if (document.body.clientWidth < 555) {
       this.screenWidth = document.body.clientWidth;
     }
+    // 获取用户头像
+    this.user("myInfo");
   },
   mounted() {
     // 监听窗口大小,更改侧边栏状态
@@ -296,6 +336,27 @@ export default {
   },
   components: { Aside },
   methods: {
+    // 用户信息修改
+    // 上次头像
+    handleAvatarSuccess(res) {
+      this.imageUrl = res;
+    },
+    beforeAvatarUpload(file) {
+      const isJPG = file.type === "image/jpeg";
+      const isLt2M = file.size / 1024 / 1024 < 2;
+
+      if (!isJPG) {
+        this.$message.error("上传头像图片只能是 JPG 格式!");
+      }
+      if (!isLt2M) {
+        this.$message.error("上传头像图片大小不能超过 2MB!");
+      }
+      return isJPG && isLt2M;
+    },
+    // 右上角头像出错
+    errorHandler() {
+      return true;
+    },
     // 修改密码
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
@@ -327,7 +388,14 @@ export default {
     },
 
     // 右上角用户信息
-    user(index) {
+    async user(index) {
+      if (index == "myInfo") {
+        let res = await getMyInfo();
+        if (res.code == "") {
+          this.dynamicValidateForm = res.data;
+        }
+        console.log(this.dynamicValidateForm);
+      }
       if (index == "logout") {
         this.$Message({
           message: "退出登录成功！",
@@ -343,7 +411,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 #app > section {
   height: 100%;
 }
@@ -399,5 +467,29 @@ export default {
 .el-tabs__nav-scroll {
   display: flex;
   justify-content: center;
+}
+/* 修改个人信息头像 */
+.avatar-uploader .el-upload {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.avatar-uploader .el-upload:hover {
+  border-color: #409eff;
+}
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 78px;
+  height: 78px;
+  line-height: 78px;
+  text-align: center;
+}
+.avatar {
+  width: 78px;
+  height: 78px;
+  display: block;
 }
 </style>

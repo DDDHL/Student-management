@@ -5,7 +5,7 @@ import "nprogress/nprogress.css"
 
 const requests = axios.create({
     // 基础路径
-    baseURL:'http://localhost:8080',
+    baseURL:'http://192.168.31.95:8001',
     timeout:3000,
     // 请求头
     /* headers:{} */
@@ -15,7 +15,12 @@ const requests = axios.create({
 requests.interceptors.request.use(config => {
     nprogress.start()
     // 请求带token
-    config.headers.Authorization = window.localStorage.getItem('token')
+    let res = window.localStorage.getItem('user')
+    let token = ''
+    if(res!=null||res!=''){
+        token = JSON.parse(window.localStorage.getItem('user')).token
+    }
+    config.headers.token = token
     return config
 })
 

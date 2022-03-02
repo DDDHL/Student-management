@@ -22,8 +22,8 @@ const routes = [
 ]
 
 const router = new VueRouter({
-    mode: 'history',
-    base: process.env.BASE_URL,
+  /*   mode: 'history',
+    base: process.env.BASE_URL, */
     routes
 })
 
@@ -68,5 +68,12 @@ export const setRoutes = () => {
 }
 
 setRoutes()
+
+router.beforeEach((to,from,next)=>{
+    // 路由守卫
+    // 修改组件标题
+    document.title = to.name
+    next();
+})
 
 export default router

@@ -47,3 +47,8 @@ Vue.use(Select)
 Vue.use(Option)
 Vue.use(TabPane)
 Vue.use(Tabs)
+
+// 头像
+import {Avatar,Upload} from 'element-ui'
+Vue.use(Avatar)
+Vue.use(Upload)

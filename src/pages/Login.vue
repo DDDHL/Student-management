@@ -58,12 +58,12 @@
 
 <script>
 /* 加密 */
-/* import { Encrypt } from "../utils/secret"; */
+import { Encrypt } from "../utils/secret";
 /* 登录接口 */
-/* import { login } from "../api"; */
+import { login,isLogin } from "../api";
 /* 路由接口 */
-import { setRoutes } from "../router/router"
-import { getMenus } from "../api"
+/* import { setRoutes } from "../router/router";
+import { getMenus } from "../api"; */
 export default {
   name: "Login",
   data() {
@@ -96,6 +96,12 @@ export default {
       },
     };
   },
+  async created() {
+      let res = await isLogin();
+      if (res.code == "") {
+        this.$router.push("/index");
+      }
+  },
   methods: {
     // 点击密码框动画
     focus() {
@@ -107,7 +113,7 @@ export default {
     },
     // 登录
     login() {
-    /*   this.$refs.form.validate(async (valid) => {
+      this.$refs.form.validate(async (valid) => {
         if (valid) {
           let password = Encrypt(this.info.pwd);
           try {
@@ -120,17 +126,29 @@ export default {
                 type: "success",
                 center: true,
               });
+              let user = {
+                avatarUrl: res.data.avatarUrl,
+                nickName: res.data.nickName,
+                token: res.data.token,
+              };
+              localStorage.setItem("user", JSON.stringify(user));
               setTimeout(() => {
-                // 成功后跳转
-                //this.$router.push("/index");
+                // 成功后跳转，并保存侧边栏和登录信息
+                // let menus = await getMenus();
+                // localStorage.setItem("menus", JSON.stringify(menus));
+                // setRoutes();
+
+                this.$router.push("/index");
+                console.log(res);
               }, 1000);
-            }
-            // 登录失败后显示
-             this.$Message({
+            } else {
+              // 登录失败后显示
+              this.$Message({
                 message: `${res.message}`,
                 type: "error",
                 center: true,
               });
+            }
           } catch (error) {
             // 登录请求失败
             this.$Message({
@@ -140,16 +158,16 @@ export default {
             });
           }
         }
-      }); */
+      });
 
-      this.$refs.form.validate( async (valid) => {
+      /*  this.$refs.form.validate( async (valid) => {
         if (valid) {
           let menus = await getMenus()
           localStorage.setItem('menus',JSON.stringify(menus))
           setRoutes()
           this.$router.push("/index");
         }
-      });
+      }); */
     },
   },
 };

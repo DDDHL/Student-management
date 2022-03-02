@@ -9,7 +9,30 @@ export const Test = () => {
         data:{userAccount:123456,password:123456}
     })
 }
+// 验证是否登录
+export const isLogin = () => {
+    return requests({
+        url:'/admin/verify',
+        method:'POST'
+    })
+}
 
+// 获取自己信息
+export const getMyInfo = () => {
+    return requests({
+        url:'/user/getById',
+        method:'POST',
+        data:{}
+    })
+}
+// 修改个人信息
+export const changeUserInfo = (query) => {
+    return requests({
+        url:'/user/edit',
+        method:'POST',
+        data:query
+    })
+}
 // 登录接口
 export const login = (query,pwd) => {
     return  requests({

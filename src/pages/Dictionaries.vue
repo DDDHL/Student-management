@@ -1,15 +1,18 @@
 <template>
   <div>
-      <h1>字典管理</h1>
+    <el-card class="box-card">
+      <div v-for="o in 4" :key="o" class="text item">
+        {{ "列表内容 " + o }}
+      </div>
+    </el-card>
   </div>
 </template>
 
 <script>
 export default {
-    name:'Dictionaries'
-}
+  name: "Dictionaries",
+};
 </script>
 
 <style>
-
 </style>

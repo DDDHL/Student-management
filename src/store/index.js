@@ -4,7 +4,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-      aside:[{name:123}]
+      aside:[{name:'主页'}]
   },
   mutations: {
   },
