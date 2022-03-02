@@ -60,7 +60,7 @@
 /* 加密 */
 import { Encrypt } from "../utils/secret";
 /* 登录接口 */
-import { login,isLogin } from "../api";
+import { login, isLogin } from "../api";
 /* 路由接口 */
 /* import { setRoutes } from "../router/router";
 import { getMenus } from "../api"; */
@@ -97,10 +97,13 @@ export default {
     };
   },
   async created() {
-      let res = await isLogin();
-      if (res.code == "") {
+    let res = localStorage.getItem("user");
+    if (res != null && res != "") {
+      let loginData = await isLogin();
+      if (loginData.code == "") {
         this.$router.push("/index");
       }
+    }
   },
   methods: {
     // 点击密码框动画
@@ -137,7 +140,6 @@ export default {
                 // let menus = await getMenus();
                 // localStorage.setItem("menus", JSON.stringify(menus));
                 // setRoutes();
-
                 this.$router.push("/index");
                 console.log(res);
               }, 1000);

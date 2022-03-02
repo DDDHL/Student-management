@@ -12,40 +12,38 @@
           <el-header>
             <el-row :gutter="20">
               <!-- 折叠展开按钮 -->
-              <el-col :span="2">
-                <div style="font-size: 28px; padding-top: 10px">
-                  <span
-                    style="cursor: pointer"
+              <el-col :span="11">
+                <div style="font-size: 28px; padding-top: 15px; display: flex;align-items:center">
+                  <div
+                    style="cursor: pointer;"
                     @click="closeNav"
                     :class="isCollapse ? 'el-icon-s-unfold' : 'el-icon-s-fold'"
-                  ></span>
-                </div>
-              </el-col>
-              <el-col :span="14"
-                ><div class="grid-content">
+                  ></div>
                   <!-- 面包屑 -->
                   <el-breadcrumb
                     separator-class="el-icon-arrow-right"
-                    style="padding-top: 21px; font-size: 16px"
+                    style="padding-left:8px;font-size: 16px;"
                   >
-                    <el-breadcrumb-item :to="{ path: '/' }"
+                    <el-breadcrumb-item :to="{ path: '/welcome' }"
                       >首页</el-breadcrumb-item
                     >
-                    <el-breadcrumb-item>{{this.$store.state.aside.name}}</el-breadcrumb-item>
+                    <el-breadcrumb-item>{{
+                      currentPathName
+                    }}</el-breadcrumb-item>
                   </el-breadcrumb>
-                </div></el-col
-              >
+                </div>
+              </el-col>
               <!-- 右上角用户区域 -->
-              <el-col :span="8"
+              <el-col :span="13"
                 ><div class="grid-content bg-purple header-right userInfo">
-                  <!-- 头像 -->
+                  <!-- 右上角头像 -->
                   <div class="demo-type" style="height: 40px; width: 40px">
-                    <el-avatar
-                      :size="40"
-                      src="https://empty"
-                      @error="errorHandler"
-                    >
-                      <img :src="dynamicValidateForm.avatarUrl" />
+                    <el-avatar :size="40">
+                      <img
+                        v-if="dynamicValidateForm.avatarUrl"
+                        :src="dynamicValidateForm.avatarUrl"
+                        alt=""
+                      />
                     </el-avatar>
                   </div>
                   <el-menu mode="horizontal" @select="user">
@@ -88,7 +86,11 @@
                   :on-success="handleAvatarSuccess"
                   :before-upload="beforeAvatarUpload"
                 >
-                  <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+                  <img
+                    v-if="dynamicValidateForm.avatarUrl"
+                    :src="dynamicValidateForm.avatarUrl"
+                    class="avatar"
+                  />
                   <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
                 <!-- 基本信息修改 -->
@@ -165,11 +167,20 @@
                   class="demo-ruleForm"
                   style="margin: 20px 0 0 -30px"
                 >
-                  <el-form-item label="密码" prop="pass">
+                  <el-form-item label="原密码" prop="OldPass">
+                    <el-input
+                      type="password"
+                      v-model="ruleForm.OldPass"
+                      show-password
+                      autocomplete="off"
+                    ></el-input>
+                  </el-form-item>
+                  <el-form-item label="新密码" prop="pass">
                     <el-input
                       type="password"
                       v-model="ruleForm.pass"
                       autocomplete="off"
+                      show-password
                     ></el-input>
                   </el-form-item>
                   <el-form-item label="确认密码" prop="checkPass">
@@ -177,6 +188,7 @@
                       type="password"
                       v-model="ruleForm.checkPass"
                       autocomplete="off"
+                      show-password
                     ></el-input>
                   </el-form-item>
                 </el-form>
@@ -203,7 +215,9 @@
             </transition>
           </el-main>
           <!-- 主体底部 -->
-          <el-footer>Footer</el-footer>
+          <el-footer>
+            <Footer />
+          </el-footer>
         </el-container>
       </el-container>
     </el-container>
@@ -213,16 +227,21 @@
 <script>
 /* API */
 import { getMyInfo } from "../api";
+
 /* 监视元素插件 */
 let elementResizeDetectorMaker = require("element-resize-detector");
+
 /* echarts动态修改大小 */
 import { resize } from "../echarts/online";
 /* 防抖 */
 import { Debounce } from "../utils/common";
+
 /* 左下角模型 */
 /* import "../assets/js/model"; */
-/* 侧边栏接口 */
+
+/* 组件 */
 import Aside from "../components/Aside.vue";
+import Footer from "../components/Footer.vue";
 /* 动画库 */
 import "animate.css";
 export default {
@@ -230,7 +249,11 @@ export default {
   data() {
     /* 密码校验规则 */
     var validatePass = (rule, value, callback) => {
-      if (value === "") {
+      if (value.toString().length < 6) {
+        callback(new Error("长度必须大于6位"));
+      } else if (value.toString().length > 15) {
+        callback(new Error("长度必须小于15位"));
+      } else if (value === "") {
         callback(new Error("请输入密码"));
       } else {
         if (this.ruleForm.checkPass !== "") {
@@ -240,10 +263,24 @@ export default {
       }
     };
     var validatePass2 = (rule, value, callback) => {
-      if (value === "") {
+      if (value.toString().length < 6) {
+        callback(new Error("长度必须大于6位"));
+      } else if (value.toString().length > 15) {
+        callback(new Error("长度必须小于15位"));
+      } else if (value === "") {
         callback(new Error("请再次输入密码"));
       } else if (value !== this.ruleForm.pass) {
         callback(new Error("两次输入密码不一致!"));
+      } else {
+        callback();
+      }
+    };
+    /* 原密码规则 */
+    var validatePass3 = (rule, value, callback) => {
+      if (value.toString().length < 6) {
+        callback(new Error("长度必须大于6位"));
+      } else if (value.toString().length > 15) {
+        callback(new Error("长度必须小于15位"));
       } else {
         callback();
       }
@@ -270,10 +307,12 @@ export default {
       ruleForm: {
         pass: "",
         checkPass: "",
+        OldPass: "",
       },
       rules: {
         pass: [{ validator: validatePass, trigger: "blur" }],
         checkPass: [{ validator: validatePass2, trigger: "blur" }],
+        OldPass: [{ validator: validatePass3, trigger: "blur" }],
         phone: [
           {
             required: true,
@@ -291,6 +330,11 @@ export default {
       screenWidth: 1,
     };
   },
+  computed: {
+    currentPathName() {
+      return this.$store.state.currentPathName;
+    },
+  },
   watch: {
     // 通过窗口大小判断是否要折叠侧边栏
     screenWidth: {
@@ -304,7 +348,6 @@ export default {
     },
   },
   created() {
-    console.log('index',this.$store.state.aside.name);
     // 初始化时判断是否需要关闭侧边栏
     if (document.body.clientWidth < 555) {
       this.screenWidth = document.body.clientWidth;
@@ -328,18 +371,19 @@ export default {
     let erd = elementResizeDetectorMaker();
     let that = this;
     erd.listenTo(document.querySelector("Aside"), function () {
+      console.log("监听");
       that.$nextTick(function () {
         //使echarts尺寸重置
         resize();
       });
     });
   },
-  components: { Aside },
+  components: { Aside, Footer },
   methods: {
     // 用户信息修改
-    // 上次头像
+    // 更新头像
     handleAvatarSuccess(res) {
-      this.imageUrl = res;
+      this.dynamicValidateForm.avatarUrl = res;
     },
     beforeAvatarUpload(file) {
       const isJPG = file.type === "image/jpeg";
@@ -353,18 +397,22 @@ export default {
       }
       return isJPG && isLt2M;
     },
-    // 右上角头像出错
-    errorHandler() {
-      return true;
-    },
-    // 修改密码
+    // 修改密码或个人信息
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          alert("submit!");
-          this.dialogFormVisible = false;
+          // 验证通过
+          if (formName == "ruleForm") {
+            // 修改密码请求
+            console.log("修改密码");
+          } else {
+            // 修改个人信息
+            console.log(321);
+          }
+          /*  alert("submit!");
+          this.dialogFormVisible = false; */
         } else {
-          console.log("error submit!!");
+          console.log("表单验证不通过");
           return false;
         }
       });
@@ -390,11 +438,19 @@ export default {
     // 右上角用户信息
     async user(index) {
       if (index == "myInfo") {
-        let res = await getMyInfo();
-        if (res.code == "") {
-          this.dynamicValidateForm = res.data;
+        try {
+          let res = await getMyInfo();
+          if (res.code == "") {
+            // 赋值
+            this.dynamicValidateForm = res.data;
+          }
+        } catch (error) {
+          this.$Message({
+            message: error,
+            type: "error",
+            center: true,
+          });
         }
-        console.log(this.dynamicValidateForm);
       }
       if (index == "logout") {
         this.$Message({

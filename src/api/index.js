@@ -16,7 +16,13 @@ export const isLogin = () => {
         method:'POST'
     })
 }
-
+// 学生管理获取列表
+export const getAll = () => {
+    return requests({
+        url:'/getAll',
+        method:'GET',
+    })
+}
 // 获取自己信息
 export const getMyInfo = () => {
     return requests({
@@ -31,6 +37,14 @@ export const changeUserInfo = (query) => {
         url:'/user/edit',
         method:'POST',
         data:query
+    })
+}
+// 修改密码
+export const changPwd = (newPassword,password) => {
+    return requests({
+        url:'/user/edit',
+        method:'POST',
+        data:{newPassword:newPassword,password:password}
     })
 }
 // 登录接口

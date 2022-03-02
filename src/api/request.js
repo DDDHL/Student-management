@@ -5,8 +5,8 @@ import "nprogress/nprogress.css"
 
 const requests = axios.create({
     // 基础路径
-    baseURL:'http://192.168.31.95:8001',
-    timeout:3000,
+    baseURL: 'http://localhost:3000',
+    timeout: 3000,
     // 请求头
     /* headers:{} */
 })
@@ -17,7 +17,7 @@ requests.interceptors.request.use(config => {
     // 请求带token
     let res = window.localStorage.getItem('user')
     let token = ''
-    if(res!=null||res!=''){
+    if (res != null && res != '') {
         token = JSON.parse(window.localStorage.getItem('user')).token
     }
     config.headers.token = token
@@ -28,10 +28,8 @@ requests.interceptors.request.use(config => {
 requests.interceptors.response.use((res) => {
     //成功的回调函数
     nprogress.done()
- 
-            return res.data
-    
-},() => {
+    return res.data
+}, () => {
     //失败的回调函数
     nprogress.done()
     return Promise.reject('服务器出错，请联系管理员')

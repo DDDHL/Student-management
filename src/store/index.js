@@ -4,9 +4,12 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-      aside:[{name:'主页'}]
+    currentPathName:''
   },
   mutations: {
+    setPath (state) {
+      state.currentPathName = sessionStorage.getItem('RouteName')
+    }
   },
   actions: {
   },

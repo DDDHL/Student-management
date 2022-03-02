@@ -1,18 +1,18 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-
+import store from '../store';
 Vue.use(VueRouter)
 
 const routes = [
     {
         path:'/',
         redirect:'/login',
-        meta:{title:"系统登录页"}
+        name:'系统登录页'
     },
     {
         path:'/login',
         component:()=>import('../pages/Login'),
-        meta:{title:"系统登录页"}
+        name:'系统登录'
     },
     {
         path: '*',
@@ -72,6 +72,8 @@ setRoutes()
 router.beforeEach((to,from,next)=>{
     // 路由守卫
     // 修改组件标题
+    sessionStorage.setItem('RouteName',to.name)
+    store.commit('setPath')
     document.title = to.name
     next();
 })
