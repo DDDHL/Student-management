@@ -1,16 +1,15 @@
 <template>
-    <div>
-        <h1>我是休假组件</h1>
-    </div>
+  <div>
+      <h1>404</h1>
+  </div>
 </template>
 
 <script>
 export default {
-    name:'Vacation',
+    name:'NotFound',
     created(){
       console.log(this.$router.options)
     }
-    
 }
 </script>
 

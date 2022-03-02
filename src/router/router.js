@@ -1,7 +1,7 @@
-/* import Vue from 'vue' */
+import Vue from 'vue'
 import VueRouter from 'vue-router'
 
-/* Vue.use(VueRouter) */
+Vue.use(VueRouter)
 
 const routes = [
     {
@@ -14,28 +14,32 @@ const routes = [
         component:()=>import('../pages/Login'),
         meta:{title:"系统登录页"}
     },
-    /* {
+    {
         path: '*',
         name: '404',
-        component: () => import('../views/404'),
-    }, */
+        component: () => import('../pages/404'),
+    }
 ]
 
 const router = new VueRouter({
+    mode: 'history',
+    base: process.env.BASE_URL,
     routes
 })
 
-export const setRoutes = (storeMenus) => {
+export const setRoutes = () => {
+    const storeMenus = localStorage.getItem('menus')
     if (storeMenus) {
         const manageRoute = {
             path:'/index',
             component:()=>import('../pages/Index'),
             redirect:'/welcome',
             meta:{title:"后台管理系统"},
+            name:'index',
             children: []
         }
-        /* const menus = JSON.parse(storeMenus) */
-        storeMenus.forEach(item => {
+        const menus = JSON.parse(storeMenus)
+        menus.forEach(item => {
             if (item.path) {
                 let itemMenu = {
                     path: item.path,
@@ -57,7 +61,7 @@ export const setRoutes = (storeMenus) => {
             }
         })
         const currentRouteNames = router.getRoutes().map(v => v.name)
-        if (!currentRouteNames.includes(('index'))) {
+        if (!currentRouteNames.includes(('系统主页'))) {
             router.addRoute(manageRoute)
         }
     }

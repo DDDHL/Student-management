@@ -41,7 +41,9 @@ Vue.use(DropdownMenu)
 Vue.use(DropdownItem)
 
 // 修改用户信息弹窗
-import {Dialog,Select,Option} from 'element-ui'
+import {Dialog,Select,Option,TabPane,Tabs} from 'element-ui'
 Vue.use(Dialog)
 Vue.use(Select)
 Vue.use(Option)
+Vue.use(TabPane)
+Vue.use(Tabs)

@@ -15,7 +15,7 @@ const requests = axios.create({
 requests.interceptors.request.use(config => {
     nprogress.start()
     // 请求带token
-    /* config.headers.Authorization = window.sessionStorage.getItem('token') */
+    config.headers.Authorization = window.localStorage.getItem('token')
     return config
 })
 

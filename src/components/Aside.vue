@@ -27,9 +27,11 @@
       <fragment v-for="item in menus" :key="item.id">
         <!-- 遍历生成一级菜单 -->
         <fragment v-if="item.path">
-          <el-menu-item :index="item.path" >
+          <el-menu-item :index="item.path">
             <i :class="item.icon"></i>
-            <span slot="title" style="padding-right:5px">{{ item.menuName }}</span>
+            <span slot="title" style="padding-right: 5px">{{
+              item.menuName
+            }}</span>
           </el-menu-item>
         </fragment>
         <!-- 遍历生成二级菜单 -->
@@ -37,7 +39,9 @@
           <el-submenu :index="item.id + ''">
             <template slot="title">
               <i :class="item.icon"></i>
-              <span slot="title" style="padding-right:5px">{{ item.menuName }}</span>
+              <span slot="title" style="padding-right: 5px">{{
+                item.menuName
+              }}</span>
             </template>
             <fragment v-for="subItem in item.children" :key="subItem.id">
               <el-menu-item :index="subItem.path">
@@ -55,27 +59,18 @@
 </template>
 
 <script>
-import { navList } from "../api";
-import { getMenus } from "../api";
 import "animate.css";
 export default {
   name: "Aside",
   props: ["isCollapse"],
   data() {
     return {
-      navList: {},
       menus: {},
     };
   },
-  async created() {
+  created() {
     /* 遍历左侧导航 */
-    try {
-      this.navList = await navList();
-      this.menus = await getMenus();
-      console.log(this.menus);
-    } catch {
-      console.log("侧边栏访问数据失败");
-    }
+    this.menus = JSON.parse(localStorage.getItem("menus"));
   },
 };
 </script>
@@ -120,7 +115,7 @@ export default {
   display: none !important;
 }
 /* 二级菜单缩进 */
-.el-submenu .el-menu-item{
-  padding-right:15px;
+.el-submenu .el-menu-item {
+  padding-right: 15px;
 }
 </style>

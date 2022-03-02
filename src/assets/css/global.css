@@ -8,10 +8,10 @@ body,
 }
 
 /* 面包屑 */
-.el-breadcrumb {
+/* .el-breadcrumb {
     font-size: 15px;
     margin-bottom: 20px;
-}
+} */
 
 /* 学生组件Table */
 .el-table {

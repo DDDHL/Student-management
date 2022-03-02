@@ -12,7 +12,7 @@
           <el-header>
             <el-row :gutter="20">
               <!-- 折叠展开按钮 -->
-              <el-col :span="4">
+              <el-col :span="2">
                 <div style="font-size: 28px; padding-top: 10px">
                   <span
                     style="cursor: pointer"
@@ -21,9 +21,19 @@
                   ></span>
                 </div>
               </el-col>
-              <el-col :span="12"
-                ><div class="grid-content bg-purple"></div
-              ></el-col>
+              <el-col :span="14"
+                ><div class="grid-content">
+                  <el-breadcrumb
+                    separator-class="el-icon-arrow-right"
+                    style="padding-top: 21px; font-size: 16px"
+                  >
+                    <el-breadcrumb-item :to="{ path: '/' }"
+                      >首页</el-breadcrumb-item
+                    >
+                    <el-breadcrumb-item>活动管理</el-breadcrumb-item>
+                  </el-breadcrumb>
+                </div></el-col
+              >
               <!-- 右上角用户区域 -->
               <el-col :span="8"
                 ><div class="grid-content bg-purple header-right userInfo">
@@ -43,21 +53,122 @@
             </el-row>
           </el-header>
           <!-- 修改用户信息弹窗 -->
-          <el-dialog title="修改个人信息" :visible.sync="dialogFormVisible">
-            <el-form :model="form">
-              <el-form-item label="活动名称" :label-width="formLabelWidth">
-                <el-input v-model="form.name" autocomplete="off"></el-input>
-              </el-form-item>
-              <el-form-item label="活动区域" :label-width="formLabelWidth">
-                <el-select v-model="form.region" placeholder="请选择活动区域">
-                  <el-option label="区域一" value="shanghai"></el-option>
-                  <el-option label="区域二" value="beijing"></el-option>
-                </el-select>
-              </el-form-item>
-            </el-form>
+          <el-dialog
+            title="修改个人信息"
+            :visible.sync="dialogFormVisible"
+            center
+            width="450px"
+          >
+            <el-tabs
+              v-model="activeName"
+              type="card"
+              @tab-click="handleClick"
+              style="margin-left: 0"
+            >
+              <el-tab-pane label="基本信息" name="first">
+                <!-- 基本信息修改 -->
+                <el-form
+                  :model="dynamicValidateForm"
+                  ref="dynamicValidateForm"
+                  label-width="100px"
+                  class="demo-dynamic"
+                  style="margin: 20px 0 0 -43px"
+                >
+                  <el-form-item label="姓名">
+                    <el-input
+                      v-model="dynamicValidateForm.nickName"
+                      :disabled="true"
+                    ></el-input>
+                  </el-form-item>
+                  <el-form-item label="工号">
+                    <el-input
+                      v-model="dynamicValidateForm.nickName"
+                      :disabled="true"
+                    ></el-input>
+                  </el-form-item>
+                  <el-form-item label="院系">
+                    <el-input
+                      v-model="dynamicValidateForm.nickName"
+                      :disabled="true"
+                    ></el-input>
+                  </el-form-item>
+                  <el-form-item label="性别">
+                    <el-input
+                      v-model="dynamicValidateForm.nickName"
+                      :disabled="true"
+                    ></el-input>
+                  </el-form-item>
+                  <el-form-item
+                    prop="email"
+                    label="手机号"
+                    :rules="[
+                      {
+                        required: true,
+                        message: '邮箱地址不能为空',
+                        trigger: 'blur',
+                      },
+                      {
+                        type: 'email',
+                        message: '请输入正确的邮箱地址',
+                        trigger: ['blur', 'change'],
+                      },
+                    ]"
+                  >
+                    <el-input v-model="dynamicValidateForm.email"></el-input>
+                  </el-form-item>
+                  <el-form-item
+                    prop="email"
+                    label="邮箱"
+                    :rules="[
+                      {
+                        required: true,
+                        message: '邮箱地址不能为空',
+                        trigger: 'blur',
+                      },
+                      {
+                        type: 'email',
+                        message: '请输入正确的邮箱地址',
+                        trigger: ['blur', 'change'],
+                      },
+                    ]"
+                  >
+                    <el-input v-model="dynamicValidateForm.email"></el-input>
+                  </el-form-item>
+                </el-form>
+              </el-tab-pane>
+              <el-tab-pane label="修改密码" name="second">
+                <!-- 密码修改 -->
+                <el-form
+                  :model="ruleForm"
+                  status-icon
+                  :rules="rules"
+                  ref="ruleForm"
+                  label-width="100px"
+                  class="demo-ruleForm"
+                  style="margin: 20px 0 0 -30px"
+                >
+                  <el-form-item label="密码" prop="pass">
+                    <el-input
+                      type="password"
+                      v-model="ruleForm.pass"
+                      autocomplete="off"
+                    ></el-input>
+                  </el-form-item>
+                  <el-form-item label="确认密码" prop="checkPass">
+                    <el-input
+                      type="password"
+                      v-model="ruleForm.checkPass"
+                      autocomplete="off"
+                    ></el-input>
+                  </el-form-item>
+                </el-form>
+              </el-tab-pane>
+            </el-tabs>
             <div slot="footer" class="dialog-footer">
               <el-button @click="dialogFormVisible = false">取 消</el-button>
-              <el-button type="primary" @click="dialogFormVisible = false"
+              <el-button
+                type="primary"
+                @click="submitForm(tab ? 'ruleForm' : 'dynamicValidateForm')"
                 >确 定</el-button
               >
             </div>
@@ -70,9 +181,7 @@
               leave-active-class="animate__fadeInDown"
             >
               <!-- 组件插入区 -->
-              <keep-alive>
-                <router-view></router-view>
-              </keep-alive>
+              <router-view></router-view>
             </transition>
           </el-main>
           <!-- 主体底部 -->
@@ -99,20 +208,47 @@ import "animate.css";
 export default {
   name: "Index",
   data() {
+    /* 密码校验规则 */
+    var validatePass = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请输入密码"));
+      } else {
+        if (this.ruleForm.checkPass !== "") {
+          this.$refs.ruleForm.validateField("checkPass");
+        }
+        callback();
+      }
+    };
+    var validatePass2 = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请再次输入密码"));
+      } else if (value !== this.ruleForm.pass) {
+        callback(new Error("两次输入密码不一致!"));
+      } else {
+        callback();
+      }
+    };
     return {
       /* 用户信息弹窗 */
-      dialogFormVisible: false,
-      form: {
-        name: "",
-        region: "",
-        date1: "",
-        date2: "",
-        delivery: false,
-        type: [],
-        resource: "",
-        desc: "",
+      /* 基本信息 */
+      dynamicValidateForm: {
+        nickName: "里河东",
+        email: "2293725360@qq.com",
+        number: 123456789,
       },
+      /* 密码 */
+      ruleForm: {
+        pass: "",
+        checkPass: "",
+      },
+      rules: {
+        pass: [{ validator: validatePass, trigger: "blur" }],
+        checkPass: [{ validator: validatePass2, trigger: "blur" }],
+      },
+      activeName: "first",
+      dialogFormVisible: false,
       formLabelWidth: "120px",
+      tab: false,
       /* 响应式 */
       isCollapse: false,
       screenWidth: 1,
@@ -160,6 +296,26 @@ export default {
   },
   components: { Aside },
   methods: {
+    // 修改密码
+    submitForm(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          alert("submit!");
+          this.dialogFormVisible = false;
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
+    },
+    // 修改用户信息标签页
+    handleClick(tab) {
+      if (tab.index == 1) {
+        this.tab = true;
+      } else {
+        this.tab = false;
+      }
+    },
     // 防抖更改echarts和aside
     Resize: Debounce(function () {
       this.screenWidth = document.body.clientWidth;
@@ -172,9 +328,6 @@ export default {
 
     // 右上角用户信息
     user(index) {
-      if (index == "myInfo") {
-        console.log("123");
-      }
       if (index == "logout") {
         this.$Message({
           message: "退出登录成功！",
@@ -241,5 +394,10 @@ export default {
 }
 .userInfo {
   justify-content: end;
+}
+/* 修改个人信息标签 */
+.el-tabs__nav-scroll {
+  display: flex;
+  justify-content: center;
 }
 </style>

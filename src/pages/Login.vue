@@ -62,8 +62,8 @@
 /* 登录接口 */
 /* import { login } from "../api"; */
 /* 路由接口 */
-/* import { setRoutes } from "../router/router"
-import { getMenus } from "../api" */
+import { setRoutes } from "../router/router"
+import { getMenus } from "../api"
 export default {
   name: "Login",
   data() {
@@ -144,7 +144,9 @@ export default {
 
       this.$refs.form.validate( async (valid) => {
         if (valid) {
-          //setRoutes(await getMenus())
+          let menus = await getMenus()
+          localStorage.setItem('menus',JSON.stringify(menus))
+          setRoutes()
           this.$router.push("/index");
         }
       });

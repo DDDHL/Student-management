@@ -1,10 +1,10 @@
 <template>
   <div>
     <!-- 面包屑导航 -->
-    <el-breadcrumb separator-class="el-icon-arrow-right">
+    <!-- <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/welcome' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>学生管理</el-breadcrumb-item>
-    </el-breadcrumb>
+    </el-breadcrumb> -->
 
     <el-card>
       <!-- 搜索 -->
@@ -57,7 +57,7 @@
 /* 获取学生列表接口 */
 import { students } from "../api";
 export default {
-  name: "Student",
+  name: "Students",
   data() {
     return {
       students: [],
