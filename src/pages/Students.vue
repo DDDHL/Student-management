@@ -2,7 +2,6 @@
   <div>
     <el-card>
       <!-- 搜索 -->
-
       <el-input
         placeholder="请输入内容"
         v-model="query"
@@ -191,10 +190,6 @@ export default {
     handleCurrentChange(num) {
       this.queryInfo.pagenum = num;
       // 请求当前页
-    },
-    // 查看单条
-    handleClick(row) {
-      console.log(row);
     },
   },
 };

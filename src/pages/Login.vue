@@ -10,7 +10,6 @@
         </div>
       </div>
       <div class="tit">休假管理系统</div>
-
       <el-form :rules="rules" :model="info" ref="form">
         <el-form-item prop="account">
           <el-input
@@ -58,109 +57,108 @@
 
 <script>
 /* 加密 */
-import { Encrypt } from "../utils/secret";
+import { Encrypt } from '../utils/secret'
 /* 登录接口 */
-import { login, isLogin } from "../api";
+import { login, isLogin } from '../api'
 /* 路由接口 */
 /* import { setRoutes } from "../router/router";
 import { getMenus } from "../api"; */
 export default {
-  name: "Login",
+  name: 'Login',
   data() {
     return {
-      className: "",
+      className: '',
       info: {
-        account: "",
-        pwd: "",
+        account: '',
+        pwd: '',
         rememberMe: false,
       },
       rules: {
         account: [
-          { required: true, message: "请输入账号", trigger: "blur" },
+          { required: true, message: '请输入账号', trigger: 'blur' },
           {
             min: 6,
             max: 15,
-            message: "长度在 6 到 15 个字符",
-            trigger: "blur",
+            message: '长度在 6 到 15 个字符',
+            trigger: 'blur',
           },
         ],
         pwd: [
-          { required: true, message: "请输入密码", trigger: "blur" },
+          { required: true, message: '请输入密码', trigger: 'blur' },
           {
             min: 6,
             max: 15,
-            message: "长度在 6 到 15 个字符",
-            trigger: "blur",
+            message: '长度在 6 到 15 个字符',
+            trigger: 'blur',
           },
         ],
       },
-    };
+    }
   },
   async created() {
-    let res = localStorage.getItem("user");
-    if (res != null && res != "") {
-      let loginData = await isLogin();
-      if (loginData.code == "") {
-        this.$router.push("/index");
+    let res = localStorage.getItem('user')
+    if (res != null && res != '') {
+      let loginData = await isLogin()
+      if (loginData.code == '') {
+        this.$router.push('/index')
       }
     }
   },
   methods: {
     // 点击密码框动画
     focus() {
-      this.className = "password";
+      this.className = 'password'
     },
     // 关闭密码框动画
     blur() {
-      this.className = "";
+      this.className = ''
     },
     // 登录
     login() {
       this.$refs.form.validate(async (valid) => {
         if (valid) {
-          let password = Encrypt(this.info.pwd);
+          let password = Encrypt(this.info.pwd)
           try {
             // 请求登录
-            let res = await login(this.info, password);
+            let res = await login(this.info, password)
             // 判断登录是否成功
-            if (res.code === "") {
+            if (res.code === '') {
               this.$Message({
                 message: `${res.message}`,
-                type: "success",
+                type: 'success',
                 center: true,
-              });
+              })
               let user = {
                 avatarUrl: res.data.avatarUrl,
                 nickName: res.data.nickName,
                 token: res.data.token,
-              };
-              localStorage.setItem("user", JSON.stringify(user));
+              }
+              localStorage.setItem('user', JSON.stringify(user))
               setTimeout(() => {
                 // 成功后跳转，并保存侧边栏和登录信息
                 // let menus = await getMenus();
                 // localStorage.setItem("menus", JSON.stringify(menus));
                 // setRoutes();
-                this.$router.push("/index");
-                console.log(res);
-              }, 1000);
+                this.$router.push('/index')
+              }, 1000)
             } else {
               // 登录失败后显示
               this.$Message({
                 message: `${res.message}`,
-                type: "error",
+                type: 'error',
                 center: true,
-              });
+              })
             }
           } catch (error) {
             // 登录请求失败
             this.$Message({
               message: error,
-              type: "error",
+              type: 'error',
               center: true,
-            });
+            })
           }
         }
-      });
+      })
 
       /*  this.$refs.form.validate( async (valid) => {
         if (valid) {
@@ -172,7 +170,7 @@ export default {
       }); */
     },
   },
-};
+}
 </script>
 
 <style src="../assets/css/login.css" scoped></style>

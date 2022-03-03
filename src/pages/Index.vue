@@ -13,16 +13,23 @@
             <el-row :gutter="20">
               <!-- 折叠展开按钮 -->
               <el-col :span="11">
-                <div style="font-size: 28px; padding-top: 15px; display: flex;align-items:center">
+                <div
+                  style="
+                    font-size: 28px;
+                    padding-top: 15px;
+                    display: flex;
+                    align-items: center;
+                  "
+                >
                   <div
-                    style="cursor: pointer;"
+                    style="cursor: pointer"
                     @click="closeNav"
                     :class="isCollapse ? 'el-icon-s-unfold' : 'el-icon-s-fold'"
                   ></div>
                   <!-- 面包屑 -->
                   <el-breadcrumb
                     separator-class="el-icon-arrow-right"
-                    style="padding-left:8px;font-size: 16px;"
+                    style="padding-left: 8px; font-size: 16px"
                   >
                     <el-breadcrumb-item :to="{ path: '/welcome' }"
                       >首页</el-breadcrumb-item
@@ -81,7 +88,7 @@
                 <el-upload
                   style="text-align: center"
                   class="avatar-uploader"
-                  action="https://jsonplaceholder.typicode.com/posts/"
+                  action="http://113.78.180.19:9568/file/upload"
                   :show-file-list="false"
                   :on-success="handleAvatarSuccess"
                   :before-upload="beforeAvatarUpload"
@@ -226,7 +233,7 @@
 
 <script>
 /* API */
-import { getMyInfo } from "../api";
+import { getMyInfo, changeUserInfo, changPwd } from "../api";
 
 /* 监视元素插件 */
 let elementResizeDetectorMaker = require("element-resize-detector");
@@ -237,8 +244,10 @@ import { resize } from "../echarts/online";
 import { Debounce } from "../utils/common";
 
 /* 左下角模型 */
-/* import "../assets/js/model"; */
+import "../assets/js/model";
 
+/* 加密 */
+import { Encrypt } from "../utils/secret"
 /* 组件 */
 import Aside from "../components/Aside.vue";
 import Footer from "../components/Footer.vue";
@@ -390,27 +399,86 @@ export default {
       const isLt2M = file.size / 1024 / 1024 < 2;
 
       if (!isJPG) {
-        this.$message.error("上传头像图片只能是 JPG 格式!");
+        this.$Message({
+          message: "上传头像图片只能是 JPG 格式!",
+          type: 'error',
+          center: true,
+        })
       }
       if (!isLt2M) {
-        this.$message.error("上传头像图片大小不能超过 2MB!");
+        this.$Message({
+          message: "上传头像图片大小不能超过 2MB!",
+          type: 'error',
+          center: true,
+        })
       }
       return isJPG && isLt2M;
     },
     // 修改密码或个人信息
     submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
+      this.$refs[formName].validate(async (valid) => {
         if (valid) {
           // 验证通过
           if (formName == "ruleForm") {
             // 修改密码请求
-            console.log("修改密码");
+            try {
+              let newPass = Encrypt(this.ruleForm.pass)
+              let oldPass = Encrypt(this.ruleForm.OldPass)
+              let res = await changPwd(newPass, oldPass)
+              if (res.code) {
+                this.$Message({
+                  message: res.message,
+                  type: 'error',
+                  center: true,
+                })
+              } else {
+                this.$Message({
+                  message: res.message,
+                  type: 'success',
+                  center: true,
+                })
+                this.dialogFormVisible = false;
+                // 成功后清除用户信息退出登录
+                localStorage.removeItem('user')
+                /* localStorage.removeItem('menus') */
+                this.$router.push('/login')
+              }
+            } catch (error) {
+              this.$Message({
+                message: error,
+                type: 'error',
+                center: true,
+              })
+            }
           } else {
             // 修改个人信息
-            console.log(321);
+            try {
+              let res = await changeUserInfo(this.dynamicValidateForm)
+              if (res.code) {
+                this.$Message({
+                  message: res.message,
+                  type: 'error',
+                  center: true,
+                })
+              } else {
+                this.$Message({
+                  message: res.message,
+                  type: 'success',
+                  center: true,
+                })
+                this.dialogFormVisible = false;
+                // 成功后重新获取用户信息
+                this.user("myInfo");
+              }
+            } catch (error) {
+              this.$Message({
+                message: error,
+                type: 'error',
+                center: true,
+              })
+            }
           }
-          /*  alert("submit!");
-          this.dialogFormVisible = false; */
+          /* this.dialogFormVisible = false; */
         } else {
           console.log("表单验证不通过");
           return false;
