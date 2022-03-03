@@ -140,7 +140,7 @@ export default {
                 // localStorage.setItem("menus", JSON.stringify(menus));
                 // setRoutes();
                 this.$router.push('/index')
-              }, 1000)
+              }, 700)
             } else {
               // 登录失败后显示
               this.$Message({
