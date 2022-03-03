@@ -61,8 +61,7 @@ import { Encrypt } from '../utils/secret'
 /* 登录接口 */
 import { login, isLogin } from '../api'
 /* 路由接口 */
-/* import { setRoutes } from "../router/router";
-import { getMenus } from "../api"; */
+import { setRoutes } from "../router/router";
 export default {
   name: 'Login',
   data() {
@@ -98,10 +97,16 @@ export default {
   async created() {
     let res = localStorage.getItem('user')
     if (res != null && res != '') {
-      let loginData = await isLogin()
-      if (loginData.code == '') {
-        this.$router.push('/index')
+      try {
+        let loginData = await isLogin()
+        console.log(loginData);
+        if (!loginData.code) {
+          this.$router.push('/index')
+        }
+      } catch (error) {
+        this.$Message.error(error)
       }
+
     }
   },
   methods: {
@@ -123,39 +128,27 @@ export default {
             let res = await login(this.info, password)
             // 判断登录是否成功
             if (res.code === '') {
-              this.$Message({
-                message: `${res.message}`,
-                type: 'success',
-                center: true,
-              })
+              this.$Message.success(res.message)
               let user = {
                 avatarUrl: res.data.avatarUrl,
                 nickName: res.data.nickName,
                 token: res.data.token,
               }
+              console.log(res);
               localStorage.setItem('user', JSON.stringify(user))
+              localStorage.setItem("menus", JSON.stringify(res.data.menus));
+              setRoutes();
               setTimeout(() => {
-                // 成功后跳转，并保存侧边栏和登录信息
-                // let menus = await getMenus();
-                // localStorage.setItem("menus", JSON.stringify(menus));
-                // setRoutes();
+                // 成功后跳转
                 this.$router.push('/index')
               }, 700)
             } else {
               // 登录失败后显示
-              this.$Message({
-                message: `${res.message}`,
-                type: 'error',
-                center: true,
-              })
+              this.$Message.error(res.message)
             }
           } catch (error) {
             // 登录请求失败
-            this.$Message({
-              message: error,
-              type: 'error',
-              center: true,
-            })
+            this.$Message.error(error)
           }
         }
       })

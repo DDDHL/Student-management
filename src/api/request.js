@@ -6,6 +6,7 @@ import 'nprogress/nprogress.css'
 const requests = axios.create({
   // 基础路径
   baseURL: 'http://113.78.180.19:9568',
+  // baseURL: 'http://localhost:8080',
   timeout: 3000,
   // 请求头
   /* headers:{} */

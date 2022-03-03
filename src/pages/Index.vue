@@ -372,20 +372,23 @@ export default {
         // 防抖修改侧边栏
         this.Resize();
         // 直接修改echarts
-        resize();
+        if (this.$store.state.currentPathName == '系统主页') {
+          resize();
+        }
       },
       false
     );
-    // 监听侧边栏动画结束，重新绘制echarts
-    let erd = elementResizeDetectorMaker();
-    let that = this;
-    erd.listenTo(document.querySelector("Aside"), function () {
-      console.log("监听");
-      that.$nextTick(function () {
-        //使echarts尺寸重置
-        resize();
+    if (this.$store.state.currentPathName == '系统主页') {
+      // 监听侧边栏动画结束，重新绘制echarts
+      let erd = elementResizeDetectorMaker();
+      let that = this;
+      erd.listenTo(document.querySelector("Aside"), function () {
+        that.$nextTick(function () {
+          //使echarts尺寸重置
+          resize();
+        });
       });
-    });
+    }
   },
   components: { Aside, Footer },
   methods: {
@@ -397,20 +400,11 @@ export default {
     beforeAvatarUpload(file) {
       const isJPG = file.type === "image/jpeg";
       const isLt2M = file.size / 1024 / 1024 < 2;
-
       if (!isJPG) {
-        this.$Message({
-          message: "上传头像图片只能是 JPG 格式!",
-          type: 'error',
-          center: true,
-        })
+        this.$Message.error("上传头像图片只能是 JPG 格式!")
       }
       if (!isLt2M) {
-        this.$Message({
-          message: "上传头像图片大小不能超过 2MB!",
-          type: 'error',
-          center: true,
-        })
+        this.$Message.error("上传头像图片大小不能超过 2MB!")
       }
       return isJPG && isLt2M;
     },
@@ -426,17 +420,9 @@ export default {
               let oldPass = Encrypt(this.ruleForm.OldPass)
               let res = await changPwd(newPass, oldPass)
               if (res.code) {
-                this.$Message({
-                  message: res.message,
-                  type: 'error',
-                  center: true,
-                })
+                this.$Message.error(res.message)
               } else {
-                this.$Message({
-                  message: res.message,
-                  type: 'success',
-                  center: true,
-                })
+                this.$Message.success(res.message)
                 this.dialogFormVisible = false;
                 // 成功后清除用户信息退出登录
                 localStorage.removeItem('user')
@@ -444,41 +430,24 @@ export default {
                 this.$router.push('/login')
               }
             } catch (error) {
-              this.$Message({
-                message: error,
-                type: 'error',
-                center: true,
-              })
+              this.$Message.error(error)
             }
           } else {
             // 修改个人信息
             try {
               let res = await changeUserInfo(this.dynamicValidateForm)
               if (res.code) {
-                this.$Message({
-                  message: res.message,
-                  type: 'error',
-                  center: true,
-                })
+                this.$Message.success(res.message)
               } else {
-                this.$Message({
-                  message: res.message,
-                  type: 'success',
-                  center: true,
-                })
+                this.$Message.success(res.message)
                 this.dialogFormVisible = false;
                 // 成功后重新获取用户信息
                 this.user("myInfo");
               }
             } catch (error) {
-              this.$Message({
-                message: error,
-                type: 'error',
-                center: true,
-              })
+              this.$Message.error(error)
             }
           }
-          /* this.dialogFormVisible = false; */
         } else {
           console.log("表单验证不通过");
           return false;
@@ -508,27 +477,25 @@ export default {
       if (index == "myInfo") {
         try {
           let res = await getMyInfo();
-          if (res.code == "") {
+          if (res) {
             // 赋值
             this.dynamicValidateForm = res.data;
+          } else {
+            this.$Message.error('您的登录信息已过期,请重新登录')
+            localStorage.removeItem('user')
+            this.$router.push('/login')
           }
         } catch (error) {
-          this.$Message({
-            message: error,
-            type: "error",
-            center: true,
-          });
+          this.$Message.error(error)
         }
       }
       if (index == "logout") {
-        this.$Message({
-          message: "退出登录成功！",
-          type: "success",
-          center: true,
-        });
+        this.$Message.success('退出登录成功')
+        localStorage.removeItem('user')
+        localStorage.removeItem('menus')
         setTimeout(() => {
           this.$router.push("/login");
-        }, 1000);
+        }, 500);
       }
     },
   },

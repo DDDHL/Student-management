@@ -9,6 +9,15 @@ export const Test = () => {
     data: { userAccount: 123456, password: 123456 },
   })
 }
+// 获取菜单信息接口
+export const getAllMenus = (data) => {
+  return requests({
+    url: '/menu/getAll',
+    method: 'POST',
+    data: data,
+  })
+}
+// 获取
 // 验证是否登录
 export const isLogin = () => {
   return requests({
@@ -17,7 +26,15 @@ export const isLogin = () => {
   })
 }
 // 学生管理获取列表
-export const getAll = () => {
+export const getAll = (data) => {
+  return requests({
+    url: '/user/getAll',
+    method: 'POST',
+    data: data,
+  })
+}
+// 测试用户列表
+export const getAlll = () => {
   return requests({
     url: '/getAll',
     method: 'GET',
@@ -57,21 +74,6 @@ export const login = (query, pwd) => {
       password: pwd,
       rememberMe: query.rememberMe,
     },
-  })
-}
-
-export const Test1 = () => {
-  return requests({
-    url: '/hello',
-    method: 'POST',
-  })
-}
-
-// 主页侧边栏接口
-export const navList = () => {
-  return requests({
-    url: '/navList',
-    method: 'GET',
   })
 }
 

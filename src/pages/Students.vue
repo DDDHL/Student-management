@@ -3,11 +3,12 @@
     <el-card>
       <!-- 搜索 -->
       <el-input
-        placeholder="请输入内容"
+        placeholder="搜索工号或者名字"
         v-model="query"
         clearable
-        @clear="getData"
+        @clear="clearSearch"
         style="width: 350px"
+        @blur="blurSearch"
       >
         <el-button
           slot="append"
@@ -15,21 +16,59 @@
           @click="find"
         ></el-button>
       </el-input>
-
-      <el-button type="primary" style="margin: 20px 0 0 20px"
+      <!-- 添加用户 -->
+      <el-button
+        type="primary"
+        style="margin: 20px 0 0 20px"
+        @click="centerDialogVisibleAdd = true"
         >添加用户</el-button
       >
-      <el-button type="primary" style="margin: 20px 0 0 20px"
+      <!-- 添加用户弹窗 -->
+      <el-dialog
+        title="提示"
+        :visible.sync="centerDialogVisibleAdd"
+        width="30%"
+        center
+      >
+        <!-- 添加用户表单 -->
+
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="centerDialogVisibleAdd = false">取 消</el-button>
+          <el-button type="primary" @click="centerDialogVisibleAdd = false"
+            >确 定</el-button
+          >
+        </span>
+      </el-dialog>
+
+      <!-- 删除用户 -->
+      <el-button
+        type="primary"
+        style="margin: 20px 0 0 20px"
+        @click="centerDialogVisibleDec = true"
         >删除用户</el-button
       >
-
+      <!-- 删除用户弹窗 -->
+      <el-dialog
+        title="提示"
+        :visible.sync="centerDialogVisibleDec"
+        width="30%"
+        center
+      >
+        <span>删除用户</span>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="centerDialogVisibleDec = false">取 消</el-button>
+          <el-button type="primary" @click="centerDialogVisibleDec = false"
+            >确 定</el-button
+          >
+        </span>
+      </el-dialog>
       <!-- 表格 -->
       <el-table
         :data="tableData"
         border
         style="width: 100%"
         stripe
-        ref="filterTable"
+        @filter-change="filterChange"
       >
         <el-table-column fixed type="selection" width="50" align="center">
         </el-table-column>
@@ -64,16 +103,14 @@
           prop="grade"
           label="年级"
           width="150"
-          :filters="gradeData"
-          :filter-method="filterHandlerGrade"
         ></el-table-column>
         <el-table-column
           prop="major"
           label="专业"
           width="150"
-          :filters="majorData"
           align="center"
-          :filter-method="filterHandlerMajor"
+          :filters="majorData"
+          column-key="filterTag"
         >
         </el-table-column>
         <el-table-column prop="phone" label="手机号" width="150" align="center">
@@ -102,7 +139,7 @@
         :page-sizes="[1, 2, 5, 10]"
         :page-size="queryInfo.pageSize"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="tableData.length"
+        :total="total"
       >
       </el-pagination>
     </el-card>
@@ -111,89 +148,109 @@
 
 <script>
 /* 获取学生列表接口 */
-import { getAll } from "../api";
+import { getAll } from '../api'
 export default {
-  name: "Students",
+  name: 'Students',
   data() {
     return {
-      /* 年级筛选 */
-      gradeData: [
-        { text: "2018", value: "2018" },
-        { text: "2019", value: "2019" },
-        { text: "2020", value: "2020" },
-        { text: "2021", value: "2021" },
-      ],
-      /* 专业筛选 */
+      // 删除和增加用户弹窗
+      centerDialogVisibleDec: false,
+      centerDialogVisibleAdd: false,
+      // 专业筛选
       majorData: [
-        { text: "软件工程", value: "软件工程" },
-        { text: "树莓", value: "树莓" },
-        { text: "英专", value: "英专" },
+        { text: '软件工程', value: '软件工程' },
+        { text: '树莓', value: '树莓' },
+        { text: '计算机科学与技术', value: '计算机科学与技术' },
       ],
-      /* 表格数据 */
+      // 表格数据
+      total: 0,
       tableData: [],
       // 查询单条数据
-      query: "",
+      query: '',
       // 列表参数
       queryInfo: {
+        majors: [],
+        nickName: '',
         // 当前页
-        pagenum: 1,
+        pageNum: 1,
         // 一页展示多少条
-        pageSize: 1,
+        pageSize: 10,
+        userAccount: '',
       },
-    };
+    }
   },
   watch: {
-    "queryInfo.query"(newValue, oldValue) {
-      console.log(newValue, oldValue);
+    'queryInfo.query'(newValue, oldValue) {
+      console.log(newValue, oldValue)
     },
   },
   created() {
     /* 初始化获取数据 */
-    this.getData();
+    this.getData()
   },
   methods: {
     // 筛选专业
-    filterHandlerMajor(value, row, column) {
-      console.log(value);
-      console.log(row);
-      console.log(column);
-    },
-    // 筛选年级
-    filterHandlerGrade(value, row, column) {
-      console.log(value);
-      console.log(row);
-      console.log(column);
+    filterChange(obj) {
+      this.queryInfo.majors = obj.filterTag
+      this.getData()
     },
     // 查询单条
     find() {
-      console.log(this.query);
+      if (isNaN(this.query)) {
+        this.queryInfo.nickName = this.query.trim()
+        this.getData()
+      } else {
+        this.queryInfo.userAccount = this.query.trim()
+        this.getData()
+      }
+      this.queryInfo.nickName = ''
+      this.queryInfo.userAccount = ''
+    },
+    // 清空还原
+    clearSearch() {
+      this.queryInfo.nickName = ''
+      this.queryInfo.userAccount = ''
+      this.getData()
+    },
+    // 失焦查看是否还原
+    blurSearch() {
+      /* if (this.query == '') {
+        this.getData()
+      } */
+      console.log('失去焦点');
     },
     // 点击行
     handleClick(row) {
-      console.log(row);
+      console.log(row)
     },
     // 获取数据接口
     async getData() {
       try {
-        this.tableData = await getAll();
+        let res = await getAll(this.queryInfo)
+        if (!res.code) {
+          this.tableData = res.data.records
+          this.total = res.data.total
+        } else {
+          this.$Message.error(res.message)
+        }
+
       } catch {
-        this.$Message.error("获取用户列表失败！");
+        this.$Message.error('获取用户列表失败！')
       }
     },
     // 修改每条页多少条
     handleSizeChange(num) {
-      this.queryInfo.pageSize = num;
-      // 重新请求多少条
-      //this.getData();
+      this.queryInfo.pageSize = num
+      this.getData();
     },
-    // 当前页
+    // 修改当前页
     handleCurrentChange(num) {
-      this.queryInfo.pagenum = num;
-      // 请求当前页
+      this.queryInfo.pageNum = num
+      this.getData();
     },
+    // 减少和增加用户弹窗
   },
-};
+}
 </script>
 
-<style>
-</style>
+<style></style>
