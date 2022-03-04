@@ -1,233 +1,238 @@
 <template>
   <div id="app">
-    <el-container>
-      <el-container style="height: 100%">
-        <!-- 左侧导航栏 -->
-        <el-aside :width="isCollapse ? '64px' : '200px'">
-          <!-- 侧边栏菜单组件 -->
-          <Aside :isCollapse="isCollapse"></Aside>
-        </el-aside>
-        <el-container>
-          <!-- 头部 -->
-          <el-header>
-            <el-row :gutter="20">
-              <!-- 折叠展开按钮 -->
-              <el-col :span="11">
-                <div
-                  style="
-                    font-size: 28px;
-                    padding-top: 15px;
-                    display: flex;
-                    align-items: center;
-                  "
-                >
+    <Loading v-if="isLoading" />
+    <div id="app" v-show="!isLoading">
+      <el-container>
+        <el-container style="height: 100%">
+          <!-- 左侧导航栏 -->
+          <el-aside :width="isCollapse ? '64px' : '200px'">
+            <!-- 侧边栏菜单组件 -->
+            <Aside :isCollapse="isCollapse"></Aside>
+          </el-aside>
+          <el-container>
+            <!-- 头部 -->
+            <el-header>
+              <el-row :gutter="20">
+                <!-- 折叠展开按钮 -->
+                <el-col :span="11">
                   <div
-                    style="cursor: pointer"
-                    @click="closeNav"
-                    :class="isCollapse ? 'el-icon-s-unfold' : 'el-icon-s-fold'"
-                  ></div>
-                  <!-- 面包屑 -->
-                  <el-breadcrumb
-                    separator-class="el-icon-arrow-right"
-                    style="padding-left: 8px; font-size: 16px"
+                    style="
+                      font-size: 28px;
+                      padding-top: 15px;
+                      display: flex;
+                      align-items: center;
+                    "
                   >
-                    <el-breadcrumb-item :to="{ path: '/welcome' }"
-                      >首页</el-breadcrumb-item
+                    <div
+                      style="cursor: pointer"
+                      @click="closeNav"
+                      :class="
+                        isCollapse ? 'el-icon-s-unfold' : 'el-icon-s-fold'
+                      "
+                    ></div>
+                    <!-- 面包屑 -->
+                    <el-breadcrumb
+                      separator-class="el-icon-arrow-right"
+                      style="padding-left: 8px; font-size: 16px"
                     >
-                    <el-breadcrumb-item>{{
-                      currentPathName
-                    }}</el-breadcrumb-item>
-                  </el-breadcrumb>
-                </div>
-              </el-col>
-              <!-- 右上角用户区域 -->
-              <el-col :span="13"
-                ><div class="grid-content bg-purple header-right userInfo">
-                  <!-- 右上角头像 -->
-                  <div class="demo-type" style="height: 40px; width: 40px">
-                    <el-avatar :size="40">
-                      <img
-                        v-if="dynamicValidateForm.avatarUrl"
-                        :src="dynamicValidateForm.avatarUrl"
-                        alt=""
-                      />
-                    </el-avatar>
-                  </div>
-                  <el-menu mode="horizontal" @select="user">
-                    <el-submenu index="1">
-                      <template slot="title">{{
-                        dynamicValidateForm.nickName
-                      }}</template>
-                      <el-menu-item
-                        index="myInfo"
-                        @click="dialogFormVisible = true"
-                        >修改信息</el-menu-item
+                      <el-breadcrumb-item :to="{ path: '/welcome' }"
+                        >首页</el-breadcrumb-item
                       >
-                      <el-menu-item index="logout">退出登录</el-menu-item>
-                    </el-submenu>
-                  </el-menu>
-                </div></el-col
-              >
-            </el-row>
-          </el-header>
-          <!-- 修改用户信息弹窗 -->
-          <el-dialog
-            title="修改个人信息"
-            :visible.sync="dialogFormVisible"
-            center
-            width="450px"
-          >
-            <el-tabs
-              v-model="activeName"
-              type="card"
-              @tab-click="handleClick"
-              style="margin-left: 0"
+                      <el-breadcrumb-item>{{
+                        currentPathName
+                      }}</el-breadcrumb-item>
+                    </el-breadcrumb>
+                  </div>
+                </el-col>
+                <!-- 右上角用户区域 -->
+                <el-col :span="13"
+                  ><div class="grid-content bg-purple header-right userInfo">
+                    <!-- 右上角头像 -->
+                    <div class="demo-type" style="height: 40px; width: 40px">
+                      <el-avatar :size="40">
+                        <img
+                          v-if="dynamicValidateForm.avatarUrl"
+                          :src="dynamicValidateForm.avatarUrl"
+                          alt=""
+                        />
+                      </el-avatar>
+                    </div>
+                    <el-menu mode="horizontal" @select="user">
+                      <el-submenu index="1">
+                        <template slot="title">{{
+                          dynamicValidateForm.nickName
+                        }}</template>
+                        <el-menu-item
+                          index="myInfo"
+                          @click="dialogFormVisible = true"
+                          >修改信息</el-menu-item
+                        >
+                        <el-menu-item index="logout">退出登录</el-menu-item>
+                      </el-submenu>
+                    </el-menu>
+                  </div></el-col
+                >
+              </el-row>
+            </el-header>
+            <!-- 修改用户信息弹窗 -->
+            <el-dialog
+              title="修改个人信息"
+              :visible.sync="dialogFormVisible"
+              center
+              width="450px"
             >
-              <el-tab-pane label="基本信息" name="first">
-                <!-- 头像修改 -->
-                <el-upload
-                  style="text-align: center"
-                  class="avatar-uploader"
-                  action="http://113.78.180.19:9568/file/upload"
-                  :show-file-list="false"
-                  :on-success="handleAvatarSuccess"
-                  :before-upload="beforeAvatarUpload"
-                >
-                  <img
-                    v-if="dynamicValidateForm.avatarUrl"
-                    :src="dynamicValidateForm.avatarUrl"
-                    class="avatar"
-                  />
-                  <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                </el-upload>
-                <!-- 基本信息修改 -->
-                <el-form
-                  :rules="rules"
-                  :model="dynamicValidateForm"
-                  ref="dynamicValidateForm"
-                  label-width="100px"
-                  class="demo-dynamic"
-                  style="margin: 20px 0 0 -35px"
-                >
-                  <el-form-item label="姓名">
-                    <el-input
-                      v-model="dynamicValidateForm.nickName"
-                      :disabled="true"
-                    ></el-input>
-                  </el-form-item>
-                  <el-form-item label="工号">
-                    <el-input
-                      v-model="dynamicValidateForm.userAccount"
-                      :disabled="true"
-                    ></el-input>
-                  </el-form-item>
-                  <el-form-item label="院系">
-                    <el-input
-                      v-model="dynamicValidateForm.department"
-                      :disabled="true"
-                    ></el-input>
-                  </el-form-item>
-                  <el-form-item label="年级">
-                    <el-input
-                      v-if="dynamicValidateForm.grade"
-                      v-model="dynamicValidateForm.grade"
-                      :disabled="true"
-                    ></el-input>
-                  </el-form-item>
-                  <el-form-item label="性别">
-                    <el-input
-                      v-model="dynamicValidateForm.sex"
-                      :disabled="true"
-                    ></el-input>
-                  </el-form-item>
-                  <el-form-item label="手机号" prop="phone">
-                    <el-input v-model="dynamicValidateForm.phone" />
-                  </el-form-item>
-                  <el-form-item
-                    prop="email"
-                    label="邮箱"
-                    :rules="[
-                      {
-                        required: true,
-                        message: '邮箱地址不能为空',
-                        trigger: 'blur',
-                      },
-                      {
-                        type: 'email',
-                        message: '请输入正确的邮箱地址',
-                        trigger: ['blur', 'change'],
-                      },
-                    ]"
+              <el-tabs
+                v-model="activeName"
+                type="card"
+                @tab-click="handleClick"
+                style="margin-left: 0"
+              >
+                <el-tab-pane label="基本信息" name="first">
+                  <!-- 头像修改 -->
+                  <el-upload
+                    style="text-align: center"
+                    class="avatar-uploader"
+                    action="http://113.78.180.19:9568/file/upload"
+                    :show-file-list="false"
+                    :on-success="handleAvatarSuccess"
+                    :before-upload="beforeAvatarUpload"
                   >
-                    <el-input v-model="dynamicValidateForm.email"></el-input>
-                  </el-form-item>
-                </el-form>
-              </el-tab-pane>
-              <el-tab-pane label="修改密码" name="second">
-                <!-- 密码修改 -->
-                <el-form
-                  :model="ruleForm"
-                  status-icon
-                  :rules="rules"
-                  ref="ruleForm"
-                  label-width="100px"
-                  class="demo-ruleForm"
-                  style="margin: 20px 0 0 -30px"
+                    <img
+                      v-if="dynamicValidateForm.avatarUrl"
+                      :src="dynamicValidateForm.avatarUrl"
+                      class="avatar"
+                    />
+                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                  </el-upload>
+                  <!-- 基本信息修改 -->
+                  <el-form
+                    :rules="rules"
+                    :model="dynamicValidateForm"
+                    ref="dynamicValidateForm"
+                    label-width="100px"
+                    class="demo-dynamic"
+                    style="margin: 20px 0 0 -35px"
+                  >
+                    <el-form-item label="姓名">
+                      <el-input
+                        v-model="dynamicValidateForm.nickName"
+                        :disabled="true"
+                      ></el-input>
+                    </el-form-item>
+                    <el-form-item label="工号">
+                      <el-input
+                        v-model="dynamicValidateForm.userAccount"
+                        :disabled="true"
+                      ></el-input>
+                    </el-form-item>
+                    <el-form-item label="院系">
+                      <el-input
+                        v-model="dynamicValidateForm.department"
+                        :disabled="true"
+                      ></el-input>
+                    </el-form-item>
+                    <el-form-item label="年级">
+                      <el-input
+                        v-if="dynamicValidateForm.grade"
+                        v-model="dynamicValidateForm.grade"
+                        :disabled="true"
+                      ></el-input>
+                    </el-form-item>
+                    <el-form-item label="性别">
+                      <el-input
+                        v-model="dynamicValidateForm.sex"
+                        :disabled="true"
+                      ></el-input>
+                    </el-form-item>
+                    <el-form-item label="手机号" prop="phone">
+                      <el-input v-model="dynamicValidateForm.phone" />
+                    </el-form-item>
+                    <el-form-item
+                      prop="email"
+                      label="邮箱"
+                      :rules="[
+                        {
+                          required: true,
+                          message: '邮箱地址不能为空',
+                          trigger: 'blur',
+                        },
+                        {
+                          type: 'email',
+                          message: '请输入正确的邮箱地址',
+                          trigger: ['blur', 'change'],
+                        },
+                      ]"
+                    >
+                      <el-input v-model="dynamicValidateForm.email"></el-input>
+                    </el-form-item>
+                  </el-form>
+                </el-tab-pane>
+                <el-tab-pane label="修改密码" name="second">
+                  <!-- 密码修改 -->
+                  <el-form
+                    :model="ruleForm"
+                    status-icon
+                    :rules="rules"
+                    ref="ruleForm"
+                    label-width="100px"
+                    class="demo-ruleForm"
+                    style="margin: 20px 0 0 -30px"
+                  >
+                    <el-form-item label="原密码" prop="OldPass">
+                      <el-input
+                        type="password"
+                        v-model="ruleForm.OldPass"
+                        show-password
+                        autocomplete="off"
+                      ></el-input>
+                    </el-form-item>
+                    <el-form-item label="新密码" prop="pass">
+                      <el-input
+                        type="password"
+                        v-model="ruleForm.pass"
+                        autocomplete="off"
+                        show-password
+                      ></el-input>
+                    </el-form-item>
+                    <el-form-item label="确认密码" prop="checkPass">
+                      <el-input
+                        type="password"
+                        v-model="ruleForm.checkPass"
+                        autocomplete="off"
+                        show-password
+                      ></el-input>
+                    </el-form-item>
+                  </el-form>
+                </el-tab-pane>
+              </el-tabs>
+              <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogFormVisible = false">取 消</el-button>
+                <el-button
+                  type="primary"
+                  @click="submitForm(tab ? 'ruleForm' : 'dynamicValidateForm')"
+                  >确 定</el-button
                 >
-                  <el-form-item label="原密码" prop="OldPass">
-                    <el-input
-                      type="password"
-                      v-model="ruleForm.OldPass"
-                      show-password
-                      autocomplete="off"
-                    ></el-input>
-                  </el-form-item>
-                  <el-form-item label="新密码" prop="pass">
-                    <el-input
-                      type="password"
-                      v-model="ruleForm.pass"
-                      autocomplete="off"
-                      show-password
-                    ></el-input>
-                  </el-form-item>
-                  <el-form-item label="确认密码" prop="checkPass">
-                    <el-input
-                      type="password"
-                      v-model="ruleForm.checkPass"
-                      autocomplete="off"
-                      show-password
-                    ></el-input>
-                  </el-form-item>
-                </el-form>
-              </el-tab-pane>
-            </el-tabs>
-            <div slot="footer" class="dialog-footer">
-              <el-button @click="dialogFormVisible = false">取 消</el-button>
-              <el-button
-                type="primary"
-                @click="submitForm(tab ? 'ruleForm' : 'dynamicValidateForm')"
-                >确 定</el-button
+              </div>
+            </el-dialog>
+            <!-- 主体中心 -->
+            <el-main>
+              <transition
+                name="animate__animated animate__bounce"
+                enter-active-class="animate__fadeInUp"
+                leave-active-class="animate__fadeInDown"
               >
-            </div>
-          </el-dialog>
-          <!-- 主体中心 -->
-          <el-main>
-            <transition
-              name="animate__animated animate__bounce"
-              enter-active-class="animate__fadeInUp"
-              leave-active-class="animate__fadeInDown"
-            >
-              <!-- 组件插入区 -->
-              <router-view></router-view>
-            </transition>
-          </el-main>
-          <!-- 主体底部 -->
-          <el-footer>
-            <Footer />
-          </el-footer>
+                <!-- 组件插入区 -->
+                <router-view></router-view>
+              </transition>
+            </el-main>
+            <!-- 主体底部 -->
+            <el-footer>
+              <Footer />
+            </el-footer>
+          </el-container>
         </el-container>
       </el-container>
-    </el-container>
+    </div>
   </div>
 </template>
 
@@ -251,6 +256,7 @@ import { Encrypt } from "../utils/secret"
 /* 组件 */
 import Aside from "../components/Aside.vue";
 import Footer from "../components/Footer.vue";
+import Loading from "../components/Loading.vue"
 /* 动画库 */
 import "animate.css";
 export default {
@@ -307,6 +313,10 @@ export default {
       }
     };
     return {
+      /* 加载动画 */
+      isLoading: true,
+      isGetUserInfo: false,
+      isMounted: false,
       /* 用户信息弹窗 */
       /* 头像 */
       imageUrl: "",
@@ -365,6 +375,9 @@ export default {
     this.user("myInfo");
   },
   mounted() {
+    // 渲染页面完成
+    this.isMounted = true
+    this.isfinish()
     // 监听窗口大小,更改侧边栏状态
     window.addEventListener(
       "resize",
@@ -390,8 +403,19 @@ export default {
       });
     }
   },
-  components: { Aside, Footer },
+  components: { Aside, Footer, Loading },
+  beforeDestroy() {
+    this.isLoading = true
+  },
   methods: {
+    // 是否加载动画
+    isfinish() {
+      if (this.isMounted && this.isGetUserInfo) {
+        setTimeout(() => {
+          this.isLoading = false
+        }, 1000)
+      }
+    },
     // 用户信息修改
     // 更新头像
     handleAvatarSuccess(res) {
@@ -422,11 +446,11 @@ export default {
               if (res.code) {
                 this.$Message.error(res.message)
               } else {
-                this.$Message.success(res.message)
+                this.$Message.success('修改密码成功,请重新登录!')
                 this.dialogFormVisible = false;
                 // 成功后清除用户信息退出登录
+                localStorage.removeItem('menus')
                 localStorage.removeItem('user')
-                /* localStorage.removeItem('menus') */
                 this.$router.push('/login')
               }
             } catch (error) {
@@ -437,7 +461,7 @@ export default {
             try {
               let res = await changeUserInfo(this.dynamicValidateForm)
               if (res.code) {
-                this.$Message.success(res.message)
+                this.$Message.error(res.message)
               } else {
                 this.$Message.success(res.message)
                 this.dialogFormVisible = false;
@@ -471,26 +495,32 @@ export default {
     closeNav() {
       this.isCollapse = !this.isCollapse;
     },
-
+    // 处理token过期
+    tokenLost() {
+      this.$Message.error('您的登录信息已过期,请重新登录')
+      localStorage.removeItem('user')
+      localStorage.removeItem('menus')
+      this.$router.push('/login')
+    },
     // 右上角用户信息
     async user(index) {
       if (index == "myInfo") {
         try {
           let res = await getMyInfo();
-          if (res) {
+          if (!res.code) {
             // 赋值
             this.dynamicValidateForm = res.data;
+            this.isGetUserInfo = true
+            this.isfinish()
           } else {
-            this.$Message.error('您的登录信息已过期,请重新登录')
-            localStorage.removeItem('user')
-            this.$router.push('/login')
+            this.tokenLost()
           }
         } catch (error) {
           this.$Message.error(error)
         }
       }
       if (index == "logout") {
-        this.$Message.success('退出登录成功')
+        this.$Message.warning('退出登录成功')
         localStorage.removeItem('user')
         localStorage.removeItem('menus')
         setTimeout(() => {

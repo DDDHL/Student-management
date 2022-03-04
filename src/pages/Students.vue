@@ -3,12 +3,11 @@
     <el-card>
       <!-- 搜索 -->
       <el-input
-        placeholder="搜索工号或者名字"
+        placeholder="搜索学号或者名字"
         v-model="query"
         clearable
         @clear="clearSearch"
         style="width: 350px"
-        @blur="blurSearch"
       >
         <el-button
           slot="append"
@@ -23,45 +22,65 @@
         @click="centerDialogVisibleAdd = true"
         >添加用户</el-button
       >
-      <!-- 添加用户弹窗 -->
+      <!-- 添加学生弹窗 -->
       <el-dialog
-        title="提示"
+        title="添加学生"
         :visible.sync="centerDialogVisibleAdd"
-        width="30%"
+        width="430px"
         center
       >
-        <!-- 添加用户表单 -->
-
+        <!-- 添加学生表单 -->
+        <el-form
+          :model="newStudent"
+          label-width="65px"
+          ref="newStudent"
+          :rules="rules"
+          style="margin-left: -10px"
+        >
+          <el-form-item label="学号" prop="userAccount">
+            <el-input v-model="newStudent.userAccount"></el-input>
+          </el-form-item>
+          <el-form-item label="姓名" prop="nickName">
+            <el-input v-model="newStudent.nickName"></el-input>
+          </el-form-item>
+          <el-form-item label="性别" prop="sex">
+            <el-select
+              v-model="newStudent.sex"
+              placeholder="请选择性别"
+              style="width: 325px"
+            >
+              <el-option label="男" value="male"></el-option>
+              <el-option label="女" value="female"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="年级" prop="grade">
+            <el-input v-model="newStudent.grade"></el-input>
+          </el-form-item>
+          <el-form-item label="学院" prop="department">
+            <el-input v-model="newStudent.department"></el-input>
+          </el-form-item>
+          <el-form-item label="专业" prop="majors">
+            <el-input v-model="newStudent.majors"></el-input>
+          </el-form-item>
+          <el-form-item label="手机号" prop="phone">
+            <el-input v-model="newStudent.phone"></el-input>
+          </el-form-item>
+          <el-form-item label="邮箱" prop="email">
+            <el-input v-model="newStudent.email"></el-input>
+          </el-form-item>
+        </el-form>
         <span slot="footer" class="dialog-footer">
           <el-button @click="centerDialogVisibleAdd = false">取 消</el-button>
-          <el-button type="primary" @click="centerDialogVisibleAdd = false"
+          <el-button type="primary" @click="submitForm('newStudent')"
             >确 定</el-button
           >
         </span>
       </el-dialog>
 
-      <!-- 删除用户 -->
-      <el-button
-        type="primary"
-        style="margin: 20px 0 0 20px"
-        @click="centerDialogVisibleDec = true"
-        >删除用户</el-button
+      <!-- 删除学生 -->
+      <el-button type="primary" style="margin: 20px 0 0 20px"
+        >删除学生</el-button
       >
-      <!-- 删除用户弹窗 -->
-      <el-dialog
-        title="提示"
-        :visible.sync="centerDialogVisibleDec"
-        width="30%"
-        center
-      >
-        <span>删除用户</span>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="centerDialogVisibleDec = false">取 消</el-button>
-          <el-button type="primary" @click="centerDialogVisibleDec = false"
-            >确 定</el-button
-          >
-        </span>
-      </el-dialog>
       <!-- 表格 -->
       <el-table
         :data="tableData"
@@ -69,6 +88,7 @@
         style="width: 100%"
         stripe
         @filter-change="filterChange"
+        @selection-change="handleSelectionChange"
       >
         <el-table-column fixed type="selection" width="50" align="center">
         </el-table-column>
@@ -152,9 +172,84 @@ import { getAll } from '../api'
 export default {
   name: 'Students',
   data() {
+    /* 手机号规则 */
+    var validatorPhone = function (rule, value, callback) {
+      let phone =
+        /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/
+      if (value === '') {
+        callback(new Error('手机号不能为空'))
+      } else if (!phone.test(value)) {
+        callback(new Error('手机号格式错误'))
+      } else {
+        callback()
+      }
+    }
     return {
-      // 删除和增加用户弹窗
-      centerDialogVisibleDec: false,
+      // 手机号邮箱验证
+      rules: {
+        phone: [
+          {
+            required: true,
+            validator: validatorPhone,
+            trigger: ['blur', 'change'],
+          },
+        ],
+        email: [
+          {
+            required: true,
+            message: '邮箱地址不能为空',
+            trigger: 'blur',
+          },
+          {
+            type: 'email',
+            message: '请输入正确的邮箱地址',
+            trigger: ['blur', 'change'],
+          },
+        ],
+        majors: [
+          {
+            required: true,
+            message: '专业不能为空',
+            trigger: 'blur',
+          },
+        ],
+        department: [
+          {
+            required: true,
+            message: '学院不能为空',
+            trigger: 'blur',
+          },
+        ],
+        nickName: [
+          {
+            required: true,
+            message: '名字不能为空',
+            trigger: 'blur',
+          },
+        ],
+        userAccount: [
+          {
+            required: true,
+            message: '学号不能为空',
+            trigger: 'blur',
+          },
+        ],
+        sex: [
+          {
+            required: true,
+            message: '性别不能为空',
+            trigger: 'blur',
+          },
+        ],
+        grade: [
+          {
+            required: true,
+            message: '年级不能为空',
+            trigger: 'blur',
+          },
+        ]
+      },
+      // 删除和增加学生弹窗
       centerDialogVisibleAdd: false,
       // 专业筛选
       majorData: [
@@ -164,6 +259,9 @@ export default {
       ],
       // 表格数据
       total: 0,
+      // 新增学生
+      newStudent: {},
+      // 表格数据
       tableData: [],
       // 查询单条数据
       query: '',
@@ -189,6 +287,25 @@ export default {
     this.getData()
   },
   methods: {
+    // 选择多条
+    handleSelectionChange(val) {
+      val.forEach(item => {
+        console.log(item.id);
+      });
+    },
+    // 提交表单
+    submitForm(val) {
+      console.log('表单:', val)
+      this.$refs[val].validate((valid) => {
+        if (valid) {
+          console.log(this.newStudent)
+          this.centerDialogVisibleAdd = false
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
     // 筛选专业
     filterChange(obj) {
       this.queryInfo.majors = obj.filterTag
@@ -212,13 +329,6 @@ export default {
       this.queryInfo.userAccount = ''
       this.getData()
     },
-    // 失焦查看是否还原
-    blurSearch() {
-      /* if (this.query == '') {
-        this.getData()
-      } */
-      console.log('失去焦点');
-    },
     // 点击行
     handleClick(row) {
       console.log(row)
@@ -233,7 +343,6 @@ export default {
         } else {
           this.$Message.error(res.message)
         }
-
       } catch {
         this.$Message.error('获取用户列表失败！')
       }
@@ -241,12 +350,12 @@ export default {
     // 修改每条页多少条
     handleSizeChange(num) {
       this.queryInfo.pageSize = num
-      this.getData();
+      this.getData()
     },
     // 修改当前页
     handleCurrentChange(num) {
       this.queryInfo.pageNum = num
-      this.getData();
+      this.getData()
     },
     // 减少和增加用户弹窗
   },

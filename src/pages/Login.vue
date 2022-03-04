@@ -1,56 +1,61 @@
 <template>
-  <div id="login">
-    <div class="container">
-      <div class="owl" :class="className" id="owl">
-        <div class="hand"></div>
-        <div class="hand hand-r"></div>
-        <div class="arms">
-          <div class="arm"></div>
-          <div class="arm arm-r"></div>
+  <div>
+    <Loading v-if="isLoading" />
+    <div v-show="!isLoading">
+      <div id="login">
+        <div class="container">
+          <div class="owl" :class="className" id="owl">
+            <div class="hand"></div>
+            <div class="hand hand-r"></div>
+            <div class="arms">
+              <div class="arm"></div>
+              <div class="arm arm-r"></div>
+            </div>
+          </div>
+          <div class="tit">休假管理系统</div>
+          <el-form :rules="rules" :model="info" ref="form">
+            <el-form-item prop="account">
+              <el-input
+                prefix-icon="el-icon-user-solid"
+                type="text"
+                placeholder="账号"
+                v-model="info.account"
+                class="first_input"
+              ></el-input>
+            </el-form-item>
+            <el-form-item prop="pwd">
+              <el-input
+                prefix-icon="el-icon-lock"
+                type="password"
+                placeholder="密码"
+                @focus="focus"
+                @blur="blur"
+                v-model="info.pwd"
+                class="second_input"
+              ></el-input>
+            </el-form-item>
+          </el-form>
+          <button @click="login">登录</button>
+        </div>
+        <div class="square">
+          <ul>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+          </ul>
+        </div>
+        <div class="circle">
+          <ul>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+          </ul>
         </div>
       </div>
-      <div class="tit">休假管理系统</div>
-      <el-form :rules="rules" :model="info" ref="form">
-        <el-form-item prop="account">
-          <el-input
-            prefix-icon="el-icon-user-solid"
-            type="text"
-            placeholder="账号"
-            v-model="info.account"
-            class="first_input"
-          ></el-input>
-        </el-form-item>
-        <el-form-item prop="pwd">
-          <el-input
-            prefix-icon="el-icon-lock"
-            type="password"
-            placeholder="密码"
-            @focus="focus"
-            @blur="blur"
-            v-model="info.pwd"
-            class="second_input"
-          ></el-input>
-        </el-form-item>
-      </el-form>
-      <button @click="login">登录</button>
-    </div>
-    <div class="square">
-      <ul>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-      </ul>
-    </div>
-    <div class="circle">
-      <ul>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-      </ul>
     </div>
   </div>
 </template>
@@ -62,10 +67,14 @@ import { Encrypt } from '../utils/secret'
 import { login, isLogin } from '../api'
 /* 路由接口 */
 import { setRoutes } from "../router/router";
+/* 加载 */
+import Loading from '../components/Loading.vue'
 export default {
   name: 'Login',
+  components: { Loading },
   data() {
     return {
+      isLoading: true,
       className: '',
       info: {
         account: '',
@@ -96,17 +105,21 @@ export default {
   },
   async created() {
     let res = localStorage.getItem('user')
-    if (res != null && res != '') {
+    let router = localStorage.getItem('menus')
+    if (res != null && res != '' && router != null && router != '') {
       try {
         let loginData = await isLogin()
-        console.log(loginData);
         if (!loginData.code) {
+          setRoutes();
           this.$router.push('/index')
+        } else {
+          this.isLoading = false
         }
       } catch (error) {
         this.$Message.error(error)
       }
-
+    } else {
+      this.isLoading = false
     }
   },
   methods: {

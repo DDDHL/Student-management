@@ -9,6 +9,8 @@ export const Test = () => {
     data: { userAccount: 123456, password: 123456 },
   })
 }
+// 新增用户
+
 // 获取菜单信息接口
 export const getAllMenus = (data) => {
   return requests({
@@ -31,13 +33,6 @@ export const getAll = (data) => {
     url: '/user/getAll',
     method: 'POST',
     data: data,
-  })
-}
-// 测试用户列表
-export const getAlll = () => {
-  return requests({
-    url: '/getAll',
-    method: 'GET',
   })
 }
 // 获取自己信息
