@@ -9,8 +9,30 @@ export const Test = () => {
     data: { userAccount: 123456, password: 123456 },
   })
 }
-// 新增用户
-
+// 学生管理页面新增用户
+export const addStudent = (data) => {
+  return requests({
+    url: '/user/add',
+    method: 'POST',
+    data: data,
+  })
+}
+// 学生页面导出excel
+export const userExport = (data) => {
+  return requests({
+    url: `/user/export/${data}`,
+    method: 'GET',
+    responseType: 'blob',
+  })
+}
+// 学生管理页面删除用户
+export const delStudent = (data) => {
+  return requests({
+    url: '/user/del',
+    method: 'POST',
+    data: { ids: data },
+  })
+}
 // 获取菜单信息接口
 export const getAllMenus = (data) => {
   return requests({
@@ -19,7 +41,6 @@ export const getAllMenus = (data) => {
     data: data,
   })
 }
-// 获取
 // 验证是否登录
 export const isLogin = () => {
   return requests({

@@ -510,8 +510,10 @@ export default {
           if (!res.code) {
             // 赋值
             this.dynamicValidateForm = res.data;
-            this.isGetUserInfo = true
-            this.isfinish()
+            this.$nextTick(() => {
+              this.isGetUserInfo = true
+              this.isfinish()
+            })
           } else {
             this.tokenLost()
           }
