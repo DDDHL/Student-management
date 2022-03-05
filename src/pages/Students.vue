@@ -123,6 +123,10 @@
       ></el-button>
       <!-- 表格 -->
       <el-table
+        :header-cell-style="{
+          background: '#ebeef5',
+          color: '#282c34',
+        }"
         :data="tableData"
         highlight-current-row
         border
@@ -666,8 +670,10 @@ export default {
     },
     // 获取数据接口
     async getData() {
+      //let myMajor = JSON.parse(localStorage.getItem('user')).major
       try {
         let res = await getAll(this.queryInfo)
+        //let resMyDept = await getMajorsByDet()
         if (res.code) {
           // token过期
           if (res.code == '1001' || res.code == '1002') {

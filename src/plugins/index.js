@@ -70,3 +70,7 @@ Vue.use(Upload)
 import { Popover, Checkbox } from 'element-ui'
 Vue.use(Popover)
 Vue.use(Checkbox)
+
+// 菜单页面
+import { Popconfirm } from 'element-ui'
+Vue.use(Popconfirm)

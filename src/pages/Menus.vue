@@ -9,7 +9,7 @@
     <el-button class="ml-5" type="primary" @click="load">搜索</el-button>
     <el-button class="ml-5" type="danger" @click="reset">重置</el-button>
     <!-- 搜索 -->
-      <el-input
+    <!--  <el-input
         placeholder="搜索学号或者名字"
         v-model="query"
         clearable
@@ -21,7 +21,7 @@
           icon="el-icon-search"
           @click="find"
         ></el-button>
-      </el-input>
+      </el-input> -->
 
     <!-- 新增菜单 -->
     <el-button type="primary" @click="handleAdd" style="margin: 20px 0 0 20px"
@@ -162,13 +162,26 @@ export default {
     }
   },
   methods: {
+    // 处理token过期
+    tokenLost() {
+      this.$Message.error('您的登录信息已过期,请重新登录')
+      localStorage.removeItem('user')
+      localStorage.removeItem('menus')
+      this.$router.push('/login')
+    },
     async load() {
       try {
         let res = await getAllMenus(this.data)
-        if (res.code === '') {
-          this.tableData = res.data.records
+        if (res.code) {
+          // token过期
+          if (res.code == '1001' || res.code == '1002') {
+            this.tokenLost()
+          } else {
+            this.$Message.error(res.message)
+          }
         } else {
-          this.$Message.error(res.message)
+          console.log(res);
+          this.tableData = res.data.records
         }
       } catch (error) {
         this.$Message.error(error)

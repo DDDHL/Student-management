@@ -4,15 +4,13 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    currentPathName:''
+    currentPathName: '',
   },
   mutations: {
-    setPath (state) {
+    setPath(state) {
       state.currentPathName = sessionStorage.getItem('RouteName')
-    }
+    },
   },
-  actions: {
-  },
-  modules: {
-  }
+  actions: {},
+  modules: {},
 })

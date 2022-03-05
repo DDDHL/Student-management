@@ -53,7 +53,7 @@
                         <img
                           v-if="userImg"
                           :src="userImg"
-                          alt="用户头像"
+                          alt=""
                           style="object-fit: cover; object-position: 50% 20%"
                         />
                       </el-avatar>
@@ -260,6 +260,8 @@ import Footer from "../components/Footer.vue";
 import Loading from "../components/Loading.vue"
 /* 动画库 */
 import "animate.css";
+/* 压缩图片 */
+import * as imageConversion from 'image-conversion';
 export default {
   name: "Index",
   data() {
@@ -424,6 +426,7 @@ export default {
     handleAvatarSuccess(res) {
       this.dynamicValidateForm.avatarUrl = res;
     },
+    // 上传头像
     beforeAvatarUpload(file) {
       const isJPG = file.type === "image/jpeg";
       const isLt2M = file.size / 1024 / 1024 < 2;
@@ -433,7 +436,16 @@ export default {
       if (!isLt2M) {
         this.$Message.error("上传头像图片大小不能超过 2MB!")
       }
-      return isJPG && isLt2M;
+      //return isJPG && isLt2M;
+      if (isJPG && isLt2M) {
+        return new Promise((resolve) => {
+          // 压缩到100KB,这里的100就是要压缩的大小,可自定义
+          imageConversion.compressAccurately(file, 40).then(res => {
+            console.log(res)
+            resolve(res);
+          });
+        })
+      }
     },
     // 修改密码或个人信息
     submitForm(formName) {
@@ -538,7 +550,7 @@ export default {
         }
       }
       if (index == "logout") {
-        this.$Message.warning('退出登录成功')
+        this.$Message.success('退出登录成功')
         localStorage.removeItem('user')
         localStorage.removeItem('menus')
         setTimeout(() => {
