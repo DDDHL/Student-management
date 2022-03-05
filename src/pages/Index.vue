@@ -51,9 +51,10 @@
                     <div class="demo-type" style="height: 40px; width: 40px">
                       <el-avatar :size="40">
                         <img
-                          v-if="dynamicValidateForm.avatarUrl"
-                          :src="dynamicValidateForm.avatarUrl"
-                          alt=""
+                          v-if="userImg"
+                          :src="userImg"
+                          alt="用户头像"
+                          style="object-fit: cover; object-position: 50% 20%"
                         />
                       </el-avatar>
                     </div>
@@ -92,7 +93,7 @@
                   <el-upload
                     style="text-align: center"
                     class="avatar-uploader"
-                    action="http://113.78.180.19:9568/file/upload"
+                    action="http://113.78.194.215:9568/file/upload"
                     :show-file-list="false"
                     :on-success="handleAvatarSuccess"
                     :before-upload="beforeAvatarUpload"
@@ -313,6 +314,8 @@ export default {
       }
     };
     return {
+      /* 右上角头像链接 */
+      userImg: '',
       /* 加载动画 */
       isLoading: true,
       isGetUserInfo: false,
@@ -524,6 +527,7 @@ export default {
           } else {
             // 赋值
             this.dynamicValidateForm = res.data;
+            this.userImg = this.dynamicValidateForm.avatarUrl
             this.$nextTick(() => {
               this.isGetUserInfo = true
               this.isfinish()
@@ -626,5 +630,7 @@ export default {
   width: 78px;
   height: 78px;
   display: block;
+  object-fit: cover;
+  object-position: 50% 20%;
 }
 </style>

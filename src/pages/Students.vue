@@ -124,6 +124,7 @@
       <!-- 表格 -->
       <el-table
         :data="tableData"
+        highlight-current-row
         border
         style="width: 100%"
         stripe
@@ -138,18 +139,35 @@
           label="学号"
           sortable
           align="center"
+          :resizable="false"
         >
         </el-table-column>
-        <el-table-column prop="nickName" label="姓名" align="center">
+        <el-table-column
+          prop="nickName"
+          label="姓名"
+          align="center"
+          :resizable="false"
+        >
         </el-table-column>
-        <el-table-column prop="sex" label="性别" align="center">
+        <el-table-column
+          prop="sex"
+          label="性别"
+          align="center"
+          :resizable="false"
+        >
         </el-table-column>
-        <el-table-column prop="department" label="学院" align="center">
+        <el-table-column
+          prop="department"
+          label="学院"
+          align="center"
+          :resizable="false"
+        >
         </el-table-column>
         <el-table-column
           align="center"
           prop="grade"
           label="年级"
+          :resizable="false"
         ></el-table-column>
         <el-table-column
           prop="major"
@@ -157,13 +175,29 @@
           align="center"
           :filters="majorData"
           column-key="filterTag"
+          :resizable="false"
         >
         </el-table-column>
-        <el-table-column prop="phone" label="手机号" align="center">
+        <el-table-column
+          prop="phone"
+          label="手机号"
+          align="center"
+          :resizable="false"
+        >
         </el-table-column>
-        <el-table-column prop="email" label="邮箱" align="center">
+        <el-table-column
+          prop="email"
+          label="邮箱"
+          align="center"
+          :resizable="false"
+        >
         </el-table-column>
-        <el-table-column fixed="right" label="操作" align="center">
+        <el-table-column
+          fixed="right"
+          label="操作"
+          align="center"
+          :resizable="false"
+        >
           <template slot-scope="scope">
             <el-button type="text" size="small" @click="handleClick(scope.row)"
               >编辑信息</el-button
@@ -409,6 +443,12 @@ export default {
     'queryInfo.query'(newValue, oldValue) {
       console.log(newValue, oldValue)
     },
+    'centerDialogVisibleEdit'(newValue) {
+      if (!newValue) {
+        // 关闭编辑就重新获取表格
+        this.getData()
+      }
+    }
   },
   created() {
     /* 初始化获取数据 */
@@ -537,10 +577,9 @@ export default {
                 // 修改成功
                 this.$Message.success(res.message)
                 this.centerDialogVisibleEdit = false
-                this.getData()
               }
             } catch (error) {
-              this.$Message.error(res.error)
+              this.$Message.error(error)
             }
           } else {
             return false
@@ -658,4 +697,8 @@ export default {
 }
 </script>
 
-<style></style>
+<style scoped>
+/deep/.el-card__body {
+  padding: 0 20px 10px 20px;
+}
+</style>
