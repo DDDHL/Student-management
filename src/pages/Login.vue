@@ -35,6 +35,11 @@
               ></el-input>
             </el-form-item>
           </el-form>
+          <div style="width: 280px; height: 40px">
+            <el-checkbox v-model="info.rememberMe" style="margin: 20px 0 0 2px"
+              >记住我</el-checkbox
+            >
+          </div>
           <button @click="login">登录</button>
         </div>
         <div class="square">
@@ -110,9 +115,13 @@ export default {
       try {
         let loginData = await isLogin()
         if (!loginData.code) {
+          // 验证成功
           setRoutes();
           this.$router.push('/index')
         } else {
+          // 验证失败
+          localStorage.removeItem('menus')
+          localStorage.removeItem('user')
           this.isLoading = false
         }
       } catch (error) {
@@ -147,7 +156,6 @@ export default {
                 nickName: res.data.nickName,
                 token: res.data.token,
               }
-              console.log(res);
               localStorage.setItem('user', JSON.stringify(user))
               localStorage.setItem("menus", JSON.stringify(res.data.menus));
               setRoutes();

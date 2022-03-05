@@ -1,24 +1,37 @@
 <template>
   <div>
-    <div style="margin: 10px 0">
+    <el-input
+      suffix-icon="el-icon-search"
+      placeholder="请输入菜单名称"
+      style="width: 200px"
+      v-model="data.menuName"
+    />
+    <el-button class="ml-5" type="primary" @click="load">搜索</el-button>
+    <el-button class="ml-5" type="danger" @click="reset">重置</el-button>
+    <!-- 搜索 -->
       <el-input
-        suffix-icon="el-icon-search"
-        placeholder="请输入菜单名称"
-        style="width: 200px"
-        v-model="data.menuName"
-      />
-      <el-button class="ml-5" type="primary" @click="load">搜索</el-button>
-      <el-button class="ml-5" type="danger" @click="reset">重置</el-button>
-    </div>
+        placeholder="搜索学号或者名字"
+        v-model="query"
+        clearable
+        @clear="clearSearch"
+        style="width: 350px"
+      >
+        <el-button
+          slot="append"
+          icon="el-icon-search"
+          @click="find"
+        ></el-button>
+      </el-input>
 
-    <div style="margin: 10px 0">
-      <el-button type="primary" @click="handleAdd"
-        >新增一级菜单 <i class="el-icon-circle-plus-outline"></i
-      ></el-button>
-      <el-button type="danger" @click="delBatch"
-        >批量删除 <i class="el-icon-remove-outline"></i
-      ></el-button>
-    </div>
+    <!-- 新增菜单 -->
+    <el-button type="primary" @click="handleAdd" style="margin: 20px 0 0 20px"
+      >新增一级菜单 <i class="el-icon-circle-plus-outline"></i
+    ></el-button>
+
+    <!-- 批量删除菜单 -->
+    <el-button type="danger" @click="delBatch" style="margin: 20px 0 0 20px"
+      >批量删除 <i class="el-icon-remove-outline"></i
+    ></el-button>
 
     <el-table
       :data="tableData"

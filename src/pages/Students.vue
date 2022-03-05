@@ -90,7 +90,7 @@
           style="margin: 20px 0 0 20px"
           slot="reference"
           @click="delBtn"
-          >删除学生</el-button
+          >批量删除</el-button
         >
       </el-popover>
       <el-dialog title="警告" :visible.sync="dialogVisibleDel" width="30%">
@@ -102,7 +102,7 @@
       </el-dialog>
       <!-- 导入导出 -->
       <el-upload
-        action="http://localhost:9090/user/import"
+        action="http://113.78.194.215:9568/user/import"
         style="display: inline-block"
         class="ml-5"
         :show-file-list="false"
@@ -130,68 +130,47 @@
         @filter-change="filterChange"
         @selection-change="handleSelectionChange"
       >
-        <el-table-column fixed type="selection" width="50" align="center">
+        <el-table-column fixed type="selection" align="center">
         </el-table-column>
-        <el-table-column prop="id" label="ID" width="150" align="center">
-        </el-table-column>
+
         <el-table-column
           prop="userAccount"
           label="学号"
-          width="150"
           sortable
           align="center"
         >
         </el-table-column>
-        <el-table-column
-          prop="nickName"
-          label="姓名"
-          width="150"
-          align="center"
-        >
+        <el-table-column prop="nickName" label="姓名" align="center">
         </el-table-column>
-        <el-table-column prop="sex" label="性别" width="150" align="center">
+        <el-table-column prop="sex" label="性别" align="center">
         </el-table-column>
-        <el-table-column
-          prop="department"
-          label="学院"
-          width="150"
-          align="center"
-        >
+        <el-table-column prop="department" label="学院" align="center">
         </el-table-column>
         <el-table-column
           align="center"
           prop="grade"
           label="年级"
-          width="150"
         ></el-table-column>
         <el-table-column
           prop="major"
           label="专业"
-          width="150"
           align="center"
           :filters="majorData"
           column-key="filterTag"
         >
         </el-table-column>
-        <el-table-column prop="phone" label="手机号" width="150" align="center">
+        <el-table-column prop="phone" label="手机号" align="center">
         </el-table-column>
-        <el-table-column prop="email" label="邮箱" width="200" align="center">
+        <el-table-column prop="email" label="邮箱" align="center">
         </el-table-column>
-        <el-table-column fixed="right" label="操作" width="180" align="center">
+        <el-table-column fixed="right" label="操作" align="center">
           <template slot-scope="scope">
-            <el-button @click="handleClick(scope.row)" type="text" size="small"
-              >查看</el-button
-            >
-            <el-button
-              type="text"
-              size="small"
-              @click="centerDialogVisibleEdit = true"
-              >编辑</el-button
+            <el-button type="text" size="small" @click="handleClick(scope.row)"
+              >编辑信息</el-button
             >
           </template>
         </el-table-column>
       </el-table>
-
       <!-- 编辑学生弹窗 -->
       <el-dialog
         title="编辑学生信息"
@@ -208,7 +187,7 @@
           style="margin-left: -10px"
         >
           <el-form-item label="学号" prop="userAccount">
-            <el-input v-model="editStudent.userAccount"></el-input>
+            <el-input v-model="editStudent.userAccount" disabled></el-input>
           </el-form-item>
           <el-form-item label="姓名" prop="nickName">
             <el-input v-model="editStudent.nickName"></el-input>
@@ -224,13 +203,47 @@
             </el-select>
           </el-form-item>
           <el-form-item label="年级" prop="grade">
-            <el-input v-model="editStudent.grade"></el-input>
+            <el-select
+              v-model="editStudent.grade"
+              placeholder="请选择年级"
+              style="width: 325px"
+            >
+              <el-option
+                v-for="item in allGrade"
+                :key="item"
+                :label="item"
+                :value="item"
+              ></el-option>
+            </el-select>
           </el-form-item>
           <el-form-item label="学院" prop="department">
-            <el-input v-model="editStudent.department"></el-input>
+            <el-select
+              v-model="editStudent.department"
+              placeholder="请选择学院"
+              style="width: 325px"
+            >
+              <el-option
+                v-for="item in allDepartment"
+                :key="item.id"
+                :label="item.organizationName"
+                :value="item.organizationName"
+                @click.native="getSomeMajors(item.id)"
+              ></el-option>
+            </el-select>
           </el-form-item>
           <el-form-item label="专业" prop="major">
-            <el-input v-model="editStudent.major"></el-input>
+            <el-select
+              v-model="editStudent.major"
+              placeholder="请选择专业"
+              style="width: 325px"
+            >
+              <el-option
+                v-for="item in SomeMajors"
+                :key="item.id"
+                :label="item.organizationName"
+                :value="item.organizationName"
+              ></el-option>
+            </el-select>
           </el-form-item>
           <el-form-item label="手机号" prop="phone">
             <el-input v-model="editStudent.phone"></el-input>
@@ -263,7 +276,7 @@
 
 <script>
 /* 获取学生列表接口 */
-import { getAll, addStudent, delStudent, userExport } from '../api'
+import { getAll, addStudent, delStudent, userExport, getAllGrade, getAllDept, getMajorsByDet, changeUserInfo } from '../api'
 /* 下载文件 */
 
 export default {
@@ -359,6 +372,14 @@ export default {
         { text: '数字媒体技术', value: '数字媒体技术' },
         { text: '计算机科学与技术', value: '计算机科学与技术' },
       ],
+      // 编辑学生的学院
+      currentDept: 0,
+      // 某学院专业
+      SomeMajors: [],
+      // 全部学院
+      allDepartment: [],
+      // 全部年级
+      allGrade: [],
       // 勾选的学生
       ids: [],
       // 表格数据
@@ -394,12 +415,19 @@ export default {
     this.getData()
   },
   methods: {
+    // 处理token过期
+    tokenLost() {
+      this.$Message.error('您的登录信息已过期,请重新登录')
+      localStorage.removeItem('user')
+      localStorage.removeItem('menus')
+      this.$router.push('/login')
+    },
     // 导入导出
     async exp() {
       try {
         let res = await userExport(this.queryInfo.roleId)
         if (res.type == 'application/json') {
-          console.log('无token')
+          this.tokenLost()
         } else {
           const href = URL.createObjectURL(
             new Blob([res], {
@@ -414,7 +442,7 @@ export default {
           document.body.appendChild(link)
           link.click()
           URL.revokeObjectURL(link.href) //释放url
-          document.body.removeChild(link)//释放标签
+          document.body.removeChild(link) //释放标签
           this.$Message.success('导出成功!')
         }
       } catch (error) {
@@ -423,7 +451,7 @@ export default {
     },
     handleExcelImportSuccess() {
       this.$message.success('导入成功')
-      this.load()
+      this.getData()
     },
     // 删除学生按钮
     async delBtn() {
@@ -442,7 +470,12 @@ export default {
       // 删除学生
       let res = await delStudent(this.ids)
       if (res.code) {
-        this.$Message.error(res.message)
+        // token过期
+        if (res.code == '1001' || res.code == '1002') {
+          this.tokenLost()
+        } else {
+          this.$Message.error(res.message)
+        }
       } else {
         this.$Message.success(res.message)
         this.getData()
@@ -472,7 +505,12 @@ export default {
             this.newStudent['roleId'] = 5
             let res = await addStudent(this.newStudent)
             if (res.code) {
-              this.$Message.error(res.message)
+              // token过期
+              if (res.code == '1001' || res.code == '1002') {
+                this.tokenLost()
+              } else {
+                this.$Message.error(res.message)
+              }
             } else {
               this.$Message.success(res.message)
               this.centerDialogVisibleAdd = false
@@ -486,7 +524,24 @@ export default {
         // 编辑学生
         this.$refs[val].validate(async (valid) => {
           if (valid) {
-            console.log(this.editStudent);
+            try {
+              let res = await changeUserInfo(this.editStudent)
+              if (res.code) {
+                // token过期
+                if (res.code == '1001' || res.code == '1002') {
+                  this.tokenLost()
+                } else {
+                  this.$Message.error(res.message)
+                }
+              } else {
+                // 修改成功
+                this.$Message.success(res.message)
+                this.centerDialogVisibleEdit = false
+                this.getData()
+              }
+            } catch (error) {
+              this.$Message.error(res.error)
+            }
           } else {
             return false
           }
@@ -516,22 +571,77 @@ export default {
       this.queryInfo.userAccount = ''
       this.getData()
     },
-    // 点击行
-    handleClick(row) {
-      console.log(row)
+    // 点击编辑行
+    async handleClick(row) {
+      this.editStudent = row
+      // 请求年级 学院
+      try {
+        let res = await getAllGrade()
+        let resDep = await getAllDept()
+        if (res.code && resDep.code) {
+          // token过期
+          if (res.code == '1001' || res.code == '1002' || resDep.code == '1001' || resDep.code == '1002') {
+            this.tokenLost()
+          } else {
+            this.$Message.error(res.message)
+            this.$Message.error(resDep.message)
+          }
+        } else {
+          // 获取年级后渲染到表单里
+          this.allGrade = res.data
+          // 获取全部学院渲染到表单里
+          this.allDepartment = resDep.data
+          resDep.data.forEach(item => {
+            if (this.editStudent.department == item.organizationName) {
+              this.getSomeMajors(item.id)
+              this.currentDept = item.id
+            }
+          })
+          this.centerDialogVisibleEdit = true
+        }
+      } catch (error) {
+        this.$Message.error(error)
+      }
+    },
+    // 获取某学院下的专业
+    async getSomeMajors(id) {
+      try {
+        let res = await getMajorsByDet(id)
+        if (res.code) {
+          // token过期
+          if (res.code == '1001' || res.code == '1002') {
+            this.tokenLost()
+          } else {
+            this.$Message.error(res.message)
+          }
+        } else {
+          // 请求成功赋值专业
+          this.SomeMajors = res.data
+          if (this.currentDept != id) {
+            this.editStudent.major = ''
+          }
+        }
+      } catch (error) {
+        this.$Message.error(error)
+      }
     },
     // 获取数据接口
     async getData() {
       try {
         let res = await getAll(this.queryInfo)
-        if (!res.code) {
-          this.tableData = res.data.records
-          this.total = res.data.records.length
+        if (res.code) {
+          // token过期
+          if (res.code == '1001' || res.code == '1002') {
+            this.tokenLost()
+          } else {
+            this.$Message.error(res.message)
+          }
         } else {
-          this.$Message.error(res.message)
+          this.tableData = res.data.records
+          this.total = res.data.total
         }
-      } catch {
-        this.$Message.error('获取用户列表失败！')
+      } catch (error) {
+        this.$Message.error(error)
       }
     },
     // 修改每条页多少条
@@ -544,7 +654,6 @@ export default {
       this.queryInfo.pageNum = num
       this.getData()
     },
-    // 减少和增加用户弹窗
   },
 }
 </script>

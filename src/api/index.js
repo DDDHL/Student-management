@@ -64,12 +64,34 @@ export const getMyInfo = () => {
     data: {},
   })
 }
-// 修改个人信息
+// 修改用户信息
 export const changeUserInfo = (query) => {
   return requests({
     url: '/user/edit',
     method: 'POST',
     data: query,
+  })
+}
+// 获取全部年级
+export const getAllGrade = () => {
+  return requests({
+    url: '/organization/getAllGrade',
+    method: 'POST',
+  })
+}
+// 获取全部学院
+export const getAllDept = () => {
+  return requests({
+    url: '/organization/getAllDept',
+    method: 'POST',
+  })
+}
+// 获取某个学院下的某专业
+export const getMajorsByDet = (data) => {
+  return requests({
+    url: '/organization/getMajorsByDept',
+    method: 'POST',
+    data: { departmentId: data },
   })
 }
 // 修改密码

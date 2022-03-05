@@ -67,5 +67,6 @@ Vue.use(Avatar)
 Vue.use(Upload)
 
 // 弹出框
-import { Popover } from 'element-ui'
+import { Popover, Checkbox } from 'element-ui'
 Vue.use(Popover)
+Vue.use(Checkbox)

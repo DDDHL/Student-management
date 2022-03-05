@@ -444,7 +444,11 @@ export default {
               let oldPass = Encrypt(this.ruleForm.OldPass)
               let res = await changPwd(newPass, oldPass)
               if (res.code) {
-                this.$Message.error(res.message)
+                if (res.code == '1001' || res.code == '1002') {
+                  this.tokenLost()
+                } else {
+                  this.$Message.error(res.message)
+                }
               } else {
                 this.$Message.success('修改密码成功,请重新登录!')
                 this.dialogFormVisible = false;
@@ -461,7 +465,11 @@ export default {
             try {
               let res = await changeUserInfo(this.dynamicValidateForm)
               if (res.code) {
-                this.$Message.error(res.message)
+                if (res.code == '1001' || res.code == '1002') {
+                  this.tokenLost()
+                } else {
+                  this.$Message.error(res.message)
+                }
               } else {
                 this.$Message.success(res.message)
                 this.dialogFormVisible = false;
@@ -473,7 +481,6 @@ export default {
             }
           }
         } else {
-          console.log("表单验证不通过");
           return false;
         }
       });
@@ -507,15 +514,20 @@ export default {
       if (index == "myInfo") {
         try {
           let res = await getMyInfo();
-          if (!res.code) {
+          if (res.code) {
+            // token过期
+            if (res.code == '1001' || res.code == '1002') {
+              this.tokenLost()
+            } else {
+              this.$Message.error(res.message)
+            }
+          } else {
             // 赋值
             this.dynamicValidateForm = res.data;
             this.$nextTick(() => {
               this.isGetUserInfo = true
               this.isfinish()
             })
-          } else {
-            this.tokenLost()
           }
         } catch (error) {
           this.$Message.error(error)
