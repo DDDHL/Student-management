@@ -9,6 +9,29 @@ export const Test = () => {
     data: { userAccount: 123456, password: 123456 },
   })
 }
+// 新增或更新菜单
+export const saveMenu = (data) => {
+  return requests({
+    url: '/menu/saveMenu',
+    method: 'POST',
+    data: data,
+  })
+}
+// 删除菜单
+export const delMenu = (data) => {
+  return requests({
+    url: '/menu/delMenu',
+    method: 'POST',
+    data: data,
+  })
+}
+// 获取所有图标
+export const getIcon = () => {
+  return requests({
+    url: '/dict/getIcons',
+    method: 'POST',
+  })
+}
 // 学生管理页面新增用户
 export const addStudent = (data) => {
   return requests({

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="margin: -10px 0">
     <el-card>
       <!-- 搜索 -->
       <el-input
@@ -8,6 +8,7 @@
         clearable
         @clear="clearSearch"
         style="width: 350px"
+        @blur="blurSearch"
       >
         <el-button
           slot="append"
@@ -20,8 +21,8 @@
         type="primary"
         style="margin: 20px 0 0 20px"
         @click="centerDialogVisibleAdd = true"
-        >添加用户</el-button
-      >
+        >添加学生<i class="el-icon-circle-plus-outline"></i
+      ></el-button>
       <!-- 添加学生弹窗 -->
       <el-dialog
         title="添加学生"
@@ -90,8 +91,8 @@
           style="margin: 20px 0 0 20px"
           slot="reference"
           @click="delBtn"
-          >批量删除</el-button
-        >
+          >批量删除<i class="el-icon-remove-outline"></i>
+        </el-button>
       </el-popover>
       <el-dialog title="警告" :visible.sync="dialogVisibleDel" width="30%">
         <span>你确定要删除勾选的学生吗?</span>
@@ -102,17 +103,34 @@
       </el-dialog>
       <!-- 导入导出 -->
       <el-upload
-        action="http://113.78.194.215:9568/user/import"
+        action="http://113.78.193.15:9568/user/import"
         style="display: inline-block"
         class="ml-5"
         :show-file-list="false"
         :accept="'xlsx'"
         :on-success="handleExcelImportSuccess"
+        :headers="upLoadHeader"
+        :data="upLoadData"
       >
         <el-button type="primary" style="margin: 20px 0 0 20px; width: 98px"
           >导入 <i class="el-icon-top"></i
         ></el-button>
       </el-upload>
+      <el-dialog
+        title="警告"
+        :visible.sync="dialogVisibleImport"
+        width="30%"
+        center
+      >
+        <span>{{ importError }}</span>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="dialogVisibleImport = false">取 消</el-button>
+          <el-button type="primary" @click="dialogVisibleImport = false"
+            >确 定</el-button
+          >
+        </span>
+      </el-dialog>
+      <!-- 导出 -->
       <el-button
         type="primary"
         @click="exp"
@@ -204,8 +222,8 @@
         >
           <template slot-scope="scope">
             <el-button type="text" size="small" @click="handleClick(scope.row)"
-              >编辑信息</el-button
-            >
+              >编辑信息<i class="el-icon-edit"></i
+            ></el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -397,6 +415,10 @@ export default {
           },
         ],
       },
+      // 导入失败文字
+      importError: '',
+      // 导入失败弹窗
+      dialogVisibleImport: false,
       // 增加学生弹窗
       centerDialogVisibleAdd: false,
       // 编辑学生弹窗
@@ -410,6 +432,10 @@ export default {
         { text: '数字媒体技术', value: '数字媒体技术' },
         { text: '计算机科学与技术', value: '计算机科学与技术' },
       ],
+      // 文件上传数据
+      upLoadData: { roleId: 5 },
+      // 文件上传token
+      upLoadHeader: {},
       // 编辑学生的学院
       currentDept: 0,
       // 某学院专业
@@ -458,6 +484,11 @@ export default {
     /* 初始化获取数据 */
     this.getData()
   },
+  mounted() {
+    // 获取token
+    let Mytoken = JSON.parse(localStorage.getItem('user')).token
+    this.upLoadHeader = { token: Mytoken }
+  },
   methods: {
     // 处理token过期
     tokenLost() {
@@ -493,9 +524,20 @@ export default {
         this.$Message.error(error)
       }
     },
-    handleExcelImportSuccess() {
-      this.$message.success('导入成功')
-      this.getData()
+    // 导入成功
+    handleExcelImportSuccess(res) {
+      console.log(res);
+      if (res.code) {
+        if (res.code == '1001' || res.code == '1002') {
+          this.tokenLost()
+        } else {
+          this.dialogVisibleImport = true
+          this.importError = res.message
+        }
+      } else {
+        this.$Message.success('导入成功')
+        this.getData()
+      }
     },
     // 删除学生按钮
     async delBtn() {
@@ -599,20 +641,26 @@ export default {
     // 查询单条
     find() {
       if (isNaN(this.query)) {
+        // 查询名字
         this.queryInfo.nickName = this.query.trim()
         this.getData()
       } else {
+        // 查询学号
         this.queryInfo.userAccount = this.query.trim()
         this.getData()
       }
-      this.queryInfo.nickName = ''
-      this.queryInfo.userAccount = ''
     },
     // 清空还原
     clearSearch() {
       this.queryInfo.nickName = ''
       this.queryInfo.userAccount = ''
       this.getData()
+    },
+    // 手动删除search
+    blurSearch() {
+      if (this.query == '') {
+        this.clearSearch()
+      }
     },
     // 点击编辑行
     async handleClick(row) {

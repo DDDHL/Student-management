@@ -72,5 +72,6 @@ Vue.use(Popover)
 Vue.use(Checkbox)
 
 // 菜单页面
-import { Popconfirm } from 'element-ui'
+import { Popconfirm, MessageBox } from 'element-ui'
 Vue.use(Popconfirm)
+Vue.prototype.$confirm = MessageBox.confirm
