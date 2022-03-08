@@ -9,6 +9,30 @@ export const Test = () => {
     data: { userAccount: 123456, password: 123456 },
   })
 }
+// 文件下载
+export const downloadFile = (data) => {
+  return requests({
+    url: `/file/${data}`,
+    method: 'GET',
+    responseType: 'blob',
+  })
+}
+// 批量删除文件
+export const delFile = (data) => {
+  return requests({
+    url: '/file/del/batch',
+    method: 'POST',
+    data: data,
+  })
+}
+// 分页查询文件
+export const getFile = (data) => {
+  return requests({
+    url: '/file/getAll',
+    method: 'POST',
+    data: data,
+  })
+}
 // 新增或更新菜单
 export const saveMenu = (data) => {
   return requests({
