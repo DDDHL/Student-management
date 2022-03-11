@@ -377,7 +377,7 @@ export default {
         this.queryInfo.dictType = ''
         this.getData()
       } else {
-        // 筛选
+        // 筛选 遗留bug，后端应该接收数组
         obj.filterTag.forEach(item => {
           this.queryInfo.dictType = item
         })
