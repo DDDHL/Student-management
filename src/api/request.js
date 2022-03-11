@@ -5,11 +5,8 @@ import 'nprogress/nprogress.css'
 
 const requests = axios.create({
   // 基础路径
-  baseURL: 'http://113.78.192.154:9568',
-  // baseURL: 'http://localhost:8080',
+  baseURL: 'http://113.78.207.211:9568',
   timeout: 30000,
-  // 请求头
-  /* headers:{} */
 })
 
 // 配置拦截器

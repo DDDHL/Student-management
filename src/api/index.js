@@ -9,6 +9,45 @@ export const Test = () => {
     data: { userAccount: 123456, password: 123456 },
   })
 }
+// 获取字典类型
+export const dictGetType = () => {
+  return requests({
+    url: '/dict/getDictTypes',
+    method: 'GET',
+  })
+}
+// 编辑字典
+export const editOneDict = (data) => {
+  return requests({
+    url: '/dict/updateDict',
+    method: 'POST',
+    data: data,
+  })
+}
+// 删除字典
+export const delDict = (data) => {
+  return requests({
+    url: '/dict/delDict',
+    method: 'POST',
+    data: { ids: data },
+  })
+}
+// 新增字典
+export const addOneDict = (data) => {
+  return requests({
+    url: '/dict/addDict',
+    method: 'POST',
+    data: data,
+  })
+}
+// 字典分页
+export const dictGetAll = (data) => {
+  return requests({
+    url: '/dict/getAll',
+    method: 'POST',
+    data: data,
+  })
+}
 // 文件下载
 export const downloadFile = (data) => {
   return requests({
