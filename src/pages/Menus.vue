@@ -58,12 +58,17 @@
         <el-table-column label="操作" width="300" align="center">
           <template slot-scope="scope">
             <el-button
+              size="small"
               type="primary"
               @click="handleAdd(scope.row.id)"
               v-if="!scope.row.pid && !scope.row.path"
               >新增 <i class="el-icon-plus"></i
             ></el-button>
-            <el-button type="success" @click="handleEdit(scope.row)"
+            <el-button
+              type="success"
+              @click="handleEdit(scope.row)"
+              size="small"
+              style="margin-right: 10px"
               >编辑 <i class="el-icon-edit"></i
             ></el-button>
             <el-popconfirm
@@ -75,7 +80,7 @@
               title="您确定删除吗?"
               @confirm="del(scope.row.id)"
             >
-              <el-button slot="reference" type="danger"
+              <el-button slot="reference" type="danger" size="small"
                 >删除 <i class="el-icon-delete"></i
               ></el-button>
             </el-popconfirm>
