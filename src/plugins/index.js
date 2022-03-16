@@ -75,3 +75,7 @@ Vue.use(Checkbox)
 import { Popconfirm, MessageBox } from 'element-ui'
 Vue.use(Popconfirm)
 Vue.prototype.$confirm = MessageBox.confirm
+
+// 用户管理页面
+import { Tree } from 'element-ui'
+Vue.use(Tree)

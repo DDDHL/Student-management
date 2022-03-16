@@ -1,12 +1,43 @@
 // 导入封装好的axios请求文件
 import requests from './request'
-
-// 测试接口
-export const Test = () => {
+// 获取角色权限
+export const rolePower = (data) => {
   return requests({
-    url: '/user/login',
+    url: '/role/roleMenu/getById',
     method: 'POST',
-    data: { userAccount: 123456, password: 123456 },
+    data: data,
+  })
+}
+// 新增角色
+export const roleAdd = (data) => {
+  return requests({
+    url: '/role/add',
+    method: 'POST',
+    data: data,
+  })
+}
+// 删除角色
+export const roleDel = (data) => {
+  return requests({
+    url: '/role/del',
+    method: 'POST',
+    data: data,
+  })
+}
+// 编辑角色
+export const roleEdit = (data) => {
+  return requests({
+    url: '/role/edit',
+    method: 'POST',
+    data: data,
+  })
+}
+// 获取角色管理分页
+export const roleGetAll = (data) => {
+  return requests({
+    url: '/role/getAll',
+    method: 'POST',
+    data: data,
   })
 }
 // 获取字典类型
@@ -95,6 +126,13 @@ export const getIcon = () => {
     method: 'POST',
   })
 }
+// 学生管理页面获取筛选
+export const getStudentMajors = () => {
+  return requests({
+    url: '/user/getMajorsByDept',
+    method: 'POST',
+  })
+}
 // 学生管理页面新增用户
 export const addStudent = (data) => {
   return requests({
@@ -117,6 +155,29 @@ export const delStudent = (data) => {
     url: '/user/del',
     method: 'POST',
     data: { ids: data },
+  })
+}
+// 添加字典类型
+export const addDictType = (data) => {
+  return requests({
+    url: '/dict/addDictType',
+    method: 'POST',
+    data: data,
+  })
+}
+// 角色管理设置权限
+export const setRole = (data) => {
+  return requests({
+    url: '/role/roleMenu/set',
+    method: 'POST',
+    data: data,
+  })
+}
+// 角色管理页面获取全部菜单
+export const getAllMenusByRole = () => {
+  return requests({
+    url: '/menu/get',
+    method: 'GET',
   })
 }
 // 获取菜单信息接口

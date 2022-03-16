@@ -21,16 +21,16 @@
         type="primary"
         style="margin: 20px 0 0 20px"
         @click="centerDialogVisibleAdd = true"
-        >添加教师<i class="el-icon-circle-plus-outline"></i
+        >添加老师<i class="el-icon-circle-plus-outline"></i
       ></el-button>
-      <!-- 添加教师弹窗 -->
+      <!-- 添加老师弹窗 -->
       <el-dialog
-        title="添加教师"
+        title="添加老师"
         :visible.sync="centerDialogVisibleAdd"
         width="430px"
         center
       >
-        <!-- 添加教师表单 -->
+        <!-- 添加老师表单 -->
         <el-form
           :model="newStudent"
           label-width="65px"
@@ -78,12 +78,12 @@
         </span>
       </el-dialog>
 
-      <!-- 删除教师 -->
+      <!-- 删除老师 -->
       <el-popover
         placement="top"
         width="200"
         trigger="manual"
-        content="请勾选需要删除的教师"
+        content="请勾选需要删除的老师"
         v-model="delPoppover"
       >
         <el-button
@@ -95,7 +95,7 @@
         </el-button>
       </el-popover>
       <el-dialog title="警告" :visible.sync="dialogVisibleDel" width="30%">
-        <span>你确定要删除勾选的教师吗?</span>
+        <span>你确定要删除勾选的老师吗?</span>
         <span slot="footer" class="dialog-footer">
           <el-button @click="dialogVisibleDel = false">取 消</el-button>
           <el-button type="primary" @click="del">确 定</el-button>
@@ -227,14 +227,14 @@
           </template>
         </el-table-column>
       </el-table>
-      <!-- 编辑教师弹窗 -->
+      <!-- 编辑老师弹窗 -->
       <el-dialog
-        title="编辑教师信息"
+        title="编辑老师信息"
         :visible.sync="centerDialogVisibleEdit"
         width="430px"
         center
       >
-        <!-- 编辑教师表单 -->
+        <!-- 编辑老师表单 -->
         <el-form
           :model="editStudent"
           label-width="65px"
@@ -331,8 +331,8 @@
 </template>
 
 <script>
-/* 获取教师列表接口 */
-import { getAll, addStudent, delStudent, userExport, getAllGrade, getAllDept, getMajorsByDet, changeUserInfo } from '../api'
+/* 获取老师列表接口 */
+import { getAll, addStudent, delStudent, userExport, getAllGrade, getAllDept, getMajorsByDet, changeUserInfo, getStudentMajors } from '../api'
 /* 下载文件 */
 
 export default {
@@ -419,24 +419,20 @@ export default {
       importError: '',
       // 导入失败弹窗
       dialogVisibleImport: false,
-      // 增加教师弹窗
+      // 增加老师弹窗
       centerDialogVisibleAdd: false,
-      // 编辑教师弹窗
+      // 编辑老师弹窗
       centerDialogVisibleEdit: false,
-      // 删除教师
+      // 删除老师
       dialogVisibleDel: false,
       delPoppover: false,
       // 专业筛选
-      majorData: [
-        { text: '软件工程', value: '软件工程' },
-        { text: '数字媒体技术', value: '数字媒体技术' },
-        { text: '计算机科学与技术', value: '计算机科学与技术' },
-      ],
+      majorData: [],
       // 文件上传数据
       upLoadData: { roleId: 4 },
       // 文件上传token
       upLoadHeader: {},
-      // 编辑教师的学院
+      // 编辑老师的学院
       currentDept: 0,
       // 某学院专业
       SomeMajors: [],
@@ -444,13 +440,13 @@ export default {
       allDepartment: [],
       // 全部年级
       allGrade: [],
-      // 勾选的教师
+      // 勾选的老师
       ids: [],
       // 表格数据
       total: 0,
-      // 新增教师
+      // 新增老师
       newStudent: {},
-      // 编辑教师
+      // 编辑老师
       editStudent: {},
       // 表格数据
       tableData: [],
@@ -511,7 +507,7 @@ export default {
           )
           // 导出excel
           const link = document.createElement('a')
-          link.download = '教师表格.xlsx'
+          link.download = '老师表格.xlsx'
           link.href = href
           link.style.display = 'none'
           document.body.appendChild(link)
@@ -539,7 +535,7 @@ export default {
         this.getData()
       }
     },
-    // 删除教师按钮
+    // 删除老师按钮
     async delBtn() {
       if (this.ids.length == 0) {
         // 未勾选
@@ -551,9 +547,9 @@ export default {
         this.dialogVisibleDel = true
       }
     },
-    // 删除教师请求
+    // 删除老师请求
     async del() {
-      // 删除教师
+      // 删除老师
       let res = await delStudent(this.ids)
       if (res.code) {
         // token过期
@@ -585,10 +581,10 @@ export default {
     // 提交表单  包含编辑和新增
     submitForm(val) {
       if (val == 'newStudent') {
-        // 新增教师
+        // 新增老师
         this.$refs[val].validate(async (valid) => {
           if (valid) {
-            this.newStudent['roleId'] = 5
+            this.newStudent['roleId'] = 4
             let res = await addStudent(this.newStudent)
             if (res.code) {
               // token过期
@@ -607,7 +603,7 @@ export default {
           }
         })
       } else {
-        // 编辑教师
+        // 编辑老师
         this.$refs[val].validate(async (valid) => {
           if (valid) {
             try {
@@ -635,8 +631,19 @@ export default {
     },
     // 筛选专业
     filterChange(obj) {
-      this.queryInfo.major = obj.filterTag
-      this.getData()
+      if (obj.filterTag.length == 0) {
+        // 重置
+        console.log('重置');
+        this.queryInfo.majors = []
+        this.majorData = []
+        this.getData()
+      } else {
+        // 筛选
+        obj.filterTag.forEach(item => {
+          this.queryInfo.majors.push(item)
+        })
+        this.getData()
+      }
     },
     // 查询单条
     find() {
@@ -718,20 +725,24 @@ export default {
     },
     // 获取数据接口
     async getData() {
-      //let myMajor = JSON.parse(localStorage.getItem('user')).major
+      this.majorData = []
       try {
         let res = await getAll(this.queryInfo)
-        //let resMyDept = await getMajorsByDet()
-        if (res.code) {
+        let resMyDept = await getStudentMajors()
+        if (res.code || resMyDept.code) {
           // token过期
-          if (res.code == '1001' || res.code == '1002') {
+          if (res.code == '1001' || res.code == '1002' || resMyDept.code == '1001' || resMyDept.code == '1002') {
             this.tokenLost()
           } else {
             this.$Message.error(res.message)
+            this.$Message.error(resMyDept.message)
           }
         } else {
           this.tableData = res.data.records
           this.total = res.data.total
+          resMyDept.data.forEach(item => {
+            this.majorData.push({ text: item.organizationName, value: item.organizationName })
+          })
         }
       } catch (error) {
         this.$Message.error(error)

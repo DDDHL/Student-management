@@ -44,7 +44,18 @@
             <el-input v-model="newDict.value"></el-input>
           </el-form-item>
           <el-form-item label="类型" prop="type">
-            <el-input v-model="newDict.type"></el-input>
+            <el-select
+              v-model="newDict.type"
+              placeholder="请选择类型"
+              style="width: 325px"
+            >
+              <el-option
+                v-for="item in dictTypes"
+                :key="item.value"
+                :label="item.value"
+                :value="item.value"
+              ></el-option>
+            </el-select>
           </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
@@ -54,7 +65,44 @@
           >
         </span>
       </el-dialog>
-
+      <!-- 添加字典类型 -->
+      <el-button
+        type="primary"
+        style="margin: 20px 0 0 20px"
+        @click="centerDialogVisibleAddType = true"
+        >添加字典类型<i class="el-icon-circle-plus-outline"></i
+      ></el-button>
+      <!-- 添加字典类型弹窗 -->
+      <el-dialog
+        title="添加字典类型"
+        :visible.sync="centerDialogVisibleAddType"
+        width="430px"
+        center
+      >
+        <!-- 添加字典类型表单 -->
+        <el-form
+          :model="newDictType"
+          label-width="65px"
+          ref="newDictType"
+          style="margin-left: -10px"
+        >
+          <el-form-item label="名字" prop="name">
+            <el-input v-model="newDictType.name"></el-input>
+          </el-form-item>
+          <el-form-item label="值" prop="value">
+            <el-input v-model="newDictType.value"></el-input>
+          </el-form-item>
+          <el-form-item label="类型" prop="type">
+            <el-input v-model="newDictType.type"></el-input>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="centerDialogVisibleAddType = false"
+            >取 消</el-button
+          >
+          <el-button type="primary" @click="submitFormType">确 定</el-button>
+        </span>
+      </el-dialog>
       <!-- 删除字典 -->
       <el-popover
         placement="top"
@@ -90,7 +138,6 @@
         border
         style="width: 100%"
         stripe
-        @filter-change="filterChange"
         @selection-change="handleSelectionChange"
       >
         <el-table-column fixed type="selection" align="center">
@@ -132,8 +179,6 @@
           prop="type"
           label="类型"
           align="center"
-          column-key="filterTag"
-          :filters="dictTypes"
           :resizable="false"
         >
         </el-table-column>
@@ -215,15 +260,19 @@
 
 <script>
 /* 获取字典列表接口 */
-import { dictGetAll, dictGetType, editOneDict, addOneDict, delDict } from '../api'
+import { dictGetAll, dictGetType, editOneDict, addOneDict, delDict, addDictType } from '../api'
 /* 下载文件 */
 
 export default {
   name: 'Dictionaries',
   data() {
     return {
+      // 添加字典类型表单
+      newDictType: {},
       // 字典类型
       dictTypes: [],
+      // 添加字典类型弹窗
+      centerDialogVisibleAddType: false,
       // 增加字典弹窗
       centerDialogVisibleAdd: false,
       // 编辑字典弹窗
@@ -326,6 +375,23 @@ export default {
         this.ids = []
       }
     },
+    // 提交字典类型表单
+    async submitFormType() {
+      try {
+        let res = await addDictType(this.newDictType)
+        if (res.code) {
+          if (res.code == '1001' || res.code == '1002') {
+            this.tokenLost()
+          } else {
+            this.$Message.error(res.message)
+          }
+        } else {
+          this.$Message.success(res.message)
+        }
+      } catch (error) {
+        this.$Message.error(error)
+      }
+    },
     // 提交表单  包含编辑和新增
     async submitForm(val) {
       if (val == 'editDict') {
@@ -368,12 +434,11 @@ export default {
         }
       }
     },
-    // 筛选专业
+    /* // 筛选专业
     filterChange(obj) {
       console.log(obj);
       if (obj.filterTag.length == 0) {
         // 重置重新获取
-        console.log('重置');
         this.queryInfo.dictType = ''
         this.getData()
       } else {
@@ -383,7 +448,7 @@ export default {
         })
         this.getData()
       }
-    },
+    }, */
     // 查询单条
     find() {
       this.queryInfo.dictName = this.query.trim()
@@ -417,11 +482,8 @@ export default {
         } else {
           this.tableData = res.data.records
           this.total = res.data.total
-          let a = { text: '', value: '' }
           resType.data.forEach(item => {
-            a.text = item.value
-            a.value = item.value
-            this.dictTypes.push(a)
+            this.dictTypes.push({ text: item, value: item })
           })
         }
       } catch (error) {

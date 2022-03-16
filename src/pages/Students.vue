@@ -332,7 +332,7 @@
 
 <script>
 /* 获取学生列表接口 */
-import { getAll, addStudent, delStudent, userExport, getAllGrade, getAllDept, getMajorsByDet, changeUserInfo } from '../api'
+import { getAll, addStudent, delStudent, userExport, getAllGrade, getAllDept, getMajorsByDet, changeUserInfo, getStudentMajors } from '../api'
 /* 下载文件 */
 
 export default {
@@ -427,11 +427,7 @@ export default {
       dialogVisibleDel: false,
       delPoppover: false,
       // 专业筛选
-      majorData: [
-        { text: '软件工程', value: '软件工程' },
-        { text: '数字媒体技术', value: '数字媒体技术' },
-        { text: '计算机科学与技术', value: '计算机科学与技术' },
-      ],
+      majorData: [],
       // 文件上传数据
       upLoadData: { roleId: 5 },
       // 文件上传token
@@ -635,8 +631,19 @@ export default {
     },
     // 筛选专业
     filterChange(obj) {
-      this.queryInfo.major = obj.filterTag
-      this.getData()
+      if (obj.filterTag.length == 0) {
+        // 重置
+        console.log('重置');
+        this.queryInfo.majors = []
+        this.majorData = []
+        this.getData()
+      } else {
+        // 筛选
+        obj.filterTag.forEach(item => {
+          this.queryInfo.majors.push(item)
+        })
+        this.getData()
+      }
     },
     // 查询单条
     find() {
@@ -718,20 +725,24 @@ export default {
     },
     // 获取数据接口
     async getData() {
-      //let myMajor = JSON.parse(localStorage.getItem('user')).major
+      this.majorData = []
       try {
         let res = await getAll(this.queryInfo)
-        //let resMyDept = await getMajorsByDet()
-        if (res.code) {
+        let resMyDept = await getStudentMajors()
+        if (res.code || resMyDept.code) {
           // token过期
-          if (res.code == '1001' || res.code == '1002') {
+          if (res.code == '1001' || res.code == '1002' || resMyDept.code == '1001' || resMyDept.code == '1002') {
             this.tokenLost()
           } else {
             this.$Message.error(res.message)
+            this.$Message.error(resMyDept.message)
           }
         } else {
           this.tableData = res.data.records
           this.total = res.data.total
+          resMyDept.data.forEach(item => {
+            this.majorData.push({ text: item.organizationName, value: item.organizationName })
+          })
         }
       } catch (error) {
         this.$Message.error(error)

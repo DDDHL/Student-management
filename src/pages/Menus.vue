@@ -1,15 +1,6 @@
 <template>
   <div>
     <el-card>
-      <!-- <el-input
-        suffix-icon="el-icon-search"
-        placeholder="请输入菜单名称"
-        style="width: 200px"
-        v-model="data.menuName"
-      />
-      <el-button class="ml-5" type="primary" @click="load">搜索</el-button>
-      <el-button class="ml-5" type="danger" @click="reset">重置</el-button> -->
-      <!-- 搜索 -->
       <el-input
         placeholder="搜索菜单"
         v-model="data.menuName"
@@ -197,10 +188,6 @@ export default {
     },
 
     async save() {
-      console.log(this.form)
-      if (this.form.pagePath == '') {
-        this.form.pid = null
-      }
       try {
         let res = await saveMenu(this.form)
         if (res.code) {
@@ -213,12 +200,11 @@ export default {
           // 获取成功
           this.$Message.success(res.message)
           this.load()
+          this.dialogFormVisible = false
         }
       } catch (error) {
         this.$Message.error(error)
       }
-
-      this.dialogFormVisible = false
       /*  this.request.post('/menu', this.form).then((res) => {
          if (res.code === '') {
            this.$Message.success(res.message)
@@ -320,7 +306,9 @@ export default {
       // 请求图标数据
       this.dialogFormVisible = true
       this.form = {}
-      if (pid) {
+      if (isNaN(pid)) {
+        this.form.pid = ''
+      } else {
         this.form.pid = pid
       }
       try {
