@@ -5,7 +5,7 @@ import 'nprogress/nprogress.css'
 
 const requests = axios.create({
   // 基础路径
-  baseURL: 'http://113.78.183.11:9568',
+  baseURL: 'http://113.78.184.113:9568',
   timeout: 30000,
 })
 

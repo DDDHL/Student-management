@@ -157,6 +157,14 @@ export const delStudent = (data) => {
     data: { ids: data },
   })
 }
+// 学校管理Tree
+export const schoolTable = (data) => {
+  return requests({
+    url: '/organization/getAll',
+    method: 'POST',
+    data: data,
+  })
+}
 // 添加字典类型
 export const addDictType = (data) => {
   return requests({
@@ -220,10 +228,11 @@ export const changeUserInfo = (query) => {
   })
 }
 // 获取全部年级
-export const getAllGrade = () => {
+export const getAllGrade = (data) => {
   return requests({
     url: '/organization/getAllGrade',
     method: 'POST',
+    data: { majorId: data },
   })
 }
 // 获取全部学院

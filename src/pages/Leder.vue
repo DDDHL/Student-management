@@ -266,9 +266,9 @@
             >
               <el-option
                 v-for="item in allGrade"
-                :key="item"
-                :label="item"
-                :value="item"
+                :key="item.organizationName"
+                :label="item.organizationName"
+                :value="item.organizationName"
               ></el-option>
             </el-select>
           </el-form-item>
@@ -674,7 +674,7 @@ export default {
       this.editStudent = row
       // 请求年级 学院
       try {
-        let res = await getAllGrade()
+        let res = await getAllGrade('')
         let resDep = await getAllDept()
         if (res.code && resDep.code) {
           // token过期
