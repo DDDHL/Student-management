@@ -2,10 +2,11 @@ import axios from 'axios'
 // 进度条
 import nprogress from 'nprogress'
 import 'nprogress/nprogress.css'
+import store from '../store'
 
 const requests = axios.create({
   // 基础路径
-  baseURL: 'http://113.78.184.113:9568',
+  baseURL: store.state.allip,
   timeout: 30000,
 })
 

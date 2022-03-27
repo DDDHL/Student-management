@@ -42,7 +42,7 @@
       </el-dialog>
       <!-- 文件上传下载 -->
       <el-upload
-        action="http://113.78.192.154:9568/file/upload"
+        :action="this.$store.state.allip + '/file/upload'"
         style="display: inline-block"
         class="ml-5"
         :show-file-list="false"

@@ -103,7 +103,7 @@
       </el-dialog>
       <!-- 导入导出 -->
       <el-upload
-        action="http://113.78.193.15:9568/user/import"
+        :action="this.$store.state.allip + '/user/import'"
         style="display: inline-block"
         class="ml-5"
         :show-file-list="false"
