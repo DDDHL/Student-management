@@ -20,7 +20,7 @@
       <el-button
         type="primary"
         style="margin: 20px 0 0 20px"
-        @click="centerDialogVisibleAdd = true"
+        @click="addStudentBtn"
         >添加导员<i class="el-icon-circle-plus-outline"></i
       ></el-button>
       <!-- 添加导员弹窗 -->
@@ -55,13 +55,35 @@
             </el-select>
           </el-form-item>
           <el-form-item label="年级" prop="grade">
-            <el-input v-model="newStudent.grade"></el-input>
+            <el-select
+              v-model="newStudent.grade"
+              placeholder="请选择年级"
+              style="width: 325px"
+            >
+              <el-option
+                v-for="item in addMajorData"
+                :key="item.organizationName"
+                :label="item.organizationName"
+                :value="item.organizationName"
+              ></el-option>
+            </el-select>
           </el-form-item>
           <el-form-item label="学院" prop="department">
-            <el-input v-model="newStudent.department"></el-input>
+            <el-input v-model="newStudent.department" disabled></el-input>
           </el-form-item>
           <el-form-item label="专业" prop="major">
-            <el-input v-model="newStudent.major"></el-input>
+            <el-select
+              v-model="newStudent.major"
+              placeholder="请选择专业"
+              style="width: 325px"
+            >
+              <el-option
+                v-for="item in majorData"
+                :key="item.value"
+                :label="item.value"
+                :value="item.value"
+              ></el-option>
+            </el-select>
           </el-form-item>
           <el-form-item label="手机号" prop="phone">
             <el-input v-model="newStudent.phone"></el-input>
@@ -336,7 +358,7 @@ import { getAll, addStudent, delStudent, userExport, getAllGrade, getAllDept, ge
 /* 下载文件 */
 
 export default {
-  name: 'Tutor',
+  name: 'Students',
   data() {
     /* 手机号规则 */
     var validatorPhone = function (rule, value, callback) {
@@ -444,6 +466,8 @@ export default {
       ids: [],
       // 表格数据
       total: 0,
+      // 新增导员年级
+      addMajorData: [],
       // 新增导员
       newStudent: {},
       // 编辑导员
@@ -492,6 +516,26 @@ export default {
       localStorage.removeItem('user')
       localStorage.removeItem('menus')
       this.$router.push('/login')
+    },
+    // 新增导员按钮
+    async addStudentBtn() {
+      try {
+        // 请求年级
+        let res = await getAllGrade('')
+        if (res.code) {
+          if (res.code == '1001' || res.code == '1002') {
+            this.tokenLost()
+          } else {
+            this.$Message.error(res.message)
+          }
+        } else {
+          // 赋值
+          this.addMajorData = res.data
+          this.centerDialogVisibleAdd = true
+        }
+      } catch (error) {
+        this.$Message.error(error)
+      }
     },
     // 导入导出
     async exp() {
@@ -713,10 +757,12 @@ export default {
             this.$Message.error(res.message)
           }
         } else {
+
           // 请求成功赋值专业
           this.SomeMajors = res.data
           if (this.currentDept != id) {
             this.editStudent.major = ''
+
           }
         }
       } catch (error) {
@@ -740,6 +786,8 @@ export default {
         } else {
           this.tableData = res.data.records
           this.total = res.data.total
+          // 赋值新增导员学院
+          this.newStudent.department = res.data.records[0].department
           resMyDept.data.forEach(item => {
             this.majorData.push({ text: item.organizationName, value: item.organizationName })
           })

@@ -174,15 +174,6 @@ export default {
           }
         }
       })
-
-      /*  this.$refs.form.validate( async (valid) => {
-        if (valid) {
-          let menus = await getMenus()
-          localStorage.setItem('menus',JSON.stringify(menus))
-          setRoutes()
-          this.$router.push("/index");
-        }
-      }); */
     },
   },
 }

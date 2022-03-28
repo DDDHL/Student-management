@@ -50,21 +50,23 @@
         <el-table-column prop="studentCount" label="学生数量" align="center" />
         <el-table-column prop="teacherCount" label="老师数量" align="center" />
         <el-table-column prop="totalCount" label="总人数" align="center" />
-        <el-table-column label="操作" width="300" align="center">
+        <el-table-column label="操作" width="400" align="center">
           <template slot-scope="scope">
             <el-button
-              size="small"
+              size="mini"
               type="primary"
               @click="handleAdd(scope.row.id)"
               v-if="!scope.row.pid && !scope.row.path"
-              >新增 <i class="el-icon-plus"></i
+              >{{ "新增" + btnName(scope.row.organizationName)
+              }}<i class="el-icon-plus"></i
             ></el-button>
             <el-button
               type="success"
               @click="handleEdit(scope.row)"
-              size="small"
+              size="mini"
               style="margin-right: 10px"
-              >编辑 <i class="el-icon-edit"></i
+              >{{ "编辑" + btnName(scope.row.organizationName) }}
+              <i class="el-icon-edit"></i
             ></el-button>
             <el-popconfirm
               class="ml-5"
@@ -75,8 +77,9 @@
               title="您确定删除吗?"
               @confirm="del(scope.row.id)"
             >
-              <el-button slot="reference" type="danger" size="small"
-                >删除 <i class="el-icon-delete"></i
+              <el-button slot="reference" type="danger" size="mini"
+                >{{ "删除" + btnName(scope.row.organizationName) }}
+                <i class="el-icon-delete"></i
               ></el-button>
             </el-popconfirm>
           </template>
@@ -161,6 +164,11 @@ export default {
     }
   },
   methods: {
+    // 获取按钮文字
+    btnName(res) {
+      let btnNameObj = new Map([['院', '院系 '], ['系', '院系 '], ['业', '专业 '], ['级', '班级 ']])
+      return btnNameObj.get(res.charAt(res.length - 1))
+    },
     // 懒加载数据
     async loadSomeData(tree, treeNode, resolve) {
       //console.log(treeNode);
@@ -302,16 +310,6 @@ export default {
           } catch (error) {
             that.$Message.error(error)
           }
-
-
-          /* that.request.post('/menu/del/batch', data).then((res) => {
-            if (res.code === '') {
-              that.$Message.success(res.message)
-              that.load()
-            } else {
-              that.$Message.error(res.message)
-            }
-          }) */
         })
         .then((data) => {
           //取消操作
@@ -388,15 +386,6 @@ export default {
       } catch (error) {
         this.$Message.error(error)
       }
-      /*  this.request.post('/menu', row).then((res) => {
-         if (res.code === '') {
-           this.$Message.success(res.message)
-           this.load()
-         } else {
-           this.$Message.error(res.message)
-         }
-       }) */
-      console.log(row.state)
     },
     // 重置搜索
     reset() {

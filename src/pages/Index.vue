@@ -93,7 +93,7 @@
                   <el-upload
                     style="text-align: center"
                     class="avatar-uploader"
-                    action="http://113.78.194.215:9568/file/upload"
+                    :action="this.$store.state.allip + '/file/upload'"
                     :show-file-list="false"
                     :on-success="handleAvatarSuccess"
                     :before-upload="beforeAvatarUpload"

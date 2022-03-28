@@ -87,13 +87,13 @@
           style="margin-left: -10px"
         >
           <el-form-item label="名字" prop="name">
-            <el-input v-model="newDictType.name"></el-input>
+            <el-input v-model="newDictType.name" disabled></el-input>
           </el-form-item>
           <el-form-item label="值" prop="value">
             <el-input v-model="newDictType.value"></el-input>
           </el-form-item>
           <el-form-item label="类型" prop="type">
-            <el-input v-model="newDictType.type"></el-input>
+            <el-input v-model="newDictType.type" disabled></el-input>
           </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
@@ -153,7 +153,7 @@
         </el-table-column>
         <el-table-column
           prop="value"
-          label="图标"
+          label="预览"
           align="center"
           :resizable="false"
         >
@@ -268,7 +268,7 @@ export default {
   data() {
     return {
       // 添加字典类型表单
-      newDictType: {},
+      newDictType: { name: '字典类型', type: 'DICT_TYPE' },
       // 字典类型
       dictTypes: [],
       // 添加字典类型弹窗
@@ -387,6 +387,8 @@ export default {
           }
         } else {
           this.$Message.success(res.message)
+          this.centerDialogVisibleAddType = false
+          this.getData()
         }
       } catch (error) {
         this.$Message.error(error)

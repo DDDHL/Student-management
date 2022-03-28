@@ -1,5 +1,14 @@
 // 导入封装好的axios请求文件
 import requests from './request'
+
+// 分页获取日志
+export const getLog = (data) => {
+  return requests({
+    url: '/log/getAll',
+    method: 'POST',
+    data: data,
+  })
+}
 // 获取角色权限
 export const rolePower = (data) => {
   return requests({

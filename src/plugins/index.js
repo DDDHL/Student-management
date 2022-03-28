@@ -79,3 +79,7 @@ Vue.prototype.$confirm = MessageBox.confirm
 // 用户管理页面
 import { Tree } from 'element-ui'
 Vue.use(Tree)
+
+// 日志页面
+import { DatePicker } from 'element-ui'
+Vue.use(DatePicker)
