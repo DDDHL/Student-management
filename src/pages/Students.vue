@@ -20,7 +20,7 @@
       <el-button
         type="primary"
         style="margin: 20px 0 0 20px"
-        @click="addStudentBtn"
+        @click="centerDialogVisibleAdd = true"
         >添加学生<i class="el-icon-circle-plus-outline"></i
       ></el-button>
       <!-- 添加学生弹窗 -->
@@ -54,20 +54,6 @@
               <el-option label="女" value="女"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="年级" prop="grade">
-            <el-select
-              v-model="newStudent.grade"
-              placeholder="请选择年级"
-              style="width: 325px"
-            >
-              <el-option
-                v-for="item in addMajorData"
-                :key="item.organizationName"
-                :label="item.organizationName"
-                :value="item.organizationName"
-              ></el-option>
-            </el-select>
-          </el-form-item>
           <el-form-item label="学院" prop="department">
             <el-input v-model="newStudent.department" disabled></el-input>
           </el-form-item>
@@ -82,6 +68,21 @@
                 :key="item.value"
                 :label="item.value"
                 :value="item.value"
+                @click.native="addStudentGetMj(item.id)"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="年级" prop="grade">
+            <el-select
+              v-model="newStudent.grade"
+              placeholder="请先选择专业"
+              style="width: 325px"
+            >
+              <el-option
+                v-for="item in addMajorData"
+                :key="item.organizationName"
+                :label="item.organizationName"
+                :value="item.organizationName"
               ></el-option>
             </el-select>
           </el-form-item>
@@ -320,6 +321,7 @@
                 :key="item.id"
                 :label="item.organizationName"
                 :value="item.organizationName"
+                @click.native="updatedGrade(item.id)"
               ></el-option>
             </el-select>
           </el-form-item>
@@ -437,6 +439,10 @@ export default {
           },
         ],
       },
+      // 编辑学生年级需要的id
+      editStudentId: 0,
+      // 新增学生年级需要的id
+      newStudentId: 0,
       // 导入失败文字
       importError: '',
       // 导入失败弹窗
@@ -479,7 +485,7 @@ export default {
       // 列表参数
       queryInfo: {
         roleId: 5,
-        major: [],
+        majors: [],
         nickName: '',
         // 当前页
         pageNum: 1,
@@ -490,9 +496,6 @@ export default {
     }
   },
   watch: {
-    'queryInfo.query'(newValue, oldValue) {
-      console.log(newValue, oldValue)
-    },
     'centerDialogVisibleEdit'(newValue) {
       if (!newValue) {
         // 关闭编辑就重新获取表格
@@ -517,11 +520,11 @@ export default {
       localStorage.removeItem('menus')
       this.$router.push('/login')
     },
-    // 新增学生按钮
-    async addStudentBtn() {
+    // 新增学生获取年级
+    async addStudentGetMj(id) {
       try {
         // 请求年级
-        let res = await getAllGrade('')
+        let res = await getAllGrade(id)
         if (res.code) {
           if (res.code == '1001' || res.code == '1002') {
             this.tokenLost()
@@ -531,7 +534,6 @@ export default {
         } else {
           // 赋值
           this.addMajorData = res.data
-          this.centerDialogVisibleAdd = true
         }
       } catch (error) {
         this.$Message.error(error)
@@ -677,7 +679,6 @@ export default {
     filterChange(obj) {
       if (obj.filterTag.length == 0) {
         // 重置
-        console.log('重置');
         this.queryInfo.majors = []
         this.majorData = []
         this.getData()
@@ -718,7 +719,13 @@ export default {
       this.editStudent = row
       // 请求年级 学院
       try {
-        let res = await getAllGrade('')
+        // 获取当前专业年级
+        this.majorData.forEach(item => {
+          if (row.major == item.text) {
+            this.editStudentId = item.id
+          }
+        })
+        let res = await getAllGrade(this.editStudentId)
         let resDep = await getAllDept()
         if (res.code && resDep.code) {
           // token过期
@@ -769,6 +776,11 @@ export default {
         this.$Message.error(error)
       }
     },
+    // 编辑学生时，切换专业重新获取年级
+    async updatedGrade(id) {
+      let res = await getAllGrade(id)
+      this.allGrade = res.data
+    },
     // 获取数据接口
     async getData() {
       this.majorData = []
@@ -789,8 +801,9 @@ export default {
           // 赋值新增学生学院
           this.newStudent.department = res.data.records[0].department
           resMyDept.data.forEach(item => {
-            this.majorData.push({ text: item.organizationName, value: item.organizationName })
+            this.majorData.push({ text: item.organizationName, value: item.organizationName, id: item.id })
           })
+
         }
       } catch (error) {
         this.$Message.error(error)

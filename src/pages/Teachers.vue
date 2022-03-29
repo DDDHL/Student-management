@@ -479,7 +479,7 @@ export default {
       // 列表参数
       queryInfo: {
         roleId: 4,
-        major: [],
+        majors: [],
         nickName: '',
         // 当前页
         pageNum: 1,
