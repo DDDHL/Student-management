@@ -52,12 +52,20 @@
         <el-table-column prop="totalCount" label="总人数" align="center" />
         <el-table-column label="操作" width="400" align="center">
           <template slot-scope="scope">
+            <!-- 班级跳转按钮 -->
+            <el-button
+              size="mini"
+              type="primary"
+              v-if="!btnName(scope.row.organizationName)"
+              >查看班级 <i class="el-icon-view"></i
+            ></el-button>
+            <!-- 其他操作的按钮 -->
             <el-button
               size="mini"
               type="primary"
               @click="handleAdd(scope.row.id)"
-              v-if="!scope.row.pid && !scope.row.path"
-              >{{ "新增" + btnName(scope.row.organizationName)
+              v-if="btnName(scope.row.organizationName)"
+              >{{ "新增" + btnName(scope.row.organizationName)[0]
               }}<i class="el-icon-plus"></i
             ></el-button>
             <el-button
@@ -65,7 +73,8 @@
               @click="handleEdit(scope.row)"
               size="mini"
               style="margin-right: 10px"
-              >{{ "编辑" + btnName(scope.row.organizationName) }}
+              v-if="btnName(scope.row.organizationName)"
+              >{{ "编辑" + btnName(scope.row.organizationName)[1] }}
               <i class="el-icon-edit"></i
             ></el-button>
             <el-popconfirm
@@ -76,9 +85,14 @@
               icon-color="red"
               title="您确定删除吗?"
               @confirm="del(scope.row.id)"
+              v-if="btnName(scope.row.organizationName)"
             >
-              <el-button slot="reference" type="danger" size="mini"
-                >{{ "删除" + btnName(scope.row.organizationName) }}
+              <el-button
+                slot="reference"
+                type="danger"
+                size="mini"
+                v-if="btnName(scope.row.organizationName)"
+                >{{ "删除" + btnName(scope.row.organizationName)[2] }}
                 <i class="el-icon-delete"></i
               ></el-button>
             </el-popconfirm>
@@ -144,7 +158,7 @@
 
 <script>
 /* API */
-import { schoolTable, getIcon, saveMenu, delMenu, getMajorsByDet, getAllGrade } from '../api'
+import { schoolTable, getIcon, saveMenu, delMenu, getMajorsByDet, getAllGrade, getAllClass } from '../api'
 export default {
   name: 'School',
   data() {
@@ -166,13 +180,18 @@ export default {
   methods: {
     // 获取按钮文字
     btnName(res) {
-      let btnNameObj = new Map([['院', '院系 '], ['系', '院系 '], ['业', '专业 '], ['级', '班级 ']])
-      return btnNameObj.get(res.charAt(res.length - 1))
+      let btnNameObj = new Map([['院', '院系 '], ['系', '院系 '], ['业', '专业 '], ['级', '班级 '], ['班', '']])
+      if (btnNameObj.get(res.charAt(res.length - 1))) {
+        if (res.charAt(res.length - 1) == '级') {
+          return [btnNameObj.get(res.charAt(res.length - 1)), '年级', '年级']
+        }
+        return [btnNameObj.get(res.charAt(res.length - 1)), btnNameObj.get(res.charAt(res.length - 1)), btnNameObj.get(res.charAt(res.length - 1))]
+      }
+      // 班级
+      return false
     },
     // 懒加载数据
     async loadSomeData(tree, treeNode, resolve) {
-      //console.log(treeNode);
-      //console.log(tree.departmentId);
       if (tree.departmentId == null) {
         // 获取专业
         try {
@@ -190,20 +209,38 @@ export default {
           this.$Message.error(error)
         }
       } else {
-        // 获取年级
-        try {
-          let res = await getAllGrade(tree.id)
-          if (res.code) {
-            if (res.code == '1001' || res.code == '1002') {
-              this.tokenLost()
+        if (tree.organizationName.charAt(tree.organizationName.length - 1) != '级') {
+          // 获取年级
+          try {
+            let res = await getAllGrade(tree.id)
+            if (res.code) {
+              if (res.code == '1001' || res.code == '1002') {
+                this.tokenLost()
+              } else {
+                this.$Message.error(res.message)
+              }
             } else {
-              this.$Message.error(res.message)
+              resolve(res.data)
             }
-          } else {
-            resolve(res.data)
+          } catch (error) {
+            this.$Message.error(error)
           }
-        } catch (error) {
-          this.$Message.error(error)
+        } else {
+          // 获取班级
+          try {
+            let res = await getAllClass(tree.id)
+            if (res.code) {
+              if (res.code == '1001' || res.code == '1002') {
+                this.tokenLost()
+              } else {
+                this.$Message.error(res.message)
+              }
+            } else {
+              resolve(res.data)
+            }
+          } catch (error) {
+            this.$Message.error(error)
+          }
         }
       }
 

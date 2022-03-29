@@ -1,6 +1,14 @@
 // 导入封装好的axios请求文件
 import requests from './request'
 
+// 学生管理懒加载获取班级
+export const getAllClass = (data) => {
+  return requests({
+    url: '/organization/getAllClass',
+    method: 'POST',
+    data: { gradeId: data },
+  })
+}
 // 分页获取日志
 export const getLog = (data) => {
   return requests({
