@@ -1,6 +1,14 @@
 // 导入封装好的axios请求文件
 import requests from './request'
 
+// 班级管理页面获取班级
+export const getClass = (data) => {
+  return requests({
+    url: '/curriculum/getAll',
+    method: 'POST',
+    data: data,
+  })
+}
 // 学校页面添加新专业学院年级
 export const addNewOrg = (data) => {
   return requests({
