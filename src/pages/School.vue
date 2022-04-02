@@ -17,7 +17,10 @@
       </el-input>
 
       <!-- 新增学院 -->
-      <el-button type="primary" @click="handleAdd" style="margin: 20px 0 0 20px"
+      <el-button
+        type="primary"
+        @click="handleAdd(false)"
+        style="margin: 20px 0 0 20px"
         >新增一级学院 <i class="el-icon-circle-plus-outline"></i
       ></el-button>
 
@@ -63,7 +66,7 @@
             <el-button
               size="mini"
               type="primary"
-              @click="handleAdd(scope.row.id)"
+              @click="handleAdd(scope.row)"
               v-if="btnName(scope.row.organizationName)"
               >{{ "新增" + btnName(scope.row.organizationName)[0]
               }}<i class="el-icon-plus"></i
@@ -112,39 +115,18 @@
       >
       </el-pagination>
 
-      <el-dialog title="学院信息" :visible.sync="dialogFormVisible" width="30%">
+      <el-dialog
+        :title="formText.title"
+        center
+        :visible.sync="dialogFormVisible"
+        width="30%"
+      >
         <el-form label-width="80px" size="small">
-          <el-form-item label="学院名称">
-            <el-input v-model="form.menuName" autocomplete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="学院路径">
-            <el-input v-model="form.path" autocomplete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="页面路径">
-            <el-input v-model="form.pagePath" autocomplete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="学院图标">
-            <el-select
-              clearable
-              v-model="form.icon"
-              placeholder="请选择图标"
-              style="width: 100%"
-              class-name="fontSize18"
-              align="center"
-              label-class-name="fontSize12"
-            >
-              <el-option
-                v-for="item in options"
-                :key="item.name"
-                :label="item.name"
-                :value="item.value"
-              >
-                <i :class="item.value" class="mr-5" /> {{ item.name }}
-              </el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="描述">
-            <el-input v-model="form.description" autocomplete="off"></el-input>
+          <el-form-item :label="formText.name">
+            <el-input
+              v-model="addForm.organizationName"
+              autocomplete="off"
+            ></el-input>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -158,7 +140,7 @@
 
 <script>
 /* API */
-import { schoolTable, getIcon, saveMenu, delMenu, getMajorsByDet, getAllGrade, getAllClass } from '../api'
+import { schoolTable, saveMenu, delMenu, getMajorsByDet, getAllGrade, getAllClass, addNewOrg } from '../api'
 export default {
   name: 'School',
   data() {
@@ -169,18 +151,32 @@ export default {
       dialogFormVisible: false,
       multipleSelection: [],
       headerBg: 'headerBg',
-      options: [],
+      formText: {
+        title: '新增',
+        name: ''
+      },
       data: {
         organizationName: '',
         pageNum: 1,
         pageSize: 10,
       },
+      addForm: {
+        delFlag: "",
+        departmentId: null,
+        gradeId: null,
+        id: null,
+        majorId: null,
+        organizationName: "",
+        studentCount: null,
+        teacherCount: null,
+        totalCount: null
+      }
     }
   },
   methods: {
     // 获取按钮文字
     btnName(res) {
-      let btnNameObj = new Map([['院', '院系 '], ['系', '院系 '], ['业', '专业 '], ['级', '班级 '], ['班', '']])
+      let btnNameObj = new Map([['院', '专业 '], ['系', '专业 '], ['业', '年级 '], ['学', '年级'], ['级', '班级 '], ['班', '']])
       if (btnNameObj.get(res.charAt(res.length - 1))) {
         if (res.charAt(res.length - 1) == '级') {
           return [btnNameObj.get(res.charAt(res.length - 1)), '年级', '年级']
@@ -272,8 +268,9 @@ export default {
     },
 
     async save() {
+      // 新增确定
       try {
-        let res = await saveMenu(this.form)
+        let res = await addNewOrg(this.addForm)
         if (res.code) {
           if (res.code == '1001' || res.code == '1002') {
             this.tokenLost()
@@ -281,41 +278,27 @@ export default {
             this.$Message.error(res.message)
           }
         } else {
-          // 获取成功
           this.$Message.success(res.message)
           this.load()
-          this.dialogFormVisible = false
         }
       } catch (error) {
         this.$Message.error(error)
       }
+      this.dialogFormVisible = false
+      this.addForm.organizationName = ''
+      this.addForm.departmentId = null
+      this.addForm.majorId = null
+      this.addForm.gradeId = null
     },
 
     async del(id) {
-      let data = {}
-      data.id = id
-      try {
-        let res = await delMenu(data)
-        if (res.code) {
-          if (res.code == '1001' || res.code == '1002') {
-            this.tokenLost()
-          } else {
-            this.$Message.error(res.message)
-          }
-        } else {
-          // 获取成功
-          this.$Message.success(res.message)
-          this.load()
-        }
-      } catch (error) {
-        this.$Message.error(error)
-      }
-      this.load()
+      console.log('删除', id)
     },
 
     delBatch() {
       let that = this
       let ids = this.multipleSelection.map((v) => v.id)
+      console.log(ids)
       if (!ids.length) {
         this.$Message.warning('请选择要批量删除的学院')
         return
@@ -358,52 +341,31 @@ export default {
       this.multipleSelection = val
     },
 
+    // 新增学院专业等
     async handleAdd(pid) {
-      // 请求图标数据
-      this.dialogFormVisible = true
-      this.form = {}
-      if (isNaN(pid)) {
-        this.form.pid = ''
+      if (!pid) {
+        // 新增学院
+        this.formText.title = '新增学院'
+        this.formText.name = '学院名称'
       } else {
-        this.form.pid = pid
-      }
-      try {
-        let res = await getIcon()
-        if (res.code) {
-          if (res.code == '1001' || res.code == '1002') {
-            this.tokenLost()
-          } else {
-            this.$Message.error(res.message)
-          }
-        } else {
-          // 获取成功
-          this.options = res.data
+        // 新增专业年级
+        let obj = new Map([['院', '专业 '], ['系', '专业 '], ['业', '年级 '], ['学', '年级'], ['级', '班级 '], ['班', '']])
+        let name = pid.organizationName
+        this.formText.title = '新增' + obj.get(name.charAt(name.length - 1))
+        this.formText.name = obj.get(name.charAt(name.length - 1)).trim() + '名称'
+        let allname = ['专业', '年级', '班级']
+        if (allname.includes(this.formText.title)) {
+          this.addForm.departmentId = pid.id
         }
-      } catch (error) {
-        this.$Message.error(error)
+        console.log(pid)
       }
+      this.dialogFormVisible = true
     },
 
     async handleEdit(row) {
       this.form = row
       this.dialogFormVisible = true
-
-      // 请求图标数据
-      try {
-        let res = await getIcon()
-        if (res.code) {
-          if (res.code == '1001' || res.code == '1002') {
-            this.tokenLost()
-          } else {
-            this.$Message.error(res.message)
-          }
-        } else {
-          // 获取成功
-          this.options = res.data
-        }
-      } catch (error) {
-        this.$Message.error(error)
-      }
+      console.log(row)
     },
 
     async handleState(row) {
