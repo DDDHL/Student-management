@@ -1,6 +1,14 @@
 // 导入封装好的axios请求文件
 import requests from './request'
 
+// 修改学院或者年级或者专业名字
+export const editById = (id, name) => {
+  return requests({
+    url: '/organization/edit',
+    method: 'POST',
+    data: { id: id, organizationName: name },
+  })
+}
 // 班级管理页面获取班级
 export const getClass = (data) => {
   return requests({
@@ -273,6 +281,14 @@ export const getAllDept = () => {
   return requests({
     url: '/organization/getAllDept',
     method: 'POST',
+  })
+}
+// 删除学院或者专业或者年级
+export const delById = (data) => {
+  return requests({
+    url: '/organization/delete',
+    method: 'POST',
+    data: { id: data },
   })
 }
 // 获取某个学院下的某专业
