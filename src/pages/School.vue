@@ -3,7 +3,7 @@
     <el-card>
       <el-input
         placeholder="搜索学院"
-        v-model="data.menuName"
+        v-model="data.organizationName"
         clearable
         @clear="reset"
         @blur="blurSearch"
@@ -62,6 +62,7 @@
               size="mini"
               type="primary"
               @click="handleAdd(scope.row)"
+              :disabled="scope.row.disAdd"
               v-if="scope.row.fr"
               >{{ scope.row.fr }}<i class="el-icon-plus"></i
             ></el-button>
@@ -71,6 +72,7 @@
               size="mini"
               style="margin-right: 10px"
               v-if="scope.row.se"
+              :disabled="scope.row.disEdit"
               >{{ scope.row.se }} <i class="el-icon-edit"></i
             ></el-button>
             <el-popconfirm
@@ -88,6 +90,7 @@
                 type="danger"
                 size="mini"
                 v-if="scope.row.th"
+                :disabled="scope.row.disDel"
                 >{{ scope.row.th }} <i class="el-icon-delete"></i
               ></el-button>
             </el-popconfirm>
@@ -208,6 +211,7 @@ export default {
             // 按钮文字
             res.data.forEach(item => {
               Object.assign(item, { fr: '新增年级' })
+              Object.assign(item, { disAdd: true })
               Object.assign(item, { se: '编辑专业' })
               Object.assign(item, { th: '删除专业' })
             })
@@ -230,6 +234,8 @@ export default {
             } else {
               res.data.forEach(item => {
                 Object.assign(item, { fr: '新增班级' })
+                Object.assign(item, { disEdit: true })
+                Object.assign(item, { disDel: true })
                 Object.assign(item, { se: '编辑年级' })
                 Object.assign(item, { th: '删除年级' })
               })
@@ -349,9 +355,16 @@ export default {
         let name = pid.organizationName
         this.formText.title = '新增' + obj.get(name.charAt(name.length - 1))
         this.formText.name = obj.get(name.charAt(name.length - 1)).trim() + '名称'
-        let allname = ['专业', '年级', '班级']
-        if (allname.includes(this.formText.title)) {
-          this.addForm.departmentId = pid.id
+        switch (this.formText.name) {
+          case '专业名称':
+            this.addForm.departmentId = pid.id
+            break
+          case '年级名称':
+            this.addForm.majorId = pid.id
+            break
+          case '班级名称':
+            this.addForm.gradeId = pid.id
+            break
         }
       }
       this.dialogFormVisible = true
@@ -403,12 +416,12 @@ export default {
     },
     // 重置搜索
     reset() {
-      this.roleName = ''
+      this.organizationName = ''
       this.load()
     },
     // 搜索失焦重置
     blurSearch() {
-      if (this.data.menuName == '') {
+      if (this.data.organizationName == '') {
         this.reset()
       }
     },

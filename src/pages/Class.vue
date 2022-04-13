@@ -20,7 +20,7 @@
       <el-button type="primary"
         >新键班级 <i class="el-icon-circle-plus-outline"></i
       ></el-button>
-      <!-- 日志表格 -->
+      <!-- 表格 -->
       <el-table
         :header-cell-style="{
           background: '#ebeef5',
@@ -36,8 +36,12 @@
           label="班级名字"
           align="center"
         />
-        <el-table-column prop="nickName" label="任课老师" align="center" />
-        <el-table-column prop="module" label="班级人数" align="center" />
+        <el-table-column
+          prop="curriculumTeacher"
+          label="任课老师"
+          align="center"
+        />
+        <el-table-column prop="studentCount" label="班级人数" align="center" />
         <el-table-column
           prop="createTime"
           label="创建时间"
