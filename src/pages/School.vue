@@ -158,6 +158,7 @@ export default {
   name: 'School',
   data() {
     return {
+      maps: new Map(),
       total: 0,
       tableData: [],
       form: {},
@@ -197,6 +198,7 @@ export default {
     },
     // 懒加载数据
     async loadSomeData(tree, treeNode, resolve) {
+      this.maps.set(tree.id, { tree, treeNode, resolve })
       if (tree.departmentId == null) {
         // 获取专业
         try {
@@ -310,7 +312,13 @@ export default {
           }
         } else {
           this.$Message.success(res.message)
-          this.load()
+          let flag = this.addForm.departmentId || this.addForm.majorId || this.addForm.gradeId
+          if (flag == null) {
+            this.load()
+          } else {
+            const { tree, treeNode, resolve } = this.maps.get(flag)
+            this.loadSomeData(tree, treeNode, resolve)
+          }
         }
       } catch (error) {
         this.$Message.error(error)
