@@ -1,6 +1,14 @@
 // 导入封装好的axios请求文件
 import requests from './request'
 
+// 班级管理新增班级
+export const addClass = (data) => {
+  return requests({
+    url: '/curriculum/addCurriculum',
+    method: 'POST',
+    data: data,
+  })
+}
 // 修改学院或者年级或者专业名字
 export const editById = (id, name) => {
   return requests({

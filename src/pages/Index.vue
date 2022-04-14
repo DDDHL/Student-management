@@ -547,6 +547,7 @@ export default {
           }
         } catch (error) {
           this.$Message.error(error)
+          this.tokenLost()
         }
       }
       if (index == "logout") {
