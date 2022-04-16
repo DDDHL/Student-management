@@ -83,3 +83,9 @@ Vue.use(Tree)
 // 日志页面
 import { DatePicker } from 'element-ui'
 Vue.use(DatePicker)
+
+// 班级页面
+import { Drawer } from 'element-ui'
+Vue.use(Drawer)
+import { Loading } from 'element-ui'
+Vue.use(Loading)

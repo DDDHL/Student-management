@@ -43,6 +43,7 @@
               v-model="startClassTime"
               placeholder="开始上课时间 (可多选)"
               multiple
+              :disabled="timeDisable"
             >
               <el-option
                 v-for="item in allClassTime"
@@ -90,9 +91,10 @@
           <div>
             <el-select
               v-model="weekDays"
-              placeholder="请选择上课的星期 (可多选)"
+              placeholder="上课星期 (可多选)"
               multiple
               style="width: 536px"
+              :disabled="timeDisable"
             >
               <el-option
                 v-for="item in allWeekDays"
@@ -114,7 +116,7 @@
           <div style="width: 536px">
             <el-input
               type="textarea"
-              placeholder="请输入内容"
+              placeholder="请输入内容 (非必填)"
               v-model="addQuerys.curriculumInfo"
               maxlength="120"
               show-word-limit
@@ -170,6 +172,67 @@
       >
       </el-pagination>
     </el-card>
+    <!-- 课程时间设计页面 -->
+    <div>
+      <el-drawer
+        title="自定义每周上课时间"
+        :visible.sync="drawer"
+        :before-close="closeDesign"
+      >
+        <div>
+          <el-table :data="designTable" style="width: 100%">
+            <el-table-column prop="weeks" label="上课周" align="center">
+            </el-table-column>
+            <el-table-column fixed="right" label="上课星期" align="center">
+              <template slot-scope="scope">
+                <el-select
+                  v-model="scope.row.weeksNumber"
+                  placeholder="请选择上课的星期 (可多选)"
+                  multiple
+                  :disabled="weeksDisable"
+                >
+                  <el-option
+                    v-for="item in allWeekDays"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  >
+                  </el-option>
+                </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column fixed="right" label="上课时间" align="center">
+              <template slot-scope="scope">
+                <el-select
+                  v-model="scope.row.weeksTime"
+                  placeholder="开始上课时间 (可多选)"
+                  multiple
+                >
+                  <el-option
+                    v-for="item in allClassTime"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  >
+                    <span style="float: left">{{ item.label }}</span>
+                    <span
+                      style="float: right; color: #8492a6; font-size: 13px"
+                      >{{ item.value }}</span
+                    >
+                  </el-option>
+                </el-select>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+        <div style="display: flex; justify-content: space-around">
+          <el-button type="primary" @click="saveDesign">保存自定义</el-button
+          ><el-button type="warning" @click="cancelDesign"
+            >取消自定义</el-button
+          >
+        </div>
+      </el-drawer>
+    </div>
   </div>
 </template>
 
@@ -179,6 +242,9 @@ export default {
   name: 'Class',
   data() {
     return {
+      weeksDisable: false,
+      timeDisable: false,
+      drawer: false,
       dialogVisible: false,
       // 分页总数
       total: 0,
@@ -210,10 +276,11 @@ export default {
       allWeek: [],
       allClassTime: [],
       startWeek: 1,
-      endWeek: 20,
+      endWeek: 5,
       startClassTime: [],
       weekDays: [],
-      allWeekDays: []
+      allWeekDays: [],
+      designTable: []
     }
   },
   created() {
@@ -292,8 +359,97 @@ export default {
       if (this.weekDays.length == 0 || this.startClassTime.length == 0) {
         this.$Message.warning('请先选择上课时间以及上课星期 !')
       } else {
-        console.log('成功')
+        const loading = this.$loading({
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
+        setTimeout(() => {
+          loading.close();
+          this.drawer = true
+        }, 500);
+        if (!this.designTable.length) {
+          for (var item = this.startWeek; item <= this.endWeek; item++) {
+            this.designTable.push({ weeks: item, weeksNumber: this.weekDays, weeksTime: this.startClassTime })
+          }
+        }
       }
+    },
+    // 取消自定义
+    cancelDesign() {
+      this.drawer = false
+      this.timeDisable = false
+      this.weekDays = this.startClassTime = []
+    },
+    // 保存自定义
+    saveDesign() {
+      this.selectFinish('自定义')
+      this.drawer = false
+      this.timeDisable = true
+      this.weekDays = this.startClassTime = ['自定义']
+      this.$Message.success('自定义保存成功!')
+    },
+    // 时间格式化成请求需要参数
+    selectFinish(e) {
+      if (e == '自定义') {
+        this.addQuerys.weeksNumber = []
+        this.addQuerys.weeksTime = []
+        let weeksNumber = ''
+        let weeksTime = ''
+        for (let i = 0; i < this.designTable.length; i++) {
+          for (let j = 0; j < this.designTable[i].weeksNumber.length; j++) {
+            if (j == this.designTable[i].weeksNumber.length - 1) {
+              weeksNumber = weeksNumber + this.designTable[i].weeksNumber[j]
+            } else {
+              weeksNumber = weeksNumber + this.designTable[i].weeksNumber[j] + '、'
+            }
+          }
+          for (let k = 0; k < this.designTable[i].weeksTime.length; k++) {
+            if (k == this.designTable[i].weeksTime.length - 1) {
+              weeksTime = weeksTime + this.designTable[i].weeksTime[k]
+            } else {
+              weeksTime = weeksTime + this.designTable[i].weeksTime[k] + ','
+            }
+          }
+          this.addQuerys.weeksNumber.push(weeksNumber)
+          this.addQuerys.weeksTime.push(weeksTime)
+          weeksNumber = ''
+          weeksTime = ''
+        }
+        console.log(this.addQuerys)
+      } else {
+        let weeksNumber = ''
+        let weeksTime = ''
+        for (let i = 0; i < this.weekDays.length; i++) {
+          if (i == this.weekDays.length - 1) {
+            weeksNumber = weeksNumber + this.weekDays[i]
+          } else {
+            weeksNumber = weeksNumber + this.weekDays[i] + '、'
+          }
+        }
+        for (let j = 0; j < this.startClassTime.length; j++) {
+          if (j == this.startClassTime.length - 1) {
+            weeksTime = weeksTime + this.startClassTime[j]
+          } else {
+            weeksTime = weeksTime + this.startClassTime[j] + ','
+          }
+        }
+        for (var item = this.startWeek; item <= this.endWeek; item++) {
+          this.addQuerys.weeks.push(item)
+          this.addQuerys.weeksNumber.push(weeksNumber)
+          this.addQuerys.weeksTime.push(weeksTime)
+        }
+      }
+    },
+    // 关闭设计
+    closeDesign(done) {
+      this.$confirm('确认关闭？ 将自动保存 ')
+        .then(_ => {
+          this.saveDesign()
+          done();
+        })
+        .catch(_ => { });
     },
     // 查询单条
     find() {

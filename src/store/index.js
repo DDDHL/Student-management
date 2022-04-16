@@ -4,7 +4,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    allip: 'http://113.78.197.221:9568',
+    allip: 'http://113.78.195.104:9568',
   },
   mutations: {
     setPath(state) {
