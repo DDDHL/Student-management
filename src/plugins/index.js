@@ -87,5 +87,6 @@ Vue.use(DatePicker)
 // 班级页面
 import { Drawer } from 'element-ui'
 Vue.use(Drawer)
-import { Loading } from 'element-ui'
+import { Loading, InputNumber } from 'element-ui'
 Vue.use(Loading)
+Vue.use(InputNumber)

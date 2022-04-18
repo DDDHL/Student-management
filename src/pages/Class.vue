@@ -41,7 +41,7 @@
           <div class="addInput">
             <el-select
               v-model="startClassTime"
-              placeholder="开始上课时间 (可多选)"
+              placeholder="开始上课时间 (仅第一节)"
               multiple
               :disabled="timeDisable"
             >
@@ -63,7 +63,11 @@
         <div class="addFather">
           <div class="addTitle">开始周</div>
           <div class="addInput">
-            <el-select v-model="startWeek" placeholder="请选择开始周">
+            <el-select
+              v-model="startWeek"
+              placeholder="请选择开始周"
+              :disabled="isDesign"
+            >
               <el-option
                 v-for="item in allWeek"
                 :key="item.value"
@@ -75,7 +79,11 @@
           </div>
           <div class="addTitle">结课周</div>
           <div class="addInput">
-            <el-select v-model="endWeek" placeholder="请选择结课周">
+            <el-select
+              v-model="endWeek"
+              placeholder="请选择结课周"
+              :disabled="isDesign"
+            >
               <el-option
                 v-for="item in allWeek"
                 :key="item.value"
@@ -205,7 +213,7 @@
               <template slot-scope="scope">
                 <el-select
                   v-model="scope.row.weeksTime"
-                  placeholder="开始上课时间 (可多选)"
+                  placeholder="开始上课时间 (仅第一节)"
                   multiple
                 >
                   <el-option
@@ -223,13 +231,41 @@
                 </el-select>
               </template>
             </el-table-column>
+            <el-table-column
+              fixed="right"
+              label="操作"
+              width="100"
+              align="center"
+            >
+              <template slot-scope="scope">
+                <el-button
+                  type="text"
+                  size="small"
+                  @click="delDesign(scope.row.weeks)"
+                  >删除</el-button
+                >
+              </template>
+            </el-table-column>
           </el-table>
         </div>
+        <div
+          style="
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+          "
+        >
+          <div style="width: 112px"></div>
+        </div>
         <div style="display: flex; justify-content: space-around">
-          <el-button type="primary" @click="saveDesign">保存自定义</el-button
-          ><el-button type="warning" @click="cancelDesign"
-            >取消自定义</el-button
-          >
+          <el-input-number
+            v-model="addWeekNum"
+            :min="1"
+            :max="20"
+          ></el-input-number>
+          <el-button type="primary" @click="addWeek">新增第几周</el-button>
+          <el-button type="primary" @click="saveDesign">保存自定义</el-button>
+          <el-button type="warning" @click="cancelDesign">取消自定义</el-button>
         </div>
       </el-drawer>
     </div>
@@ -280,7 +316,25 @@ export default {
       startClassTime: [],
       weekDays: [],
       allWeekDays: [],
-      designTable: []
+      designTable: [],
+      isDesign: false,
+      addWeekNum: 1
+    }
+  },
+  watch: {
+    startWeek() {
+      if (this.startWeek > this.endWeek) {
+        this.$Message.error('开始周必须小于结束周 ! 请先设置结束周')
+        this.startWeek = 1
+        return
+      }
+    },
+    endWeek() {
+      if (this.startWeek > this.endWeek) {
+        this.$Message.error('开始周必须大于结束周 ! 请先设置开始周')
+        this.endWeek = 5
+        return
+      }
     }
   },
   created() {
@@ -298,7 +352,7 @@ export default {
     // 初始化新增课程参数
     initData() {
       // 初始化用户姓名
-      this.addQuerys.curriculumTeacher = JSON.parse(localStorage.getItem('user')).nickName
+      //this.addQuerys.curriculumTeacher = JSON.parse(localStorage.getItem('user')).nickName
       // 初始化上课时间数组
       let classTime = ['08:20', '09:10', '10:10', '11:00', '11:50', '12:40', '13:30', '14:15', '15:05', '16:05', '16:55', '19:00', '19:50', '20:40']
       let tranformNumber = new Map([[1, '一'], [2, '二'], [3, '三'], [4, '四'], [5, '五'], [6, '六'], [7, '日']])
@@ -339,6 +393,14 @@ export default {
     },
     // 新建班级
     async newClass() {
+      if (!this.designTable.length) {
+        this.selectFinish('非自定义')
+      }
+      if (!this.startClassTime.length || !this.weekDays.length) {
+        this.$Message.error('请完善表单再提交!')
+        return
+      }
+      console.log(this.addQuerys)
       try {
         let res = await addClass()
         if (res.code) {
@@ -354,11 +416,38 @@ export default {
         this.$Message.error(error)
       }
     },
+    // 提交参数初始化
+    queryInit() {
+      let weeksTime = ''
+      let weeksNumber = ''
+      for (let i = this.startWeek; i < this.endWeek + 1; i++) {
+        for (let j = 0; j < this.startClassTime.length; j++) {
+          if (j == this.startClassTime.length - 1) {
+            weeksTime = weeksTime + this.startClassTime[j]
+          } else {
+            weeksTime = weeksTime + this.startClassTime[j] + ','
+          }
+        }
+        for (let k = 0; k < this.weekDays.length; k++) {
+          if (k == this.weekDays.length - 1) {
+            weeksNumber = weeksNumber + this.weekDays[k]
+          } else {
+            weeksNumber = weeksNumber + this.weekDays[k] + '、'
+          }
+        }
+        this.addQuerys.weeks.push(i)
+        this.addQuerys.weeksNumber.push(weeksNumber)
+        this.addQuerys.weeksTime.push(weeksTime)
+        weeksTime = ''
+        weeksNumber = ''
+      }
+    },
     // 详细设计上课时间
     openDesign() {
       if (this.weekDays.length == 0 || this.startClassTime.length == 0) {
         this.$Message.warning('请先选择上课时间以及上课星期 !')
       } else {
+        this.isDesign = true
         const loading = this.$loading({
           lock: true,
           text: 'Loading',
@@ -376,15 +465,34 @@ export default {
         }
       }
     },
+    // 新增周
+    addWeek() {
+      let res = this.designTable.indexOf(this.designTable.filter(d => d.weeks == this.addWeekNum)[0])
+      if (res != -1) {
+        this.$Message.error('已经有这一周 !')
+      } else {
+        this.designTable.splice(this.addWeekNum - 1, 0, { weeks: this.addWeekNum, weeksNumber: this.designTable[0].weeksNumber, weeksTime: this.designTable[0].weeksTime })
+        this.designTable.sort((a, b) => { return a.weeks - b.weeks })
+      }
+    },
+    // 删除周
+    delDesign(e) {
+      let index = this.designTable.indexOf(this.designTable.filter(d => d.weeks == e)[0])
+      this.designTable.splice(index, 1)
+    },
     // 取消自定义
     cancelDesign() {
+      this.isDesign = false
       this.drawer = false
       this.timeDisable = false
       this.weekDays = this.startClassTime = []
+      this.designTable = []
     },
     // 保存自定义
     saveDesign() {
       this.selectFinish('自定义')
+      this.startWeek = this.designTable[0].weeks
+      this.endWeek = this.designTable[this.designTable.length - 1].weeks
       this.drawer = false
       this.timeDisable = true
       this.weekDays = this.startClassTime = ['自定义']
@@ -392,9 +500,10 @@ export default {
     },
     // 时间格式化成请求需要参数
     selectFinish(e) {
+      this.addQuerys.weeksNumber = []
+      this.addQuerys.weeksTime = []
+      this.addQuerys.weeks = []
       if (e == '自定义') {
-        this.addQuerys.weeksNumber = []
-        this.addQuerys.weeksTime = []
         let weeksNumber = ''
         let weeksTime = ''
         for (let i = 0; i < this.designTable.length; i++) {
@@ -414,42 +523,23 @@ export default {
           }
           this.addQuerys.weeksNumber.push(weeksNumber)
           this.addQuerys.weeksTime.push(weeksTime)
+          this.addQuerys.weeks.push(i + 1)
           weeksNumber = ''
           weeksTime = ''
         }
         console.log(this.addQuerys)
       } else {
-        let weeksNumber = ''
-        let weeksTime = ''
-        for (let i = 0; i < this.weekDays.length; i++) {
-          if (i == this.weekDays.length - 1) {
-            weeksNumber = weeksNumber + this.weekDays[i]
-          } else {
-            weeksNumber = weeksNumber + this.weekDays[i] + '、'
-          }
-        }
-        for (let j = 0; j < this.startClassTime.length; j++) {
-          if (j == this.startClassTime.length - 1) {
-            weeksTime = weeksTime + this.startClassTime[j]
-          } else {
-            weeksTime = weeksTime + this.startClassTime[j] + ','
-          }
-        }
-        for (var item = this.startWeek; item <= this.endWeek; item++) {
-          this.addQuerys.weeks.push(item)
-          this.addQuerys.weeksNumber.push(weeksNumber)
-          this.addQuerys.weeksTime.push(weeksTime)
-        }
+        this.queryInit()
       }
     },
     // 关闭设计
     closeDesign(done) {
       this.$confirm('确认关闭？ 将自动保存 ')
-        .then(_ => {
+        .then(() => {
           this.saveDesign()
           done();
         })
-        .catch(_ => { });
+        .catch(() => { });
     },
     // 查询单条
     find() {

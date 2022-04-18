@@ -319,7 +319,7 @@ export default {
       /* 右上角头像链接 */
       userImg: '',
       /* 加载动画 */
-      isLoading: true,
+      isLoading: false,
       isGetUserInfo: false,
       isMounted: false,
       /* 用户信息弹窗 */
