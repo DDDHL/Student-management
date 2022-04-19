@@ -1,6 +1,38 @@
 // 导入封装好的axios请求文件
 import requests from './request'
 
+// 班级详情批量删除学生
+export const addSomeStudent = (id, data) => {
+  return requests({
+    url: '/curriculum-user/addStudent',
+    method: 'POST',
+    data: { curriculumId: id, userAccounts: data },
+  })
+}
+// 班级详情里删除学生
+export const delClassStudent = (id, data) => {
+  return requests({
+    url: '/curriculum-user/delStudent',
+    method: 'POST',
+    data: { curriculumId: id, userAccounts: data },
+  })
+}
+// 班级管理删除课程
+export const delClass = (data) => {
+  return requests({
+    url: '/curriculum/delCurriculum',
+    method: 'POST',
+    data: { ids: data },
+  })
+}
+// 班级详情里获取学生数据
+export const getClassStudents = (data) => {
+  return requests({
+    url: '/curriculum-user/getAll',
+    method: 'POST',
+    data: data,
+  })
+}
 // 班级管理新增班级
 export const addClass = (data) => {
   return requests({

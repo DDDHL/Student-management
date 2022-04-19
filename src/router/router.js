@@ -19,11 +19,6 @@ const routes = [
     name: '404',
     component: () => import('../pages/404'),
   },
-  {
-    path: '/class',
-    name: 'class',
-    component: () => import('../pages/Class'),
-  },
 ]
 
 const router = new VueRouter({

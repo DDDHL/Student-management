@@ -4,7 +4,12 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    allip: 'http://113.78.195.100:9568',
+    allip: 'http://113.78.196.149:9568',
+    currentPathName: '',
+    curriculumId: 0,
+    classInfo: {},
+    allWeekDays: [],
+    allClassTime: [],
   },
   mutations: {
     setPath(state) {

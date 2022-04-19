@@ -278,9 +278,6 @@ export default {
     }
   },
   watch: {
-    'queryInfo.query'(newValue, oldValue) {
-      console.log(newValue, oldValue)
-    },
     centerDialogVisibleEdit(newValue) {
       if (!newValue) {
         // 关闭编辑就重新获取表格
@@ -318,7 +315,6 @@ export default {
           this.rolePowerTree = resTree.data
           this.myCheckedKeys = res.data
           this.centerDialogVisiblePower = true
-          console.log(res)
         }
       } catch (error) {
         this.$Message.error(error)
@@ -404,7 +400,7 @@ export default {
               this.centerDialogVisiblePower = false
             }
           } else {
-            this.$Message.success(res.message)
+            this.$Message.success(res.message + '! 重新登录即可更新菜单 !')
             this.centerDialogVisiblePower = false
           }
         } catch (error) {
@@ -415,7 +411,6 @@ export default {
     // Tree选择节点
     currentChecked(nodeObj, SelectedObj) {
       this.menuIds = SelectedObj.checkedKeys // 这是选中的节点的key数组
-      console.log(this.menuIds)
     },
     // 筛选专业
     filterChange(obj) {

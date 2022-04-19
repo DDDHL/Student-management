@@ -26,7 +26,7 @@
     >
       <fragment v-for="item in menus" :key="item.id">
         <!-- 遍历生成一级菜单 -->
-        <fragment v-if="item.path">
+        <fragment v-if="item.path && item.icon">
           <el-menu-item :index="item.path">
             <i :class="item.icon"></i>
             <span slot="title" style="padding-right: 5px">{{
@@ -35,7 +35,7 @@
           </el-menu-item>
         </fragment>
         <!-- 遍历生成二级菜单 -->
-        <fragment v-else>
+        <fragment v-if="!item.path && item.icon">
           <el-submenu :index="item.id + ''">
             <template slot="title">
               <i :class="item.icon"></i>

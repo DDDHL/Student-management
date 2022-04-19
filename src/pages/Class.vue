@@ -17,9 +17,16 @@
         ></el-button>
       </el-input>
       <!-- 新增班级 -->
-      <el-button type="primary" @click="dialogVisible = true"
+      <el-button
+        type="primary"
+        @click="dialogVisible = true"
+        style="margin-top: 20px"
         >新增班级 <i class="el-icon-circle-plus-outline"></i
       ></el-button>
+      <el-button type="danger" @click="delClass" style="margin-top: 20px"
+        >删除班级 <i class="el-icon-remove-outline"></i
+      ></el-button>
+      <!-- 新增班级表单 -->
       <el-dialog
         title="新增班级"
         :visible.sync="dialogVisible"
@@ -94,6 +101,15 @@
             </el-select>
           </div>
         </div>
+        <div class="info" style="margin-bottom: 20px">
+          <div class="infoText">课程名字</div>
+          <div style="width: 536px">
+            <el-input
+              v-model="addQuerys.curriculumName"
+              placeholder="请输入课程的名字"
+            ></el-input>
+          </div>
+        </div>
         <div class="info">
           <div class="infoText">上课星期</div>
           <div>
@@ -140,7 +156,6 @@
       </el-dialog>
       <!-- 表格 -->
       <el-table
-        @row-click="rowClick"
         :header-cell-style="{
           background: '#ebeef5',
           color: '#282c34',
@@ -149,7 +164,9 @@
         border
         stripe
         row-key="id"
+        @selection-change="handleSelectionChange"
       >
+        <el-table-column fixed type="selection" align="center" />
         <el-table-column
           prop="curriculumName"
           label="班级名字"
@@ -161,12 +178,14 @@
           align="center"
         />
         <el-table-column prop="studentCount" label="班级人数" align="center" />
-        <el-table-column
-          prop="createTime"
-          label="创建时间"
-          align="center"
-          fixed="right"
-        />
+        <el-table-column prop="createTime" label="创建时间" align="center" />
+        <el-table-column label="操作" align="center">
+          <template slot-scope="scope">
+            <el-button @click="rowClick(scope.row)" type="primary" size="small"
+              >查看班级</el-button
+            >
+          </template>
+        </el-table-column>
       </el-table>
       <!-- 分页 -->
       <el-pagination
@@ -273,7 +292,7 @@
 </template>
 
 <script>
-import { getClass, addClass } from '../api'
+import { getClass, addClass, delClass } from '../api'
 export default {
   name: 'Class',
   data() {
@@ -318,7 +337,9 @@ export default {
       allWeekDays: [],
       designTable: [],
       isDesign: false,
-      addWeekNum: 1
+      addWeekNum: 1,
+      // 删除id
+      delClassId: []
     }
   },
   watch: {
@@ -352,7 +373,7 @@ export default {
     // 初始化新增课程参数
     initData() {
       // 初始化用户姓名
-      //this.addQuerys.curriculumTeacher = JSON.parse(localStorage.getItem('user')).nickName
+      this.addQuerys.curriculumTeacher = JSON.parse(localStorage.getItem('user')).nickName
       // 初始化上课时间数组
       let classTime = ['08:20', '09:10', '10:10', '11:00', '11:50', '12:40', '13:30', '14:15', '15:05', '16:05', '16:55', '19:00', '19:50', '20:40']
       let tranformNumber = new Map([[1, '一'], [2, '二'], [3, '三'], [4, '四'], [5, '五'], [6, '六'], [7, '日']])
@@ -377,7 +398,6 @@ export default {
             this.$Message.error(res.message)
           }
         } else {
-          console.log(res)
           this.allLog = res.data.records
           this.total = res.data.total
           /* // 赋值完恢复
@@ -387,22 +407,27 @@ export default {
         this.$Message.error(error)
       }
     },
-    // 点击行
+    // 点击查看班级
     rowClick(row) {
-      console.log(row)
+      this.$store.state.curriculumId = row.id
+      this.$store.state.classInfo = row
+      this.$store.state.allClassTime = this.allClassTime
+      this.$store.state.allWeekDays = this.allWeekDays
+      this.$router.push('/classItem')
     },
     // 新建班级
     async newClass() {
       if (!this.designTable.length) {
         this.selectFinish('非自定义')
       }
-      if (!this.startClassTime.length || !this.weekDays.length) {
+      if (!this.startClassTime.length || !this.weekDays.length || this.addQuerys.curriculumName == '') {
         this.$Message.error('请完善表单再提交!')
         return
       }
       console.log(this.addQuerys)
       try {
-        let res = await addClass()
+        let res = await addClass(this.addQuerys)
+        console.log(res)
         if (res.code) {
           if (res.code == '1001' || res.code == '1002') {
             this.tokenLost()
@@ -411,6 +436,8 @@ export default {
           }
         } else {
           this.$Message.success(res.message)
+          this.dialogVisible = false
+          this.getData()
         }
       } catch (error) {
         this.$Message.error(error)
@@ -589,26 +616,36 @@ export default {
       }
       this.getData()
     },
-    // 筛选日期
-    // 日期改变
-    dateChange() {
-      if (this.value2) {
-        this.getLogData.startTime = this.value2[0]
-        this.getLogData.endTime = this.value2[1]
-      } else {
-        this.getLogData.startTime = ''
-        this.getLogData.endTime = ''
-      }
-      this.getData()
+    // 批量删除
+    handleSelectionChange(e) {
+      this.delClassId = []
+      e.forEach(item => {
+        this.delClassId.push(item.id)
+      })
     },
+    // 删除
+    async delClass() {
+      if (this.delClassId.length == 0) {
+        this.$Message.warning('请先勾选要删除的课程 !')
+        return
+      }
+      let res = await delClass(this.delClassId)
+      if (res.code) {
+        if (res.code == '1001' || res.code == '1002') {
+          this.tokenLost()
+          return
+        }
+        this.$Message.error(res.message)
+        return
+      }
+      this.$Message.success(res.message)
+      this.getData()
+    }
   },
 }
 </script>
 
 <style scoped>
-/deep/.el-table__row:hover {
-  cursor: pointer;
-}
 .addTitle {
   width: 60px;
   margin: 0 20px 0 0;
