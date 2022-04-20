@@ -2,6 +2,7 @@
   <div style="margin: -10px 0">
     <el-card>
       <div class="title">{{ name }}</div>
+      <div class="title1">{{ teacherName }}</div>
       <!-- 搜索 -->
       <el-input
         placeholder="搜索学生"
@@ -25,7 +26,7 @@
         >新增学生 <i class="el-icon-circle-plus-outline"></i
       ></el-button>
       <!-- 删除学生 -->
-      <el-popconfirm
+      <!--  <el-popconfirm
         confirm-button-text="好的"
         cancel-button-text="点错了"
         icon="el-icon-info"
@@ -37,13 +38,32 @@
         <el-button slot="reference" type="danger"
           >删除学生 <i class="el-icon-remove-outline"></i
         ></el-button>
-      </el-popconfirm>
+      </el-popconfirm> -->
+      <el-popover
+        placement="top"
+        width="160"
+        v-model="delVisible"
+        style="margin: 20px 0 0 20px"
+      >
+        <p>确认删除勾选的学生吗？</p>
+        <div style="text-align: right; margin: 0">
+          <el-button size="mini" type="text" @click="delVisible = false"
+            >取消</el-button
+          >
+          <el-button type="primary" size="mini" @click="delStudent"
+            >确定</el-button
+          >
+        </div>
+        <el-button slot="reference" type="danger" @click="delStudentCheck"
+          >删除学生 <i class="el-icon-remove-outline"></i
+        ></el-button>
+      </el-popover>
       <!-- 修改课程信息 -->
       <el-button
         type="primary"
         style="margin: 20px 0 0 20px"
         @click="dialogVisibleEdit = true"
-        >修改课程信息 <i class="el-icon-edit-outline"></i
+        >修改课程信息 <i class="el-icon-edit"></i
       ></el-button>
 
       <!-- 修改上课时间 -->
@@ -262,7 +282,7 @@
 </template>
 
 <script>
-import { getClassStudents, delClassStudent, addSomeStudent, editClassTime } from '../api'
+import { getClassStudents, delClassStudent, addSomeStudent, editClassTime, getClass } from '../api'
 export default {
   name: 'ClassItem',
   data() {
@@ -281,6 +301,8 @@ export default {
       tableData: [],
       // 删除的id
       delStudentId: [],
+      delVisible: true,
+      delDisabled: true,
       // 新增学生
       dialogVisible: false,
       addTable: [],
@@ -290,11 +312,21 @@ export default {
       // 修改课程时间
       dialogVisibleEditTime: false,
       name: '',
+      teacherName: '暂定',
       direction: 'rtl',
       changeTimeTable: [],
       allWeekDays: [],
       allClassTime: [],
       addChangeTime: '',
+      // 获取新时间规则
+      timeQuery: {
+        curriculumDepartment: 0,
+        curriculumGarde: 0,
+        curriculumMajor: 0,
+        curriculumName: "",
+        pageNum: 1,
+        pageSize: 10
+      }
     }
   },
   created() {
@@ -325,6 +357,7 @@ export default {
     initData() {
       // 设置查询课程的id
       this.name = this.$store.state.classInfo.curriculumName
+      //this.teacherName = this.$store.state.classInfo.curricu
       this.queryInfo.curriculumId = this.$store.state.curriculumId
       // 初始化时间选择
       this.allWeekDays = this.$store.state.allWeekDays
@@ -396,12 +429,14 @@ export default {
       if (index == -1) {
         this.changeTimeTable.push({ weeks: this.addChangeTime, weeksNumber: this.changeTimeTable[0].weeksNumber, weeksTime: this.changeTimeTable[0].weeksTime })
         this.changeTimeTable.sort((a, b) => a.weeks - b.weeks)
+        this.addChangeTime = ''
       } else {
         this.$Message.error('已有这一周 !')
       }
     },
     // 保存改变的时间
     async saveChange() {
+      this.addChangeTime = ''
       let a = []
       let b = []
       let c = []
@@ -440,9 +475,22 @@ export default {
       }
       this.$Message.success(res.message)
       this.dialogVisibleEditTime = false
+      this.timeQuery.curriculumName = this.name
+      let req = await getClass(this.timeQuery)
+      if (req.code) {
+        if (req.code == '1001' || req.code == '1002') {
+          this.tokenLost()
+          return
+        }
+        this.$Message.error(req.message)
+        return
+      }
+      this.$store.state.classInfo = req.data.records[0]
+      this.initData()
     },
     // 取消修改
     cancelChange() {
+      this.addChangeTime = ''
       this.initData()
       this.dialogVisibleEditTime = false
     },
@@ -489,12 +537,16 @@ export default {
         this.delStudentId.push(item.userAccount)
       })
     },
-    // 删除学生
-    async delStudent() {
+    // 删除学生检测
+    delStudentCheck() {
       if (this.delStudentId.length == 0) {
         this.$Message.warning('请先勾选要删除的学生 !')
         return
       }
+      this.delDisabled = false
+    },
+    // 删除学生
+    async delStudent() {
       let res = await delClassStudent(this.queryInfo.curriculumId, this.delStudentId)
       if (res.code) {
         if (res.code == '1001' || res.code == '1002') {
@@ -516,5 +568,9 @@ export default {
   font-size: 25px;
   font-weight: 700;
   text-align: center;
+}
+.title1 {
+  text-align: center;
+  margin-top: 5px;
 }
 </style>

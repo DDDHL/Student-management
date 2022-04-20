@@ -677,17 +677,20 @@ export default {
     },
     // 筛选专业
     filterChange(obj) {
+      console.log(obj)
       if (obj.filterTag.length == 0) {
         // 重置
         this.queryInfo.majors = []
         this.majorData = []
         this.getData()
+        this.queryInfo.majors = []
       } else {
         // 筛选
         obj.filterTag.forEach(item => {
           this.queryInfo.majors.push(item)
         })
         this.getData()
+        this.queryInfo.majors = []
       }
     },
     // 查询单条
@@ -764,12 +767,10 @@ export default {
             this.$Message.error(res.message)
           }
         } else {
-
           // 请求成功赋值专业
           this.SomeMajors = res.data
           if (this.currentDept != id) {
             this.editStudent.major = ''
-
           }
         }
       } catch (error) {
@@ -784,29 +785,27 @@ export default {
     // 获取数据接口
     async getData() {
       this.majorData = []
-      try {
-        let res = await getAll(this.queryInfo)
-        let resMyDept = await getStudentMajors()
-        if (res.code || resMyDept.code) {
-          // token过期
-          if (res.code == '1001' || res.code == '1002' || resMyDept.code == '1001' || resMyDept.code == '1002') {
-            this.tokenLost()
-          } else {
-            this.$Message.error(res.message)
-            this.$Message.error(resMyDept.message)
-          }
+      let res = await getAll(this.queryInfo)
+      let resMyDept = await getStudentMajors()
+      if (res.code || resMyDept.code) {
+        // token过期
+        if (res.code == '1001' || res.code == '1002' || resMyDept.code == '1001' || resMyDept.code == '1002') {
+          this.tokenLost()
         } else {
-          this.tableData = res.data.records
-          this.total = res.data.total
+          this.$Message.error(res.message)
+          this.$Message.error(resMyDept.message)
+        }
+      } else {
+        this.tableData = res.data.records
+        this.total = res.data.total
+        if (res.data.records.length != 0) {
           // 赋值新增学生学院
           this.newStudent.department = res.data.records[0].department
-          resMyDept.data.forEach(item => {
-            this.majorData.push({ text: item.organizationName, value: item.organizationName, id: item.id })
-          })
-
         }
-      } catch (error) {
-        this.$Message.error(error)
+        resMyDept.data.forEach(item => {
+          this.majorData.push({ text: item.organizationName, value: item.organizationName, id: item.id })
+        })
+
       }
     },
     // 修改每条页多少条

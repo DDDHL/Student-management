@@ -249,8 +249,6 @@ import { resize } from "../echarts/online";
 /* 防抖 */
 import { Debounce } from "../utils/common";
 
-/* 左下角模型 */
-import "../assets/js/model";
 
 /* 加密 */
 import { Encrypt } from "../utils/secret"

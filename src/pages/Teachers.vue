@@ -786,8 +786,10 @@ export default {
         } else {
           this.tableData = res.data.records
           this.total = res.data.total
-          // 赋值新增老师学院
-          this.newStudent.department = res.data.records[0].department
+          if (res.data.records.length != 0) {
+            // 赋值新增学生学院
+            this.newStudent.department = res.data.records[0].department
+          }
           resMyDept.data.forEach(item => {
             this.majorData.push({ text: item.organizationName, value: item.organizationName })
           })
