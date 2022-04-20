@@ -25,39 +25,28 @@
         @click="dialogVisible = true"
         >新增学生 <i class="el-icon-circle-plus-outline"></i
       ></el-button>
-      <!-- 删除学生 -->
-      <!--  <el-popconfirm
-        confirm-button-text="好的"
-        cancel-button-text="点错了"
-        icon="el-icon-info"
-        icon-color="red"
-        title="确定删除选中的学生吗？"
-        @confirm="delStudent"
-        style="margin: 20px 0 0 20px"
-      >
-        <el-button slot="reference" type="danger"
-          >删除学生 <i class="el-icon-remove-outline"></i
-        ></el-button>
-      </el-popconfirm> -->
       <el-popover
         placement="top"
-        width="160"
+        width="200"
+        trigger="manual"
+        content="请勾选需要删除的学生"
         v-model="delVisible"
-        style="margin: 20px 0 0 20px"
       >
-        <p>确认删除勾选的学生吗？</p>
-        <div style="text-align: right; margin: 0">
-          <el-button size="mini" type="text" @click="delVisible = false"
-            >取消</el-button
-          >
-          <el-button type="primary" size="mini" @click="delStudent"
-            >确定</el-button
-          >
-        </div>
-        <el-button slot="reference" type="danger" @click="delStudentCheck"
-          >删除学生 <i class="el-icon-remove-outline"></i
-        ></el-button>
+        <el-button
+          type="danger"
+          style="margin: 20px 0 0 20px"
+          slot="reference"
+          @click="delStudentCheck"
+          >批量删除<i class="el-icon-remove-outline"></i>
+        </el-button>
       </el-popover>
+      <el-dialog title="警告" :visible.sync="dialogVisibleDel" width="30%">
+        <span>你确定要删除勾选的学生吗?</span>
+        <span slot="footer">
+          <el-button @click="dialogVisibleDel = false">取 消</el-button>
+          <el-button type="primary" @click="delStudent">确 定</el-button>
+        </span>
+      </el-dialog>
       <!-- 修改课程信息 -->
       <el-button
         type="primary"
@@ -301,8 +290,8 @@ export default {
       tableData: [],
       // 删除的id
       delStudentId: [],
-      delVisible: true,
-      delDisabled: true,
+      delVisible: false,
+      dialogVisibleDel: false,
       // 新增学生
       dialogVisible: false,
       addTable: [],
@@ -333,25 +322,12 @@ export default {
     this.initData()
   },
   methods: {
-    // 处理token过期
-    tokenLost() {
-      this.$Message.error('您的登录信息已过期,请重新登录')
-      localStorage.removeItem('user')
-      localStorage.removeItem('menus')
-      this.$router.push('/login')
-    },
     // 获取数据
     async getData() {
       let res = await getClassStudents(this.queryInfo)
-      if (res.code) {
-        if (res.code == '1001' || res.code == '1002') {
-          this.tokenLost()
-        } else {
-          this.$Message.error(res.message)
-          return
-        }
+      if (res.code == '') {
+        this.tableData = res.data.records
       }
-      this.tableData = res.data.records
     },
     // 初始化数据
     initData() {
@@ -383,18 +359,12 @@ export default {
         account.push(item.userAccount)
       })
       let res = await addSomeStudent(this.queryInfo.curriculumId, account)
-      if (res.code) {
-        if (res.code == '1001' || res.code == '1002') {
-          this.tokenLost()
-          return
-        }
-        this.$Message.error(res.message)
-        return
+      if (res.code == '') {
+        this.$Message.success(res.message)
+        this.getData()
+        this.addTable = []
+        this.dialogVisible = false
       }
-      this.$Message.success(res.message)
-      this.getData()
-      this.addTable = []
-      this.dialogVisible = false
     },
     // 新增学生表单删除单条
     handleDelTable(e) {
@@ -465,28 +435,16 @@ export default {
       }
       )
       let res = await editClassTime(id, a, b, c)
-      if (res.code) {
-        if (res.code == '1001' || res.code == '1002') {
-          this.tokenLost()
-          return
+      if (res.code == '') {
+        this.$Message.success(res.message)
+        this.dialogVisibleEditTime = false
+        this.timeQuery.curriculumName = this.name
+        let req = await getClass(this.timeQuery)
+        if (req.code == '') {
+          this.$store.state.classInfo = req.data.records[0]
+          this.initData()
         }
-        this.$Message.error(res.message)
-        return
       }
-      this.$Message.success(res.message)
-      this.dialogVisibleEditTime = false
-      this.timeQuery.curriculumName = this.name
-      let req = await getClass(this.timeQuery)
-      if (req.code) {
-        if (req.code == '1001' || req.code == '1002') {
-          this.tokenLost()
-          return
-        }
-        this.$Message.error(req.message)
-        return
-      }
-      this.$store.state.classInfo = req.data.records[0]
-      this.initData()
     },
     // 取消修改
     cancelChange() {
@@ -540,24 +498,22 @@ export default {
     // 删除学生检测
     delStudentCheck() {
       if (this.delStudentId.length == 0) {
-        this.$Message.warning('请先勾选要删除的学生 !')
-        return
+        this.delVisible = true
+        setTimeout(() => {
+          this.delVisible = false
+        }, 1000)
+      } else {
+        this.dialogVisibleDel = true
       }
-      this.delDisabled = false
     },
     // 删除学生
     async delStudent() {
       let res = await delClassStudent(this.queryInfo.curriculumId, this.delStudentId)
-      if (res.code) {
-        if (res.code == '1001' || res.code == '1002') {
-          this.tokenLost()
-          return
-        }
-        this.$Message.error(res.message)
-        return
+      if (res.code == '') {
+        this.$Message.success(res.message)
+        this.getData()
+        this.dialogVisibleDel = false
       }
-      this.$Message.success(res.message)
-      this.getData()
     }
   }
 }

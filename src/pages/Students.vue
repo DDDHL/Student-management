@@ -522,48 +522,34 @@ export default {
     },
     // 新增学生获取年级
     async addStudentGetMj(id) {
-      try {
-        // 请求年级
-        let res = await getAllGrade(id)
-        if (res.code) {
-          if (res.code == '1001' || res.code == '1002') {
-            this.tokenLost()
-          } else {
-            this.$Message.error(res.message)
-          }
-        } else {
-          // 赋值
-          this.addMajorData = res.data
-        }
-      } catch (error) {
-        this.$Message.error(error)
+      // 请求年级
+      let res = await getAllGrade(id)
+      if (res.code == '') {
+        // 赋值
+        this.addMajorData = res.data
       }
     },
     // 导入导出
     async exp() {
-      try {
-        let res = await userExport(this.queryInfo.roleId)
-        if (res.type == 'application/json') {
-          this.tokenLost()
-        } else {
-          const href = URL.createObjectURL(
-            new Blob([res], {
-              type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8',
-            })
-          )
-          // 导出excel
-          const link = document.createElement('a')
-          link.download = '学生表格.xlsx'
-          link.href = href
-          link.style.display = 'none'
-          document.body.appendChild(link)
-          link.click()
-          URL.revokeObjectURL(link.href) //释放url
-          document.body.removeChild(link) //释放标签
-          this.$Message.success('导出成功!')
-        }
-      } catch (error) {
-        this.$Message.error(error)
+      let res = await userExport(this.queryInfo.roleId)
+      if (res.type == 'application/json') {
+        this.tokenLost()
+      } else {
+        const href = URL.createObjectURL(
+          new Blob([res], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8',
+          })
+        )
+        // 导出excel
+        const link = document.createElement('a')
+        link.download = '学生表格.xlsx'
+        link.href = href
+        link.style.display = 'none'
+        document.body.appendChild(link)
+        link.click()
+        URL.revokeObjectURL(link.href) //释放url
+        document.body.removeChild(link) //释放标签
+        this.$Message.success('导出成功!')
       }
     },
     // 导入成功
@@ -597,14 +583,7 @@ export default {
     async del() {
       // 删除学生
       let res = await delStudent(this.ids)
-      if (res.code) {
-        // token过期
-        if (res.code == '1001' || res.code == '1002') {
-          this.tokenLost()
-        } else {
-          this.$Message.error(res.message)
-        }
-      } else {
+      if (res.code == '') {
         this.$Message.success(res.message)
         this.getData()
         this.dialogVisibleDel = false
@@ -632,14 +611,7 @@ export default {
           if (valid) {
             this.newStudent['roleId'] = 5
             let res = await addStudent(this.newStudent)
-            if (res.code) {
-              // token过期
-              if (res.code == '1001' || res.code == '1002') {
-                this.tokenLost()
-              } else {
-                this.$Message.error(res.message)
-              }
-            } else {
+            if (res.code == '') {
               this.$Message.success(res.message)
               this.centerDialogVisibleAdd = false
               this.getData()
@@ -652,22 +624,11 @@ export default {
         // 编辑学生
         this.$refs[val].validate(async (valid) => {
           if (valid) {
-            try {
-              let res = await changeUserInfo(this.editStudent)
-              if (res.code) {
-                // token过期
-                if (res.code == '1001' || res.code == '1002') {
-                  this.tokenLost()
-                } else {
-                  this.$Message.error(res.message)
-                }
-              } else {
-                // 修改成功
-                this.$Message.success(res.message)
-                this.centerDialogVisibleEdit = false
-              }
-            } catch (error) {
-              this.$Message.error(error)
+            let res = await changeUserInfo(this.editStudent)
+            if (res.code == '') {
+              // 修改成功
+              this.$Message.success(res.message)
+              this.centerDialogVisibleEdit = false
             }
           } else {
             return false
@@ -721,81 +682,53 @@ export default {
     async handleClick(row) {
       this.editStudent = row
       // 请求年级 学院
-      try {
-        // 获取当前专业年级
-        this.majorData.forEach(item => {
-          if (row.major == item.text) {
-            this.editStudentId = item.id
+
+      // 获取当前专业年级
+      this.majorData.forEach(item => {
+        if (row.major == item.text) {
+          this.editStudentId = item.id
+        }
+      })
+      let res = await getAllGrade(this.editStudentId)
+      let resDep = await getAllDept()
+      if (res.code == '' && resDep.code == '') {
+        // 获取年级后渲染到表单里
+        this.allGrade = res.data
+        // 获取全部学院渲染到表单里
+        this.allDepartment = resDep.data
+        resDep.data.forEach(item => {
+          if (this.editStudent.department == item.organizationName) {
+            this.getSomeMajors(item.id)
+            this.currentDept = item.id
           }
         })
-        let res = await getAllGrade(this.editStudentId)
-        let resDep = await getAllDept()
-        if (res.code && resDep.code) {
-          // token过期
-          if (res.code == '1001' || res.code == '1002' || resDep.code == '1001' || resDep.code == '1002') {
-            this.tokenLost()
-          } else {
-            this.$Message.error(res.message)
-            this.$Message.error(resDep.message)
-          }
-        } else {
-          // 获取年级后渲染到表单里
-          this.allGrade = res.data
-          // 获取全部学院渲染到表单里
-          this.allDepartment = resDep.data
-          resDep.data.forEach(item => {
-            if (this.editStudent.department == item.organizationName) {
-              this.getSomeMajors(item.id)
-              this.currentDept = item.id
-            }
-          })
-          this.centerDialogVisibleEdit = true
-        }
-      } catch (error) {
-        this.$Message.error(error)
+        this.centerDialogVisibleEdit = true
       }
     },
     // 获取某学院下的专业
     async getSomeMajors(id) {
-      try {
-        let res = await getMajorsByDet(id)
-        if (res.code) {
-          // token过期
-          if (res.code == '1001' || res.code == '1002') {
-            this.tokenLost()
-          } else {
-            this.$Message.error(res.message)
-          }
-        } else {
-          // 请求成功赋值专业
-          this.SomeMajors = res.data
-          if (this.currentDept != id) {
-            this.editStudent.major = ''
-          }
+      let res = await getMajorsByDet(id)
+      if (res.code == '') {
+        // 请求成功赋值专业
+        this.SomeMajors = res.data
+        if (this.currentDept != id) {
+          this.editStudent.major = ''
         }
-      } catch (error) {
-        this.$Message.error(error)
       }
     },
     // 编辑学生时，切换专业重新获取年级
     async updatedGrade(id) {
       let res = await getAllGrade(id)
-      this.allGrade = res.data
+      if (res.code == '') {
+        this.allGrade = res.data
+      }
     },
     // 获取数据接口
     async getData() {
       this.majorData = []
       let res = await getAll(this.queryInfo)
       let resMyDept = await getStudentMajors()
-      if (res.code || resMyDept.code) {
-        // token过期
-        if (res.code == '1001' || res.code == '1002' || resMyDept.code == '1001' || resMyDept.code == '1002') {
-          this.tokenLost()
-        } else {
-          this.$Message.error(res.message)
-          this.$Message.error(resMyDept.message)
-        }
-      } else {
+      if (res.code == '' && resMyDept.code == '') {
         this.tableData = res.data.records
         this.total = res.data.total
         if (res.data.records.length != 0) {
@@ -805,7 +738,6 @@ export default {
         resMyDept.data.forEach(item => {
           this.majorData.push({ text: item.organizationName, value: item.organizationName, id: item.id })
         })
-
       }
     },
     // 修改每条页多少条

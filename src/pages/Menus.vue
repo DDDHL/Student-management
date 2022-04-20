@@ -166,49 +166,21 @@ export default {
     }
   },
   methods: {
-    // 处理token过期
-    tokenLost() {
-      this.$Message.error('您的登录信息已过期,请重新登录')
-      localStorage.removeItem('user')
-      localStorage.removeItem('menus')
-      this.$router.push('/login')
-    },
     async load() {
-      try {
-        let res = await getAllMenus(this.data)
-        if (res.code) {
-          // token过期
-          if (res.code == '1001' || res.code == '1002') {
-            this.tokenLost()
-          } else {
-            this.$Message.error(res.message)
-          }
-        } else {
-          this.tableData = res.data.records
-          this.total = res.data.total
-        }
-      } catch (error) {
-        this.$Message.error(error)
+      let res = await getAllMenus(this.data)
+      if (res.code == '') {
+        this.tableData = res.data.records
+        this.total = res.data.total
       }
     },
 
     async save() {
-      try {
-        let res = await saveMenu(this.form)
-        if (res.code) {
-          if (res.code == '1001' || res.code == '1002') {
-            this.tokenLost()
-          } else {
-            this.$Message.error(res.message)
-          }
-        } else {
-          // 获取成功
-          this.$Message.success(res.message)
-          this.load()
-          this.dialogFormVisible = false
-        }
-      } catch (error) {
-        this.$Message.error(error)
+      let res = await saveMenu(this.form)
+      if (res.code == '') {
+        // 获取成功
+        this.$Message.success(res.message)
+        this.load()
+        this.dialogFormVisible = false
       }
       /*  this.request.post('/menu', this.form).then((res) => {
          if (res.code === '') {
@@ -224,23 +196,12 @@ export default {
     async del(id) {
       let data = {}
       data.id = id
-      try {
-        let res = await delMenu(data)
-        if (res.code) {
-          if (res.code == '1001' || res.code == '1002') {
-            this.tokenLost()
-          } else {
-            this.$Message.error(res.message)
-          }
-        } else {
-          // 获取成功
-          this.$Message.success(res.message)
-          this.load()
-        }
-      } catch (error) {
-        this.$Message.error(error)
+      let res = await delMenu(data)
+      if (res.code == '') {
+        // 获取成功
+        this.$Message.success(res.message)
+        this.load()
       }
-
       /* this.request.post('/menu/delById', data).then((res) => {
         if (res.code === '') {
           this.$Message.success(res.message)
@@ -270,24 +231,12 @@ export default {
           let data = {}
           data.ids = ids
           //确认操作
-          try {
-            let res = await delMenu(data)
-            if (res.code) {
-              if (res.code == '1001' || res.code == '1002') {
-                that.tokenLost()
-              } else {
-                that.$Message.error(res.message)
-              }
-            } else {
-              // 获取成功
-              that.$Message.success(res.message)
-              that.load()
-            }
-          } catch (error) {
-            that.$Message.error(error)
+          let res = await delMenu(data)
+          if (res.code == '') {
+            // 获取成功
+            that.$Message.success(res.message)
+            that.load()
           }
-
-
           /* that.request.post('/menu/del/batch', data).then((res) => {
             if (res.code === '') {
               that.$Message.success(res.message)
@@ -316,61 +265,30 @@ export default {
       } else {
         this.form.pid = pid
       }
-      try {
-        let res = await getIcon()
-        if (res.code) {
-          if (res.code == '1001' || res.code == '1002') {
-            this.tokenLost()
-          } else {
-            this.$Message.error(res.message)
-          }
-        } else {
-          // 获取成功
-          this.options = res.data
-        }
-      } catch (error) {
-        this.$Message.error(error)
+      let res = await getIcon()
+      if (res.code == '') {
+        // 获取成功
+        this.options = res.data
       }
     },
 
     async handleEdit(row) {
       this.form = row
       this.dialogFormVisible = true
-
       // 请求图标数据
-      try {
-        let res = await getIcon()
-        if (res.code) {
-          if (res.code == '1001' || res.code == '1002') {
-            this.tokenLost()
-          } else {
-            this.$Message.error(res.message)
-          }
-        } else {
-          // 获取成功
-          this.options = res.data
-        }
-      } catch (error) {
-        this.$Message.error(error)
+      let res = await getIcon()
+      if (res.code == '') {
+        // 获取成功
+        this.options = res.data
       }
     },
 
     async handleState(row) {
-      try {
-        let res = await saveMenu(row)
-        if (res.code) {
-          if (res.code == '1001' || res.code == '1002') {
-            this.tokenLost()
-          } else {
-            this.$Message.error(res.message)
-          }
-        } else {
-          // 获取成功
-          this.$Message.success(res.message)
-          this.load()
-        }
-      } catch (error) {
-        this.$Message.error(error)
+      let res = await saveMenu(row)
+      if (res.code == '') {
+        // 获取成功
+        this.$Message.success(res.message)
+        this.load()
       }
       /*  this.request.post('/menu', row).then((res) => {
          if (res.code === '') {
@@ -380,7 +298,6 @@ export default {
            this.$Message.error(res.message)
          }
        }) */
-      console.log(row.state)
     },
     // 重置搜索
     reset() {

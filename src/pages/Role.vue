@@ -291,33 +291,15 @@ export default {
     this.getData()
   },
   methods: {
-    // 处理token过期
-    tokenLost() {
-      this.$Message.error('您的登录信息已过期,请重新登录')
-      localStorage.removeItem('user')
-      localStorage.removeItem('menus')
-      this.$router.push('/login')
-    },
     // 点击分配权限
     async handleRolePower(row) {
       this.rolePowerList.roleId = row.id
-      try {
-        let res = await rolePower(this.rolePowerList)
-        let resTree = await getAllMenusByRole()
-        if (res.code || resTree.code) {
-          if (res.code == '1001' || res.code == '1002' || resTree.code == '1001' || resTree.code == '1002') {
-            this.tokenLost()
-          } else {
-            this.$Message.error(res.message)
-            this.$Message.error(resTree.message)
-          }
-        } else {
-          this.rolePowerTree = resTree.data
-          this.myCheckedKeys = res.data
-          this.centerDialogVisiblePower = true
-        }
-      } catch (error) {
-        this.$Message.error(error)
+      let res = await rolePower(this.rolePowerList)
+      let resTree = await getAllMenusByRole()
+      if (res.code == '' && resTree.code == '') {
+        this.rolePowerTree = resTree.data
+        this.myCheckedKeys = res.data
+        this.centerDialogVisiblePower = true
       }
     },
     // 点击编辑角色
@@ -341,14 +323,7 @@ export default {
     async del() {
       // 删除角色
       let res = await roleDel(this.ids)
-      if (res.code) {
-        // token过期
-        if (res.code == '1001' || res.code == '1002') {
-          this.tokenLost()
-        } else {
-          this.$Message.error(res.message)
-        }
-      } else {
+      if (res.code == '') {
         this.$Message.success(res.message)
         this.getData()
         this.dialogVisibleDel = false
@@ -372,40 +347,19 @@ export default {
     async submitForm(val) {
       if (val == 'editRole') {
         // 编辑角色
-        try {
-          let res = await roleEdit(this.editRole)
-          if (res.code) {
-            if (res.code == '1001' || res.code == '1002') {
-              this.tokenLost()
-            } else {
-              this.$Message.error(res.message)
-            }
-          } else {
-            // 修改成功
-            this.$Message.success(res.message)
-            this.centerDialogVisibleEdit = false
-          }
-        } catch (error) {
-          this.$Message.error(error)
+        let res = await roleEdit(this.editRole)
+        if (res.code == '') {
+          // 修改成功
+          this.$Message.success(res.message)
+          this.centerDialogVisibleEdit = false
         }
       } else {
         // 分配权限
-        try {
-          let res = await setRole({ roleId: this.rolePowerList.roleId, menuIds: this.menuIds })
-          if (res.code) {
-            if (res.code == '1001' || res.code == '1002') {
-              this.tokenLost()
-            } else {
-              this.$Message.error(res.message)
-              this.centerDialogVisiblePower = false
-            }
-          } else {
-            this.$Message.success(res.message + '! 重新登录即可更新菜单 !')
-            this.centerDialogVisiblePower = false
-          }
-        } catch (error) {
-          this.$Message.error(error)
+        let res = await setRole({ roleId: this.rolePowerList.roleId, menuIds: this.menuIds })
+        if (res.code == '') {
+          this.$Message.success(res.message + '! 重新登录即可更新菜单 !')
         }
+        this.centerDialogVisiblePower = false
       }
     },
     // Tree选择节点
@@ -447,37 +401,20 @@ export default {
     // 获取数据接口
     async getData() {
       this.dictTypes = []
-      try {
-        let res = await roleGetAll(this.queryInfo)
-        let resType = await dictGetType()
-        if (res.code || resType.code) {
-          // token过期
-          if (
-            res.code == '1001' ||
-            res.code == '1002' ||
-            resType.code == '1001' ||
-            resType.code == '1002'
-          ) {
-            this.tokenLost()
-          } else {
-            this.$Message.error(res.message)
-            this.$Message.error(resType.message)
-          }
-        } else {
-          this.tableData = res.data.records
-          this.total = res.data.total
-          let a = {
-            text: '',
-            value: ''
-          }
-          resType.data.forEach((item) => {
-            a.text = item.value
-            a.value = item.value
-            this.dictTypes.push(a)
-          })
+      let res = await roleGetAll(this.queryInfo)
+      let resType = await dictGetType()
+      if (res.code == '' && resType.code == '') {
+        this.tableData = res.data.records
+        this.total = res.data.total
+        let a = {
+          text: '',
+          value: ''
         }
-      } catch (error) {
-        this.$Message.error(error)
+        resType.data.forEach((item) => {
+          a.text = item.value
+          a.value = item.value
+          this.dictTypes.push(a)
+        })
       }
     },
     // 修改每条页多少条

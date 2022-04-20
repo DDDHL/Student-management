@@ -112,20 +112,16 @@ export default {
     let res = localStorage.getItem('user')
     let router = localStorage.getItem('menus')
     if (res != null && res != '' && router != null && router != '') {
-      try {
-        let loginData = await isLogin()
-        if (!loginData.code) {
-          // 验证成功
-          setRoutes();
-          this.$router.push('/index')
-        } else {
-          // 验证失败
-          localStorage.removeItem('menus')
-          localStorage.removeItem('user')
-          this.isLoading = false
-        }
-      } catch (error) {
-        this.$Message.error(error)
+      let loginData = await isLogin()
+      if (!loginData.code) {
+        // 验证成功
+        setRoutes();
+        this.$router.push('/index')
+      } else {
+        // 验证失败
+        localStorage.removeItem('menus')
+        localStorage.removeItem('user')
+        this.isLoading = false
       }
     } else {
       this.isLoading = false
@@ -145,33 +141,29 @@ export default {
       this.$refs.form.validate(async (valid) => {
         if (valid) {
           let password = Encrypt(this.info.pwd)
-          try {
-            // 请求登录
-            let res = await login(this.info, password)
-            // 判断登录是否成功
-            if (res.code === '') {
-              this.$Message.success(res.message)
-              let user = {
-                avatarUrl: res.data.avatarUrl,
-                nickName: res.data.nickName,
-                token: res.data.token,
-                major: res.data.major
-              }
-              localStorage.setItem('user', JSON.stringify(user))
-              localStorage.setItem("menus", JSON.stringify(res.data.menus));
-              setRoutes();
-              setTimeout(() => {
-                // 成功后跳转
-                this.$router.push('/index')
-              }, 700)
-            } else {
-              // 登录失败后显示
-              this.$Message.error(res.message)
+          // 请求登录
+          let res = await login(this.info, password)
+          // 判断登录是否成功
+          if (res.code === '') {
+            this.$Message.success(res.message)
+            let user = {
+              avatarUrl: res.data.avatarUrl,
+              nickName: res.data.nickName,
+              token: res.data.token,
+              major: res.data.major
             }
-          } catch (error) {
-            // 登录请求失败
-            this.$Message.error(error)
+            localStorage.setItem('user', JSON.stringify(user))
+            localStorage.setItem("menus", JSON.stringify(res.data.menus));
+            setRoutes();
+            setTimeout(() => {
+              // 成功后跳转
+              this.$router.push('/index')
+            }, 700)
+          } else {
+            // 登录失败后显示
+            this.$Message.error(res.message)
           }
+
         }
       })
     },

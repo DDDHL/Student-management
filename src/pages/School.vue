@@ -201,69 +201,39 @@ export default {
       this.maps.set(tree.id, { tree, treeNode, resolve })
       if (tree.departmentId == null) {
         // 获取专业
-        try {
-          let res = await getMajorsByDet(tree.id)
-          if (res.code) {
-            if (res.code == '1001' || res.code == '1002') {
-              this.tokenLost()
-            } else {
-              this.$Message.error(res.message)
-            }
-          } else {
-            // 按钮文字
-            res.data.forEach(item => {
-              Object.assign(item, { fr: '新增年级' })
-              Object.assign(item, { disAdd: true })
-              Object.assign(item, { se: '编辑专业' })
-              Object.assign(item, { th: '删除专业' })
-            })
-            resolve(res.data)
-          }
-        } catch (error) {
-          this.$Message.error(error)
+        let res = await getMajorsByDet(tree.id)
+        if (res.code == '') {
+          // 按钮文字
+          res.data.forEach(item => {
+            Object.assign(item, { fr: '新增年级' })
+            Object.assign(item, { disAdd: true })
+            Object.assign(item, { se: '编辑专业' })
+            Object.assign(item, { th: '删除专业' })
+          })
+          resolve(res.data)
         }
       } else {
         if (tree.organizationName.charAt(tree.organizationName.length - 1) != '级') {
           // 获取年级
-          try {
-            let res = await getAllGrade(tree.id)
-            if (res.code) {
-              if (res.code == '1001' || res.code == '1002') {
-                this.tokenLost()
-              } else {
-                this.$Message.error(res.message)
-              }
-            } else {
-              res.data.forEach(item => {
-                Object.assign(item, { fr: '新增班级' })
-                Object.assign(item, { disEdit: true })
-                Object.assign(item, { disDel: true })
-                Object.assign(item, { se: '编辑年级' })
-                Object.assign(item, { th: '删除年级' })
-              })
-              resolve(res.data)
-            }
-          } catch (error) {
-            this.$Message.error(error)
+          let res = await getAllGrade(tree.id)
+          if (res.code == '') {
+            res.data.forEach(item => {
+              Object.assign(item, { fr: '新增班级' })
+              Object.assign(item, { disEdit: true })
+              Object.assign(item, { disDel: true })
+              Object.assign(item, { se: '编辑年级' })
+              Object.assign(item, { th: '删除年级' })
+            })
+            resolve(res.data)
           }
         } else {
           // 获取班级
-          try {
-            let res = await getAllClass(tree.id)
-            if (res.code) {
-              if (res.code == '1001' || res.code == '1002') {
-                this.tokenLost()
-              } else {
-                this.$Message.error(res.message)
-              }
-            } else {
-              res.data.forEach(item => {
-                Object.assign(item, { checkName: '查看班级' })
-              })
-              resolve(res.data)
-            }
-          } catch (error) {
-            this.$Message.error(error)
+          let res = await getAllClass(tree.id)
+          if (res.code == '') {
+            res.data.forEach(item => {
+              Object.assign(item, { checkName: '查看班级' })
+            })
+            resolve(res.data)
           }
         }
       }
@@ -277,74 +247,43 @@ export default {
       this.$router.push('/login')
     },
     async load() {
-      try {
-        let res = await schoolTable(this.data)
-        if (res.code) {
-          // token过期
-          if (res.code == '1001' || res.code == '1002') {
-            this.tokenLost()
-          } else {
-            this.$Message.error(res.message)
-          }
-        } else {
-          res.data.records.forEach(item => {
-            Object.assign(item, { fr: '新增专业' })
-            Object.assign(item, { se: '编辑学院' })
-            Object.assign(item, { th: '删除学院' })
-          })
-          this.tableData = res.data.records
-          this.total = res.data.total
-        }
-      } catch (error) {
-        this.$Message.error(error)
+      let res = await schoolTable(this.data)
+      if (res.code == '') {
+        res.data.records.forEach(item => {
+          Object.assign(item, { fr: '新增专业' })
+          Object.assign(item, { se: '编辑学院' })
+          Object.assign(item, { th: '删除学院' })
+        })
+        this.tableData = res.data.records
+        this.total = res.data.total
       }
     },
 
     async save() {
       // 新增确定
-      try {
-        let res = await addNewOrg(this.addForm)
-        if (res.code) {
-          if (res.code == '1001' || res.code == '1002') {
-            this.tokenLost()
-          } else {
-            this.$Message.error(res.message)
-          }
+      let res = await addNewOrg(this.addForm)
+      if (res.code == '') {
+        this.$Message.success(res.message)
+        let flag = this.addForm.departmentId || this.addForm.majorId || this.addForm.gradeId
+        if (flag == null) {
+          this.load()
         } else {
-          this.$Message.success(res.message)
-          let flag = this.addForm.departmentId || this.addForm.majorId || this.addForm.gradeId
-          if (flag == null) {
-            this.load()
-          } else {
-            const { tree, treeNode, resolve } = this.maps.get(flag)
-            this.loadSomeData(tree, treeNode, resolve)
-          }
+          const { tree, treeNode, resolve } = this.maps.get(flag)
+          this.loadSomeData(tree, treeNode, resolve)
         }
-      } catch (error) {
-        this.$Message.error(error)
+        this.dialogFormVisible = false
+        this.addForm.organizationName = ''
+        this.addForm.departmentId = null
+        this.addForm.majorId = null
+        this.addForm.gradeId = null
       }
-      this.dialogFormVisible = false
-      this.addForm.organizationName = ''
-      this.addForm.departmentId = null
-      this.addForm.majorId = null
-      this.addForm.gradeId = null
     },
 
     async del(id) {
-      try {
-        let res = await delById(id)
-        if (res.code) {
-          if (res.code == '1001' || res.code == '1002') {
-            this.tokenLost()
-          } else {
-            this.$Message.error(res.message)
-          }
-        } else {
-          this.$Message.success(res.message)
-          this.load()
-        }
-      } catch (error) {
-        this.$Message.error(error)
+      let res = await delById(id)
+      if (res.code == '') {
+        this.$Message.success(res.message)
+        this.load()
       }
     },
     handleSelectionChange(val) {
@@ -385,41 +324,21 @@ export default {
       this.dialogFormEditVisible = true
     },
     async editSave() {
-      try {
-        let res = await editById(this.editId, this.editName)
-        if (res.code) {
-          if (res.code == '1001' || res.code == '1002') {
-            this.tokenLost()
-          } else {
-            this.$Message.error(res.message)
-          }
-        } else {
-          this.$Message.success(res.message)
-          this.dialogFormEditVisible = false
-          this.load()
-        }
-      } catch (error) {
-        this.$Message.error(error)
+      let res = await editById(this.editId, this.editName)
+      if (res.code == '') {
+        this.$Message.success(res.message)
+        this.dialogFormEditVisible = false
+        this.load()
+        this.editName = ''
       }
-      this.editName = ''
     },
 
     async handleState(row) {
-      try {
-        let res = await saveMenu(row)
-        if (res.code) {
-          if (res.code == '1001' || res.code == '1002') {
-            this.tokenLost()
-          } else {
-            this.$Message.error(res.message)
-          }
-        } else {
-          // 获取成功
-          this.$Message.success(res.message)
-          this.load()
-        }
-      } catch (error) {
-        this.$Message.error(error)
+      let res = await saveMenu(row)
+      if (res.code == '') {
+        // 获取成功
+        this.$Message.success(res.message)
+        this.load()
       }
     },
     // 重置搜索

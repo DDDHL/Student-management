@@ -127,32 +127,15 @@ export default {
     this.getData()
   },
   methods: {
-    // 处理token过期
-    tokenLost() {
-      this.$Message.error('您的登录信息已过期,请重新登录')
-      localStorage.removeItem('user')
-      localStorage.removeItem('menus')
-      this.$router.push('/login')
-    },
     // 初始化获取数据
     async getData() {
-      try {
-        let res = await getLog(this.getLogData);
-        if (res.code) {
-          if (res.code == '1001' || res.code == '1002') {
-            this.tokenLost()
-          } else {
-            this.$Message.error(res.message)
-          }
-        } else {
-          this.allLog = res.data.records
-          this.total = res.data.total
-          /* // 赋值完恢复
-          this.getLogData.nickName = '' */
-        }
-      } catch (error) {
-        this.$Message.error(error)
+      let res = await getLog(this.getLogData);
+      if (res.code == '') {
+        this.allLog = res.data.records
+        this.total = res.data.total
       }
+      /* // 赋值完恢复
+      this.getLogData.nickName = '' */
     },
     // 查询单条
     find() {

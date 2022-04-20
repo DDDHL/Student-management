@@ -363,13 +363,6 @@ export default {
     this.initData()
   },
   methods: {
-    // 处理token过期
-    tokenLost() {
-      this.$Message.error('您的登录信息已过期,请重新登录')
-      localStorage.removeItem('user')
-      localStorage.removeItem('menus')
-      this.$router.push('/login')
-    },
     // 初始化新增课程参数
     initData() {
       // 初始化用户姓名
@@ -389,24 +382,14 @@ export default {
     },
     // 初始化获取数据
     async getData() {
-      try {
-        let res = await getClass(this.getLogData);
-        if (res.code) {
-          if (res.code == '1001' || res.code == '1002') {
-            this.tokenLost()
-          } else {
-            this.$Message.error(res.message)
-          }
-        } else {
-          this.allLog = res.data.records
-          this.total = res.data.total
-          console.log(res)
-          /* // 赋值完恢复
-          this.getLogData.nickName = '' */
-        }
-      } catch (error) {
-        this.$Message.error(error)
+      let res = await getClass(this.getLogData);
+      console.log(res)
+      if (res.code == '') {
+        this.allLog = res.data.records
+        this.total = res.data.total
       }
+      /* // 赋值完恢复
+      this.getLogData.nickName = '' */
     },
     // 点击查看班级
     rowClick(row) {
@@ -425,23 +408,12 @@ export default {
         this.$Message.error('请完善表单再提交!')
         return
       }
-      console.log(this.addQuerys)
-      try {
-        let res = await addClass(this.addQuerys)
-        console.log(res)
-        if (res.code) {
-          if (res.code == '1001' || res.code == '1002') {
-            this.tokenLost()
-          } else {
-            this.$Message.error(res.message)
-          }
-        } else {
-          this.$Message.success(res.message)
-          this.dialogVisible = false
-          this.getData()
-        }
-      } catch (error) {
-        this.$Message.error(error)
+      let res = await addClass(this.addQuerys)
+      console.log(res)
+      if (res.code == '') {
+        this.$Message.success(res.message)
+        this.dialogVisible = false
+        this.getData()
       }
     },
     // 提交参数初始化
@@ -622,17 +594,11 @@ export default {
         this.$Message.warning('请先勾选要删除的课程 !')
         return
       }
-      let res = await delClass(this.delClassId)
-      if (res.code) {
-        if (res.code == '1001' || res.code == '1002') {
-          this.tokenLost()
-          return
-        }
-        this.$Message.error(res.message)
-        return
+      await delClass(this.delClassId)
+      if (res.code == '') {
+        this.$Message.success(res.message)
+        this.getData()
       }
-      this.$Message.success(res.message)
-      this.getData()
     }
   },
 }

@@ -218,46 +218,31 @@ export default {
     this.upLoadHeader = { token: Mytoken }
   },
   methods: {
-    // 处理token过期
-    tokenLost() {
-      this.$Message.error('您的登录信息已过期,请重新登录')
-      localStorage.removeItem('user')
-      localStorage.removeItem('menus')
-      this.$router.push('/login')
-    },
     // 下载文件
     async exp(row) {
-      try {
-        let res = await downloadFile(row.fileUrl)
-        const href = URL.createObjectURL(
-          new Blob([res], {
-            type: 'application/octet-stream',
-          })
-        )
-        // 下载文件
-        const link = document.createElement('a')
-        link.download = `${row.fileName}`
-        link.href = href
-        link.style.display = 'none'
-        document.body.appendChild(link)
-        link.click()
-        URL.revokeObjectURL(link.href) //释放url
-        document.body.removeChild(link) //释放标签
-        this.$Message.success('下载成功!')
-      } catch (error) {
-        this.$Message.error(error)
-      }
+      let res = await downloadFile(row.fileUrl)
+      const href = URL.createObjectURL(
+        new Blob([res], {
+          type: 'application/octet-stream',
+        })
+      )
+      // 下载文件
+      const link = document.createElement('a')
+      link.download = `${row.fileName}`
+      link.href = href
+      link.style.display = 'none'
+      document.body.appendChild(link)
+      link.click()
+      URL.revokeObjectURL(link.href) //释放url
+      document.body.removeChild(link) //释放标签
+      this.$Message.success('下载成功!')
     },
     // 导入成功
     handleExcelImportSuccess(res) {
       console.log(res);
       if (res.code) {
-        if (res.code == '1001' || res.code == '1002') {
-          this.tokenLost()
-        } else {
-          this.dialogVisibleImport = true
-          this.importError = res.message
-        }
+        this.dialogVisibleImport = true
+        this.importError = res.message
       } else {
         this.$Message.success('文件上传成功')
         this.getData()
@@ -285,14 +270,7 @@ export default {
       data.ids = this.ids
       // 删除文件
       let res = await delFile(data)
-      if (res.code) {
-        // token过期
-        if (res.code == '1001' || res.code == '1002') {
-          this.tokenLost()
-        } else {
-          this.$Message.error(res.message)
-        }
-      } else {
+      if (res.code == '') {
         this.$Message.success(res.message)
         this.getData()
         this.dialogVisibleDel = false
@@ -369,23 +347,11 @@ export default {
     // 获取数据接口
     async getData() {
       //let myMajor = JSON.parse(localStorage.getItem('user')).major
-      try {
-        let res = await getFile(this.queryInfo)
-        //let resMyDept = await getMajorsByDet()
-        if (res.code) {
-          // token过期
-          if (res.code == '1001' || res.code == '1002') {
-            this.tokenLost()
-          } else {
-            this.$Message.error(res.message)
-          }
-        } else {
-          console.log(res);
-          this.tableData = res.data.records
-          this.total = res.data.total
-        }
-      } catch (error) {
-        this.$Message.error(error)
+      //let resMyDept = await getMajorsByDet()
+      let res = await getFile(this.queryInfo)
+      if (res.code == '') {
+        this.tableData = res.data.records
+        this.total = res.data.total
       }
     },
     // 修改每条页多少条

@@ -320,13 +320,6 @@ export default {
     this.getData()
   },
   methods: {
-    // 处理token过期
-    tokenLost() {
-      this.$Message.error('您的登录信息已过期,请重新登录')
-      localStorage.removeItem('user')
-      localStorage.removeItem('menus')
-      this.$router.push('/login')
-    },
     // 点击编辑字典
     async handleEditDict(row) {
       this.editDict = row
@@ -348,14 +341,7 @@ export default {
     async del() {
       // 删除字典
       let res = await delDict(this.ids)
-      if (res.code) {
-        // token过期
-        if (res.code == '1001' || res.code == '1002') {
-          this.tokenLost()
-        } else {
-          this.$Message.error(res.message)
-        }
-      } else {
+      if (res.code == '') {
         this.$Message.success(res.message)
         this.getData()
         this.dialogVisibleDel = false
@@ -377,62 +363,32 @@ export default {
     },
     // 提交字典类型表单
     async submitFormType() {
-      try {
-        let res = await addDictType(this.newDictType)
-        if (res.code) {
-          if (res.code == '1001' || res.code == '1002') {
-            this.tokenLost()
-          } else {
-            this.$Message.error(res.message)
-          }
-        } else {
-          this.$Message.success(res.message)
-          this.centerDialogVisibleAddType = false
-          this.getData()
-        }
-      } catch (error) {
-        this.$Message.error(error)
+      let res = await addDictType(this.newDictType)
+      if (res.code == '') {
+        this.$Message.success(res.message)
+        this.centerDialogVisibleAddType = false
+        this.getData()
       }
     },
     // 提交表单  包含编辑和新增
     async submitForm(val) {
       if (val == 'editDict') {
         // 编辑字典
-        try {
-          let res = await editOneDict(this.editDict)
-          if (res.code) {
-            if (res.code == '1001' || res.code == '1002') {
-              this.tokenLost()
-            } else {
-              this.$Message.error(res.message)
-            }
-          } else {
-            // 修改成功
-            this.$Message.success(res.message)
-            this.centerDialogVisibleEdit = false
-          }
-        } catch (error) {
-          this.$Message.error(error)
+        let res = await editOneDict(this.editDict)
+        if (res.code == '') {
+          // 修改成功
+          this.$Message.success(res.message)
+          this.centerDialogVisibleEdit = false
         }
       } else {
         // 新增字典
-        try {
-          let res = await addOneDict(this.newDict)
-          if (res.code) {
-            if (res.code == '1001' || res.code == '1002') {
-              this.tokenLost()
-            } else {
-              this.$Message.error(res.message)
-            }
-          } else {
-            // 新增成功
-            this.$Message.success(res.message)
-            this.newDict == ''
-            this.centerDialogVisibleAdd = false
-            this.getData()
-          }
-        } catch (error) {
-          this.$Message.error(error)
+        let res = await addOneDict(this.newDict)
+        if (res.code == '') {
+          // 新增成功
+          this.$Message.success(res.message)
+          this.newDict == ''
+          this.centerDialogVisibleAdd = false
+          this.getData()
         }
       }
     },
@@ -470,26 +426,14 @@ export default {
     // 获取数据接口
     async getData() {
       this.dictTypes = []
-      try {
-        let res = await dictGetAll(this.queryInfo)
-        let resType = await dictGetType()
-        if (res.code || resType.code) {
-          // token过期
-          if (res.code == '1001' || res.code == '1002' || resType.code == '1001' || resType.code == '1002') {
-            this.tokenLost()
-          } else {
-            this.$Message.error(res.message)
-            this.$Message.error(resType.message)
-          }
-        } else {
-          this.tableData = res.data.records
-          this.total = res.data.total
-          resType.data.forEach(item => {
-            this.dictTypes.push({ text: item, value: item })
-          })
-        }
-      } catch (error) {
-        this.$Message.error(error)
+      let res = await dictGetAll(this.queryInfo)
+      let resType = await dictGetType()
+      if (res.code == '' && resType.code == '') {
+        this.tableData = res.data.records
+        this.total = res.data.total
+        resType.data.forEach(item => {
+          this.dictTypes.push({ text: item, value: item })
+        })
       }
     },
     // 修改每条页多少条
