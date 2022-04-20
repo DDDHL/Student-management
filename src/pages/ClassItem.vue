@@ -168,6 +168,19 @@
             </el-table-column>
           </el-table>
         </div>
+        <div style="width: 80%; margin-left: 10%">
+          <el-input placeholder="添加新的周" v-model="addChangeTime">
+            <el-button
+              slot="append"
+              icon="el-icon-plus"
+              @click="addNewChangeTime"
+            ></el-button>
+          </el-input>
+        </div>
+        <div style="margin-top: 20px; text-align: center">
+          <el-button type="primary" @click="saveChange">保存修改</el-button>
+          <el-button type="warning" @click="cancelChange">取消修改</el-button>
+        </div>
       </el-drawer>
 
       <!-- 表格 -->
@@ -249,7 +262,7 @@
 </template>
 
 <script>
-import { getClassStudents, delClassStudent, addSomeStudent } from '../api'
+import { getClassStudents, delClassStudent, addSomeStudent, editClassTime } from '../api'
 export default {
   name: 'ClassItem',
   data() {
@@ -281,6 +294,7 @@ export default {
       changeTimeTable: [],
       allWeekDays: [],
       allClassTime: [],
+      addChangeTime: '',
     }
   },
   created() {
@@ -321,12 +335,13 @@ export default {
         return
       }
       this.getData()
+      this.changeTimeTable = []
       let data = this.$store.state.classInfo.param
-      console.log(data)
       for (let i = 0; i < data.weeks.length; i++) {
-        this.changeTimeTable.push({ weeks: data.weeks[i], weeksNumber: data.weeksNumber[i], weeksTime: data.weeksTime[i] })
+        let a = data.weeksNumber[i].split('、')
+        let b = data.weeksTime[i].split(',')
+        this.changeTimeTable.push({ weeks: data.weeks[i], weeksNumber: a, weeksTime: b })
       }
-      console.log(this.changeTimeTable)
     },
     // 新增学生(表单)
     async addStudent() {
@@ -366,17 +381,74 @@ export default {
     async changeInfo() {
 
     },
-    // 修改上课时间
-    async changeTime() {
-
-    },
     // 删除某周
     delDesign(e) {
-
+      let index = this.changeTimeTable.indexOf(this.changeTimeTable.filter(d => d.weeks == e)[0])
+      this.changeTimeTable.splice(index, 1)
+    },
+    // 新增某周
+    addNewChangeTime() {
+      if (this.addChangeTime == '') {
+        this.$Message.error('请输入第几周')
+        return
+      }
+      let index = this.changeTimeTable.indexOf(this.changeTimeTable.filter(d => d.weeks == this.addChangeTime)[0])
+      if (index == -1) {
+        this.changeTimeTable.push({ weeks: this.addChangeTime, weeksNumber: this.changeTimeTable[0].weeksNumber, weeksTime: this.changeTimeTable[0].weeksTime })
+        this.changeTimeTable.sort((a, b) => a.weeks - b.weeks)
+      } else {
+        this.$Message.error('已有这一周 !')
+      }
+    },
+    // 保存改变的时间
+    async saveChange() {
+      let a = []
+      let b = []
+      let c = []
+      let number = ''
+      let weeks = ''
+      let id = this.queryInfo.curriculumId
+      this.changeTimeTable.forEach(item => {
+        for (let i = 0; i < item.weeksNumber.length; i++) {
+          if (i == item.weeksNumber.length - 1) {
+            number += item.weeksNumber[i]
+          } else {
+            number = number + item.weeksNumber[i] + '、'
+          }
+        }
+        for (let j = 0; j < item.weeksTime.length; j++) {
+          if (j == item.weeksTime.length - 1) {
+            weeks += item.weeksTime[j]
+          } else {
+            weeks = weeks + item.weeksTime[j] + ','
+          }
+        }
+        a.push(item.weeks)
+        b.push(number)
+        c.push(weeks)
+        weeks = number = ''
+      }
+      )
+      let res = await editClassTime(id, a, b, c)
+      if (res.code) {
+        if (res.code == '1001' || res.code == '1002') {
+          this.tokenLost()
+          return
+        }
+        this.$Message.error(res.message)
+        return
+      }
+      this.$Message.success(res.message)
+      this.dialogVisibleEditTime = false
+    },
+    // 取消修改
+    cancelChange() {
+      this.initData()
+      this.dialogVisibleEditTime = false
     },
     // 关闭修改时间
     CloseTime(done) {
-      this.$confirm('确认关闭？')
+      this.$confirm('确认关闭？ 将取消修改!')
         .then(() => {
           this.dialogVisibleEditTime = false
           done();

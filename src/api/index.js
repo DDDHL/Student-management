@@ -1,6 +1,19 @@
 // 导入封装好的axios请求文件
 import requests from './request'
 
+// 班级详情修改时间
+export const editClassTime = (id, weeks, weeksNumber, weeksTime) => {
+  return requests({
+    url: '/curriculum/editCurriculumRule',
+    method: 'POST',
+    data: {
+      id: id,
+      weeks: weeks,
+      weeksNumber: weeksNumber,
+      weeksTime: weeksTime,
+    },
+  })
+}
 // 班级详情批量删除学生
 export const addSomeStudent = (id, data) => {
   return requests({

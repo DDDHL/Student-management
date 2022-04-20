@@ -400,6 +400,7 @@ export default {
         } else {
           this.allLog = res.data.records
           this.total = res.data.total
+          console.log(res)
           /* // 赋值完恢复
           this.getLogData.nickName = '' */
         }
@@ -570,20 +571,12 @@ export default {
     },
     // 查询单条
     find() {
-      if (isNaN(this.query)) {
-        // 查询名字
-        this.getLogData.nickName = this.query.trim()
-        this.getData()
-      } else {
-        // 查询学号
-        this.getLogData.userAccount = this.query.trim()
-        this.getData()
-      }
+      this.getLogData.curriculumName = this.query.trim()
+      this.getData()
     },
     // 搜索清空还原
     clearSearch() {
-      this.getLogData.nickName = ''
-      this.getLogData.userAccount = ''
+      this.getLogData.curriculumName = ''
       this.getData()
     },
     // 手动删除search
