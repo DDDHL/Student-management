@@ -62,7 +62,35 @@
         @click="dialogVisibleEditTime = true"
         >修改上课时间 <i class="el-icon-edit-outline"></i
       ></el-button>
-
+      <!-- 导入导出 -->
+      <el-upload
+        :action="this.$store.state.allip + '/curriculum-user/import'"
+        style="display: inline-block"
+        class="ml-5"
+        :show-file-list="false"
+        :accept="'xlsx'"
+        :on-success="handleExcelImportSuccess"
+        :headers="upLoadHeader"
+        :data="uploadData"
+      >
+        <el-button type="primary" style="margin: 20px 0 0 20px; width: 98px"
+          >导入 <i class="el-icon-top"></i
+        ></el-button>
+      </el-upload>
+      <el-dialog
+        title="警告"
+        :visible.sync="dialogVisibleImport"
+        width="30%"
+        center
+      >
+        <span>{{ importError }}</span>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="dialogVisibleImport = false">取 消</el-button>
+          <el-button type="primary" @click="dialogVisibleImport = false"
+            >确 定</el-button
+          >
+        </span>
+      </el-dialog>
       <!-- 新增学生表单 -->
       <el-dialog
         title="新增学生"
@@ -100,10 +128,29 @@
       <el-dialog
         title="修改课程信息"
         :visible.sync="dialogVisibleEdit"
-        width="40%"
+        width="500px"
         center
       >
-        <span>课程修改</span>
+        <div class="changeClassInfo">
+          <div>课程名字：</div>
+          <div style="width: 300px; margin-left: -70px">
+            <el-input v-model="className" placeholder="修改课程名字"></el-input>
+          </div>
+        </div>
+        <div class="changeClassInfo" style="margin-top: 20px">
+          <div>课程信息：</div>
+          <div style="width: 300px; margin-left: -70px">
+            <el-input
+              type="textarea"
+              :rows="2"
+              placeholder="修改课程信息(非必填)"
+              v-model="classInfo"
+              maxlength="120"
+              show-word-limit
+            >
+            </el-input>
+          </div>
+        </div>
         <span slot="footer">
           <el-button @click="dialogVisibleEdit = false">取 消</el-button>
           <el-button type="primary" @click="changeInfo">确 定</el-button>
@@ -271,7 +318,7 @@
 </template>
 
 <script>
-import { getClassStudents, delClassStudent, addSomeStudent, editClassTime, getClass } from '../api'
+import { getClassStudents, delClassStudent, addSomeStudent, editClassTime, getClass, editClassInfo } from '../api'
 export default {
   name: 'ClassItem',
   data() {
@@ -315,13 +362,42 @@ export default {
         curriculumName: "",
         pageNum: 1,
         pageSize: 10
-      }
+      },
+      // 文件上传token
+      upLoadHeader: {},
+      dialogVisibleImport: false,
+      importError: '',
+      uploadData: {},
+      // 修改课程信息
+      className: '',
+      classInfo: ''
     }
   },
   created() {
     this.initData()
+    // 文件上传token
+    this.upLoadHeader = { token: JSON.parse(localStorage.getItem('user')).token }
+    this.uploadData = { curriculumId: this.queryInfo.curriculumId }
   },
   methods: {
+    // 导入成功
+    handleExcelImportSuccess(res) {
+      console.log(res);
+      if (res.code) {
+        if (res.code == '1001' || res.code == '1002') {
+          this.$Message.error('您的登录信息已过期,请重新登录')
+          localStorage.removeItem('user')
+          localStorage.removeItem('menus')
+          this.$router.push('/login')
+        } else {
+          this.dialogVisibleImport = true
+          this.importError = res.message
+        }
+      } else {
+        this.$Message.success('导入成功')
+        this.getData()
+      }
+    },
     // 获取数据
     async getData() {
       let res = await getClassStudents(this.queryInfo)
@@ -332,9 +408,10 @@ export default {
     // 初始化数据
     initData() {
       // 设置查询课程的id
-      this.name = this.$store.state.classInfo.curriculumName
+      this.className = this.name = this.$store.state.classInfo.curriculumName
       //this.teacherName = this.$store.state.classInfo.curricu
       this.queryInfo.curriculumId = this.$store.state.curriculumId
+      this.classInfo = this.$store.state.curriculumInfo
       // 初始化时间选择
       this.allWeekDays = this.$store.state.allWeekDays
       this.allClassTime = this.$store.state.allClassTime
@@ -350,6 +427,14 @@ export default {
         let a = data.weeksNumber[i].split('、')
         let b = data.weeksTime[i].split(',')
         this.changeTimeTable.push({ weeks: data.weeks[i], weeksNumber: a, weeksTime: b })
+      }
+    },
+    // 获取最新班级信息
+    async updateClassInfo() {
+      let req = await getClass(this.timeQuery)
+      if (req.code == '') {
+        this.$store.state.classInfo = req.data.records[0]
+        this.initData()
       }
     },
     // 新增学生(表单)
@@ -382,7 +467,24 @@ export default {
     },
     // 修改课程信息
     async changeInfo() {
-
+      if (this.className == '') {
+        this.$Message.error('请填写课程名字')
+        return
+      }
+      let data = {
+        curriculumDepartment: 0,
+        curriculumGarde: 0,
+        curriculumInfo: this.classInfo,
+        curriculumMajor: 0,
+        curriculumName: this.className,
+        id: this.queryInfo.curriculumId
+      }
+      let res = await editClassInfo(data)
+      if (res.code == '') {
+        this.$Message.success(res.message)
+        this.dialogVisibleEdit = false
+        this.updateClassInfo()
+      }
     },
     // 删除某周
     delDesign(e) {
@@ -439,11 +541,7 @@ export default {
         this.$Message.success(res.message)
         this.dialogVisibleEditTime = false
         this.timeQuery.curriculumName = this.name
-        let req = await getClass(this.timeQuery)
-        if (req.code == '') {
-          this.$store.state.classInfo = req.data.records[0]
-          this.initData()
-        }
+        this.updateClassInfo()
       }
     },
     // 取消修改
@@ -528,5 +626,10 @@ export default {
 .title1 {
   text-align: center;
   margin-top: 5px;
+}
+.changeClassInfo {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
 }
 </style>

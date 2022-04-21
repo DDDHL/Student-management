@@ -1,6 +1,14 @@
 // 导入封装好的axios请求文件
 import requests from './request'
 
+// 班级详情修改课程信息
+export const editClassInfo = (data) => {
+  return requests({
+    url: '/curriculum/editCurriculum',
+    method: 'POST',
+    data: data,
+  })
+}
 // 班级详情修改时间
 export const editClassTime = (id, weeks, weeksNumber, weeksTime) => {
   return requests({
