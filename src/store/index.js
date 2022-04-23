@@ -4,7 +4,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    allip: 'http://113.78.186.56:9568',
+    allip: 'http://113.78.182.3:9568',
     currentPathName: '',
     curriculumId: 0,
     classInfo: {},

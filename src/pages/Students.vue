@@ -522,6 +522,7 @@ export default {
     },
     // 新增学生获取年级
     async addStudentGetMj(id) {
+      console.log(id)
       // 请求年级
       let res = await getAllGrade(id)
       if (res.code == '') {

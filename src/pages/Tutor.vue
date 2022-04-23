@@ -20,7 +20,7 @@
       <el-button
         type="primary"
         style="margin: 20px 0 0 20px"
-        @click="addStudentBtn"
+        @click="centerDialogVisibleAdd = true"
         >添加导员<i class="el-icon-circle-plus-outline"></i
       ></el-button>
       <!-- 添加导员弹窗 -->
@@ -54,35 +54,45 @@
               <el-option label="女" value="女"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="年级" prop="grade">
-            <el-select
-              v-model="newStudent.grade"
-              placeholder="请选择年级"
-              style="width: 325px"
-            >
-              <el-option
-                v-for="item in addMajorData"
-                :key="item.organizationName"
-                :label="item.organizationName"
-                :value="item.organizationName"
-              ></el-option>
-            </el-select>
-          </el-form-item>
           <el-form-item label="学院" prop="department">
             <el-input v-model="newStudent.department" disabled></el-input>
           </el-form-item>
-          <el-form-item label="专业" prop="major">
+          <el-form-item label="专业" required>
             <el-select
-              v-model="newStudent.major"
+              multiple
               placeholder="请选择专业"
               style="width: 325px"
+              v-model="allNewMajor"
+              @change="addNewMajor"
             >
               <el-option
                 v-for="item in majorData"
                 :key="item.value"
-                :label="item.value"
+                :label="item.text"
                 :value="item.value"
-              ></el-option>
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item
+            label="年级"
+            required
+            v-for="(val, key) in addGradeTable"
+            :key="key"
+          >
+            <el-select
+              placeholder="请选择专业"
+              style="width: 325px"
+              v-model="newGrade[`${key}`]"
+              @change="chooseGrade"
+            >
+              <el-option
+                v-for="item in val"
+                :key="item.name"
+                :label="item.name + item.majorName"
+                :value="item.id"
+              >
+              </el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="手机号" prop="phone">
@@ -207,12 +217,6 @@
           :resizable="false"
         >
         </el-table-column>
-        <el-table-column
-          align="center"
-          prop="grade"
-          label="年级"
-          :resizable="false"
-        ></el-table-column>
         <el-table-column
           prop="major"
           label="专业"
@@ -353,6 +357,7 @@
 </template>
 
 <script>
+import axios from 'axios'
 /* 获取导员列表接口 */
 import { getAll, addStudent, delStudent, userExport, getAllGrade, getAllDept, getMajorsByDet, changeUserInfo, getStudentMajors } from '../api'
 /* 下载文件 */
@@ -391,13 +396,6 @@ export default {
           {
             type: 'email',
             message: '请输入正确的邮箱地址',
-            trigger: ['blur', 'change'],
-          },
-        ],
-        major: [
-          {
-            required: true,
-            message: '专业不能为空',
             trigger: ['blur', 'change'],
           },
         ],
@@ -487,6 +485,13 @@ export default {
         pageSize: 10,
         userAccount: '',
       },
+      // 多选专业
+      allNewMajor: [],
+      addGradeTable: {},
+      allGradeInMajor: {},
+      newGrade: {},
+      // 记录当前选择的年级key
+      allGradeKey: []
     }
   },
   watch: {
@@ -516,26 +521,6 @@ export default {
       localStorage.removeItem('user')
       localStorage.removeItem('menus')
       this.$router.push('/login')
-    },
-    // 新增导员按钮
-    async addStudentBtn() {
-      try {
-        // 请求年级
-        let res = await getAllGrade('')
-        if (res.code) {
-          if (res.code == '1001' || res.code == '1002') {
-            this.tokenLost()
-          } else {
-            this.$Message.error(res.message)
-          }
-        } else {
-          // 赋值
-          this.addMajorData = res.data
-          this.centerDialogVisibleAdd = true
-        }
-      } catch (error) {
-        this.$Message.error(error)
-      }
     },
     // 导入导出
     async exp() {
@@ -618,6 +603,11 @@ export default {
         this.$refs[val].validate(async (valid) => {
           if (valid) {
             this.newStudent['roleId'] = 3
+            this.newStudent.majorIds = []
+            this.allGradeKey.forEach(i => {
+              this.newStudent.majorIds.push(this.newGrade[i])
+            })
+            console.log(this.newStudent)
             let res = await addStudent(this.newStudent)
             if (res.code == '') {
               this.$Message.success(res.message)
@@ -728,9 +718,29 @@ export default {
           this.newStudent.department = res.data.records[0].department
         }
         resMyDept.data.forEach(item => {
-          this.majorData.push({ text: item.organizationName, value: item.organizationName })
+          this.majorData.push({ text: item.organizationName, value: item.id + ',' + item.organizationName })
         })
       }
+    },
+    // 新增导员选择专业
+    addNewMajor(e) {
+      this.addGradeTable = {}
+      this.allGradeKey = []
+      e.forEach(async item => {
+        let res = await getAllGrade(item.split(',')[0])
+        let gradeTable = []
+        if (res.code == '') {
+          res.data.forEach(i => {
+            gradeTable.push({ id: i.id, name: i.organizationName, majorName: item.split(',')[1], value: '' })
+          })
+        }
+        this.allGradeKey.push(item.split(',')[0])
+        this.$set(this.addGradeTable, item.split(',')[0], gradeTable);
+      })
+    },
+    // 选择新年级
+    chooseGrade() {
+      console.log(this.newGrade)
     },
     // 修改每条页多少条
     handleSizeChange(num) {
