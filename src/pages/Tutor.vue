@@ -81,7 +81,7 @@
             :key="key"
           >
             <el-select
-              placeholder="请选择专业"
+              :placeholder="'请选择' + val[0].majorName + '的年级'"
               style="width: 325px"
               v-model="newGrade[`${key}`]"
               @change="chooseGrade"
@@ -182,7 +182,6 @@
         border
         style="width: 100%"
         stripe
-        @filter-change="filterChange"
         @selection-change="handleSelectionChange"
       >
         <el-table-column fixed type="selection" align="center">
@@ -221,8 +220,6 @@
           prop="major"
           label="专业"
           align="center"
-          :filters="majorData"
-          column-key="filterTag"
           :resizable="false"
         >
         </el-table-column>
@@ -284,49 +281,17 @@
               <el-option label="女" value="女"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="年级" prop="grade">
-            <el-select
-              v-model="editStudent.grade"
-              placeholder="请选择年级"
-              style="width: 325px"
-            >
-              <el-option
-                v-for="item in allGrade"
-                :key="item.organizationName"
-                :label="item.organizationName"
-                :value="item.organizationName"
-              ></el-option>
-            </el-select>
-          </el-form-item>
           <el-form-item label="学院" prop="department">
-            <el-select
-              v-model="editStudent.department"
-              placeholder="请选择学院"
-              style="width: 325px"
-            >
-              <el-option
-                v-for="item in allDepartment"
-                :key="item.id"
-                :label="item.organizationName"
-                :value="item.organizationName"
-                @click.native="getSomeMajors(item.id)"
-              ></el-option>
-            </el-select>
+            <el-input v-model="editStudent.department" disabled></el-input>
           </el-form-item>
-          <el-form-item label="专业" prop="major">
-            <el-select
-              v-model="editStudent.major"
-              placeholder="请选择专业"
-              style="width: 325px"
-            >
-              <el-option
-                v-for="item in SomeMajors"
-                :key="item.id"
-                :label="item.organizationName"
-                :value="item.organizationName"
-              ></el-option>
-            </el-select>
+          <el-form-item label="专业" required>
+            <el-input v-model="editStudent.major" disabled></el-input>
           </el-form-item>
+          <div class="changeEditMajor">
+            <el-button type="text" @click="drawer = true"
+              >修改绑定的专业</el-button
+            >
+          </div>
           <el-form-item label="手机号" prop="phone">
             <el-input v-model="editStudent.phone"></el-input>
           </el-form-item>
@@ -352,14 +317,72 @@
         :total="total"
       >
       </el-pagination>
+      <el-drawer
+        title="修改绑定的专业"
+        :visible.sync="drawer"
+        :direction="direction"
+        :before-close="handleClose"
+      >
+        <div class="editMajor">
+          <el-form
+            :model="newStudent"
+            label-width="65px"
+            ref="newStudent"
+            :rules="rules"
+            style="margin-left: -10px"
+          >
+            <el-form-item label="专业" required>
+              <el-select
+                multiple
+                placeholder="请选择专业"
+                style="width: 300px"
+                v-model="allNewMajor"
+                @change="addNewMajor"
+              >
+                <el-option
+                  v-for="item in majorData"
+                  :key="item.value"
+                  :label="item.text"
+                  :value="item.value"
+                >
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item
+              v-for="(val, key) in addGradeTable"
+              label="年级"
+              required
+              :key="key"
+            >
+              <el-select
+                :placeholder="'请选择' + val[0].majorName + '的年级'"
+                style="width: 300px"
+                v-model="newGrade[`${key}`]"
+                @change="chooseGrade"
+              >
+                <el-option
+                  v-for="item in val"
+                  :key="item.name"
+                  :label="item.name + item.majorName"
+                  :value="item.id"
+                >
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-form>
+        </div>
+        <div class="editMajor">
+          <el-button type="primary" @click="saveEdit">保存修改</el-button>
+          <el-button type="warning" @click="cancelEdit">取消修改</el-button>
+        </div>
+      </el-drawer>
     </el-card>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
 /* 获取导员列表接口 */
-import { getAll, addStudent, delStudent, userExport, getAllGrade, getAllDept, getMajorsByDet, changeUserInfo, getStudentMajors } from '../api'
+import { getAll, addStudent, delStudent, userExport, getAllGrade, getMajorsByDet, changeUserInfo, getStudentMajors, editTutorMajor } from '../api'
 /* 下载文件 */
 
 export default {
@@ -491,7 +514,11 @@ export default {
       allGradeInMajor: {},
       newGrade: {},
       // 记录当前选择的年级key
-      allGradeKey: []
+      allGradeKey: [],
+      // 抽屉
+      drawer: false,
+      direction: 'rtl',
+      userId: 0,
     }
   },
   watch: {
@@ -622,8 +649,11 @@ export default {
         // 编辑导员
         this.$refs[val].validate(async (valid) => {
           if (valid) {
+            this.editStudent.major = ''
+            console.log(this.editStudent)
             let res = await changeUserInfo(this.editStudent)
             if (res.code == '') {
+              console.log(res)
               // 修改成功
               this.$Message.success(res.message)
               this.centerDialogVisibleEdit = false
@@ -632,22 +662,6 @@ export default {
             return false
           }
         })
-      }
-    },
-    // 筛选专业
-    filterChange(obj) {
-      if (obj.filterTag.length == 0) {
-        // 重置
-        console.log('重置');
-        this.queryInfo.majors = []
-        this.majorData = []
-        this.getData()
-      } else {
-        // 筛选
-        obj.filterTag.forEach(item => {
-          this.queryInfo.majors.push(item)
-        })
-        this.getData()
       }
     },
     // 查询单条
@@ -677,23 +691,65 @@ export default {
     // 点击编辑行
     async handleClick(row) {
       this.editStudent = row
-      // 请求年级 学院
-      let res = await getAllGrade('')
-      let resDep = await getAllDept()
-      if (res.code == '' && resDep.code == '') {
-        // 获取年级后渲染到表单里
-        this.allGrade = res.data
-        // 获取全部学院渲染到表单里
-        this.allDepartment = resDep.data
-        resDep.data.forEach(item => {
-          if (this.editStudent.department == item.organizationName) {
-            this.getSomeMajors(item.id)
-            this.currentDept = item.id
-          }
-        })
-        this.centerDialogVisibleEdit = true
+      this.userId = row.id
+      /*  // 请求年级 学院
+       let res = await getAllGrade('')
+       let resDep = await getAllDept()
+       if (res.code == '' && resDep.code == '') {
+         // 获取年级后渲染到表单里
+         this.allGrade = res.data
+         // 获取全部学院渲染到表单里
+         this.allDepartment = resDep.data
+         resDep.data.forEach(item => {
+           if (this.editStudent.department == item.organizationName) {
+             this.getSomeMajors(item.id)
+             this.currentDept = item.id
+           }
+         })
+       } */
+      this.centerDialogVisibleEdit = true
+    },
+    // 取消编辑专业
+    cancelEdit() {
+      this.addGradeTable = {}
+      this.allGradeKey = []
+      this.drawer = false
+      this.newGrade = {}
+      this.allNewMajor = []
+    },
+    // 保存编辑专业
+    async saveEdit() {
+      let key = []
+      if (this.allGradeKey.length == 0) {
+        this.$Message.error('请先选择好绑定的专业再提交')
+        return
+      }
+      this.allGradeKey.forEach(i => {
+        if (this.newGrade[i] != undefined) {
+          key.push(this.newGrade[i])
+        }
+      })
+      if (key.length == 0) {
+        this.$Message.error('请先选择好绑定的年级再提交')
+        return
+      }
+      let res = await editTutorMajor({ userId: this.userId, organizationIds: key })
+      if (res.code == '') {
+        this.$Message.success(res.message)
+        this.cancelEdit()
+        this.centerDialogVisibleEdit = false
       }
     },
+    // 编辑绑定专业
+    handleClose(done) {
+      this.$confirm('确认关闭？将取消修改')
+        .then(() => {
+          this.cancelEdit()
+          done();
+        })
+        .catch(() => { });
+    },
+
     // 获取某学院下的专业
     async getSomeMajors(id) {
       let res = await getMajorsByDet(id)
@@ -726,6 +782,7 @@ export default {
     addNewMajor(e) {
       this.addGradeTable = {}
       this.allGradeKey = []
+      this.newGrade = {}
       e.forEach(async item => {
         let res = await getAllGrade(item.split(',')[0])
         let gradeTable = []
@@ -759,5 +816,17 @@ export default {
 <style scoped>
 /deep/.el-card__body {
   padding: 0 20px 10px 20px;
+}
+.changeEditMajor {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 10px;
+  margin-top: -20px;
+}
+.editMajor {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>

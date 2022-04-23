@@ -1,6 +1,14 @@
 // 导入封装好的axios请求文件
 import requests from './request'
 
+// 辅导员管理修改绑定专业
+export const editTutorMajor = (data) => {
+  return requests({
+    url: '/userMajor/edit',
+    method: 'POST',
+    data: data,
+  })
+}
 // 班级详情修改课程信息
 export const editClassInfo = (data) => {
   return requests({
