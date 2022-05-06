@@ -594,7 +594,7 @@ export default {
         this.$Message.warning('请先勾选要删除的课程 !')
         return
       }
-      await delClass(this.delClassId)
+      let res = await delClass(this.delClassId)
       if (res.code == '') {
         this.$Message.success(res.message)
         this.getData()

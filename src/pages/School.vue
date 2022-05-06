@@ -302,6 +302,7 @@ export default {
         let name = pid.organizationName
         this.formText.title = '新增' + obj.get(name.charAt(name.length - 1))
         this.formText.name = obj.get(name.charAt(name.length - 1)).trim() + '名称'
+        this.addForm.majorId = pid.majorId
         switch (this.formText.name) {
           case '专业名称':
             this.addForm.departmentId = pid.id

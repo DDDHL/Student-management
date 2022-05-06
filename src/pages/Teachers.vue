@@ -613,6 +613,8 @@ export default {
               this.$Message.success(res.message)
               this.centerDialogVisibleAdd = false
               this.getData()
+              this.newStudent = {}
+              this.$refs['newStudent'].resetFields()
             }
           } else {
             return false
