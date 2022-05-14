@@ -55,7 +55,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label="学院" prop="department">
-            <el-input v-model="newStudent.department" disabled></el-input>
+            <el-input v-model="newStudent.department"></el-input>
           </el-form-item>
           <el-form-item label="专业" prop="major">
             <el-select

@@ -20,7 +20,7 @@
       <el-button
         type="primary"
         style="margin: 20px 0 0 20px"
-        @click="addStudentBtn"
+        @click="centerDialogVisibleAdd = true"
         >添加领导<i class="el-icon-circle-plus-outline"></i
       ></el-button>
       <!-- 添加领导弹窗 -->
@@ -54,24 +54,10 @@
               <el-option label="女" value="女"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="年级" prop="grade">
-            <el-select
-              v-model="newStudent.grade"
-              placeholder="请选择年级"
-              style="width: 325px"
-            >
-              <el-option
-                v-for="item in addMajorData"
-                :key="item.organizationName"
-                :label="item.organizationName"
-                :value="item.organizationName"
-              ></el-option>
-            </el-select>
-          </el-form-item>
           <el-form-item label="学院" prop="department">
-            <el-input v-model="newStudent.department" disabled></el-input>
+            <el-input v-model="newStudent.department"></el-input>
           </el-form-item>
-          <el-form-item label="专业" prop="major">
+          <!-- <el-form-item label="专业" prop="major">
             <el-select
               v-model="newStudent.major"
               placeholder="请选择专业"
@@ -82,9 +68,39 @@
                 :key="item.value"
                 :label="item.value"
                 :value="item.value"
+                @click.native="addStudentGetMj(item.id)"
               ></el-option>
             </el-select>
           </el-form-item>
+          <el-form-item label="年级" prop="grade">
+            <el-select
+              v-model="newStudent.grade"
+              placeholder="请先选择专业"
+              style="width: 325px"
+            >
+              <el-option
+                v-for="item in addMajorData"
+                :key="item.organizationName"
+                :label="item.organizationName"
+                @click.native="addStudentGetMjClass(item.id)"
+                :value="item.organizationName"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="班级" required>
+            <el-select
+              v-model="newStudent.majorClass"
+              placeholder="请先选择年级"
+              style="width: 325px"
+            >
+              <el-option
+                v-for="item in addMajorClass"
+                :key="item.organizationName"
+                :label="item.organizationName"
+                :value="item.organizationName"
+              ></el-option>
+            </el-select>
+          </el-form-item> -->
           <el-form-item label="手机号" prop="phone">
             <el-input v-model="newStudent.phone"></el-input>
           </el-form-item>
@@ -124,43 +140,63 @@
         </span>
       </el-dialog>
       <!-- 导入导出 -->
-      <el-upload
-        :action="this.$store.state.allip + '/user/import'"
-        style="display: inline-block"
-        class="ml-5"
-        :show-file-list="false"
-        :accept="'xlsx'"
-        :on-success="handleExcelImportSuccess"
-        :headers="upLoadHeader"
-        :data="upLoadData"
-      >
-        <el-button type="primary" style="margin: 20px 0 0 20px; width: 98px"
-          >导入 <i class="el-icon-top"></i
-        ></el-button>
-      </el-upload>
-      <el-dialog
-        title="警告"
-        :visible.sync="dialogVisibleImport"
-        width="30%"
-        center
-      >
-        <span>{{ importError }}</span>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="dialogVisibleImport = false">取 消</el-button>
-          <el-button type="primary" @click="dialogVisibleImport = false"
-            >确 定</el-button
-          >
-        </span>
-      </el-dialog>
-      <!-- 导出 -->
       <el-button
         type="primary"
-        @click="exp"
-        class="ml-5"
         style="margin: 20px 0 0 20px; width: 98px"
-        width="200"
-        >导出 <i class="el-icon-bottom"></i
-      ></el-button>
+        @click="uploadDialog = true"
+        >导入 <i class="el-icon-top"></i>
+      </el-button>
+      <el-dialog
+        title="Excel导入（请按照模板进行导入）"
+        :visible.sync="uploadDialog"
+        width="30%"
+      >
+        <span class="uploadContent">
+          <el-button type="warning" @click="downloadMuban">下载模板</el-button>
+          <el-upload
+            :action="this.$store.state.allip + '/user/import'"
+            style="display: inline-block"
+            class="ml-5"
+            :show-file-list="false"
+            :accept="'xlsx'"
+            :on-success="handleExcelImportSuccess"
+            :headers="upLoadHeader"
+            :data="upLoadData"
+          >
+            <el-button type="primary" style="margin: 0 0 0 20px; width: 98px"
+              >导入 <i class="el-icon-top"></i>
+            </el-button>
+          </el-upload>
+          <el-dialog
+            title="警告"
+            :visible.sync="dialogVisibleImport"
+            width="30%"
+            center
+          >
+            <span>{{ importError }}</span>
+            <span slot="footer" class="dialog-footer">
+              <el-button @click="dialogVisibleImport = false">取 消</el-button>
+              <el-button type="primary" @click="dialogVisibleImport = false"
+                >确 定</el-button
+              >
+            </span>
+          </el-dialog>
+        </span>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="uploadDialog = false">取 消</el-button>
+        </span>
+      </el-dialog>
+
+      <!-- 导出 -->
+      <el-popconfirm title="确定导出所有数据吗？" @confirm="exp">
+        <el-button
+          slot="reference"
+          type="primary"
+          style="margin: 20px 0 0 20px; width: 98px"
+          width="200"
+          >导出 <i class="el-icon-bottom"></i
+        ></el-button>
+      </el-popconfirm>
       <!-- 表格 -->
       <el-table
         :header-cell-style="{
@@ -207,7 +243,7 @@
           :resizable="false"
         >
         </el-table-column>
-        <el-table-column
+        <!-- <el-table-column
           align="center"
           prop="grade"
           label="年级"
@@ -221,7 +257,7 @@
           column-key="filterTag"
           :resizable="false"
         >
-        </el-table-column>
+        </el-table-column> -->
         <el-table-column
           prop="phone"
           label="手机号"
@@ -244,8 +280,8 @@
         >
           <template slot-scope="scope">
             <el-button type="text" size="small" @click="handleClick(scope.row)"
-              >编辑信息<i class="el-icon-edit"></i
-            ></el-button>
+              >编辑信息<i class="el-icon-edit"></i>
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -280,7 +316,7 @@
               <el-option label="女" value="女"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="年级" prop="grade">
+          <!--  <el-form-item label="年级" prop="grade">
             <el-select
               v-model="editStudent.grade"
               placeholder="请选择年级"
@@ -293,12 +329,13 @@
                 :value="item.organizationName"
               ></el-option>
             </el-select>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item label="学院" prop="department">
             <el-select
               v-model="editStudent.department"
               placeholder="请选择学院"
               style="width: 325px"
+              disabled
             >
               <el-option
                 v-for="item in allDepartment"
@@ -309,20 +346,56 @@
               ></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="专业" prop="major">
+          <!--  <el-form-item label="专业" prop="major">
+            <el-select v-model="editStudent.major" placeholder="请选择专业" style="width: 325px">
+              <el-option v-for="item in SomeMajors" :key="item.id" :label="item.organizationName"
+                :value="item.organizationName" @click.native="updatedGrade(item.id)"></el-option>
+            </el-select>
+          </el-form-item> -->
+          <!--  <el-form-item label="专业" prop="major">
             <el-select
               v-model="editStudent.major"
               placeholder="请选择专业"
               style="width: 325px"
             >
               <el-option
-                v-for="item in SomeMajors"
-                :key="item.id"
+                v-for="item in majorData"
+                :key="item.value"
+                :label="item.value"
+                :value="item.value"
+                @click.native="addStudentGetMj(item.id)"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="年级" prop="grade">
+            <el-select
+              v-model="editStudent.grade"
+              placeholder="请先选择专业"
+              style="width: 325px"
+            >
+              <el-option
+                v-for="item in addMajorData"
+                :key="item.organizationName"
                 :label="item.organizationName"
+                @click.native="addStudentGetMjClass(item.id)"
                 :value="item.organizationName"
               ></el-option>
             </el-select>
           </el-form-item>
+          <el-form-item label="班级" required>
+            <el-select
+              v-model="editStudent.majorClass"
+              placeholder="请先选择年级"
+              style="width: 325px"
+            >
+              <el-option
+                v-for="item in addMajorClass"
+                :key="item.organizationName"
+                :label="item.organizationName"
+                :value="item.organizationName"
+              ></el-option>
+            </el-select>
+          </el-form-item> -->
           <el-form-item label="手机号" prop="phone">
             <el-input v-model="editStudent.phone"></el-input>
           </el-form-item>
@@ -354,7 +427,19 @@
 
 <script>
 /* 获取领导列表接口 */
-import { getAll, addStudent, delStudent, userExport, getAllGrade, getAllDept, getMajorsByDet, changeUserInfo, getStudentMajors } from '../api'
+import {
+  getAll,
+  addStudent,
+  delStudent,
+  userExport,
+  getAllGrade,
+  getAllDept,
+  getMajorsByDet,
+  changeUserInfo,
+  getStudentMajors,
+  downloadFile,
+  getAllClass
+} from '../api'
 /* 下载文件 */
 
 export default {
@@ -375,68 +460,57 @@ export default {
     return {
       // 手机号邮箱验证
       rules: {
-        phone: [
-          {
-            required: true,
-            validator: validatorPhone,
-            trigger: ['blur', 'change'],
-          },
+        phone: [{
+          required: true,
+          validator: validatorPhone,
+          trigger: ['blur', 'change'],
+        },],
+        email: [{
+          required: true,
+          message: '邮箱地址不能为空',
+          trigger: 'blur',
+        },
+        {
+          type: 'email',
+          message: '请输入正确的邮箱地址',
+          trigger: ['blur', 'change'],
+        },
         ],
-        email: [
-          {
-            required: true,
-            message: '邮箱地址不能为空',
-            trigger: 'blur',
-          },
-          {
-            type: 'email',
-            message: '请输入正确的邮箱地址',
-            trigger: ['blur', 'change'],
-          },
-        ],
-        major: [
-          {
-            required: true,
-            message: '专业不能为空',
-            trigger: ['blur', 'change'],
-          },
-        ],
-        department: [
-          {
-            required: true,
-            message: '学院不能为空',
-            trigger: ['blur', 'change'],
-          },
-        ],
-        nickName: [
-          {
-            required: true,
-            message: '名字不能为空',
-            trigger: ['blur', 'change'],
-          },
-        ],
-        userAccount: [
-          {
-            required: true,
-            message: '工号不能为空',
-            trigger: ['blur', 'change'],
-          },
-        ],
-        sex: [
-          {
-            required: true,
-            message: '性别不能为空',
-            trigger: ['blur', 'change'],
-          },
-        ],
-        grade: [
-          {
-            required: true,
-            message: '年级不能为空',
-            trigger: ['blur', 'change'],
-          },
-        ],
+        major: [{
+          required: true,
+          message: '专业不能为空',
+          trigger: ['blur', 'change'],
+        },],
+        department: [{
+          required: true,
+          message: '学院不能为空',
+          trigger: ['blur', 'change'],
+        },],
+        nickName: [{
+          required: true,
+          message: '名字不能为空',
+          trigger: ['change'],
+        },],
+        userAccount: [{
+          required: true,
+          message: '工号不能为空',
+          trigger: ['blur', 'change'],
+        },],
+        sex: [{
+          required: true,
+          message: '性别不能为空',
+          trigger: ['blur', 'change'],
+        },],
+        grade: [{
+          required: true,
+          message: '年级不能为空',
+          trigger: ['blur', 'change'],
+        },],
       },
+      // 编辑领导年级需要的id
+      editStudentId: 0,
+      // 新增领导年级需要的id
+      newStudentId: 0,
       // 导入失败文字
       importError: '',
       // 导入失败弹窗
@@ -451,7 +525,9 @@ export default {
       // 专业筛选
       majorData: [],
       // 文件上传数据
-      upLoadData: { roleId: 2 },
+      upLoadData: {
+        roleId: 2,
+      },
       // 文件上传token
       upLoadHeader: {},
       // 编辑领导的学院
@@ -487,18 +563,17 @@ export default {
         pageSize: 10,
         userAccount: '',
       },
+      uploadDialog: false,
+      addMajorClass: []
     }
   },
   watch: {
-    'queryInfo.query'(newValue, oldValue) {
-      console.log(newValue, oldValue)
-    },
-    'centerDialogVisibleEdit'(newValue) {
+    centerDialogVisibleEdit(newValue) {
       if (!newValue) {
         // 关闭编辑就重新获取表格
         this.getData()
       }
-    }
+    },
   },
   created() {
     /* 初始化获取数据 */
@@ -507,7 +582,9 @@ export default {
   mounted() {
     // 获取token
     let Mytoken = JSON.parse(localStorage.getItem('user')).token
-    this.upLoadHeader = { token: Mytoken }
+    this.upLoadHeader = {
+      token: Mytoken,
+    }
   },
   methods: {
     // 处理token过期
@@ -517,21 +594,49 @@ export default {
       localStorage.removeItem('menus')
       this.$router.push('/login')
     },
-    // 新增领导按钮
-    async addStudentBtn() {
+    // 新增领导获取年级
+    async addStudentGetMj(id) {
       // 请求年级
-      let res = await getAllGrade('')
+      let res = await getAllGrade(id)
       if (res.code == '') {
         // 赋值
         this.addMajorData = res.data
-        this.centerDialogVisibleAdd = true
       }
+    },
+    // 新增领导获取班级
+    async addStudentGetMjClass(id) {
+      // 请求班级
+      let res = await getAllClass(id)
+      if (res.code == '') {
+        // 赋值
+        this.addMajorClass = res.data
+      }
+    },
+    // 下载模板
+    async downloadMuban() {
+      let res = await downloadFile('2022-05-06_f4d76ef7f3644a6fa21d7cb40807e75a.xlsx')
+      const href = URL.createObjectURL(
+        new Blob([res], {
+          type: 'application/octet-stream',
+        })
+      )
+      // 下载文件
+      const link = document.createElement('a')
+      link.download = '领导导入模板.xlsx'
+      link.href = href
+      link.style.display = 'none'
+      document.body.appendChild(link)
+      link.click()
+      URL.revokeObjectURL(link.href) //释放url
+      document.body.removeChild(link) //释放标签
+      this.$Message.success('下载成功!')
     },
     // 导入导出
     async exp() {
       let res = await userExport(this.queryInfo.roleId)
       if (res.type == 'application/json') {
-        this.tokenLost()
+        this.$Message.warning('部分用户出现无角色，请联系管理员')
+        //this.tokenLost()
       } else {
         const href = URL.createObjectURL(
           new Blob([res], {
@@ -552,9 +657,14 @@ export default {
     },
     // 导入成功
     handleExcelImportSuccess(res) {
+      console.log(res)
       if (res.code) {
-        this.dialogVisibleImport = true
-        this.importError = res.message
+        if (res.code == '1001' || res.code == '1002') {
+          this.tokenLost()
+        } else {
+          this.dialogVisibleImport = true
+          this.importError = res.message
+        }
       } else {
         this.$Message.success('导入成功')
         this.getData()
@@ -608,6 +718,8 @@ export default {
               this.$Message.success(res.message)
               this.centerDialogVisibleAdd = false
               this.getData()
+              this.newStudent = {}
+              this.$refs['newStudent'].resetFields()
             }
           } else {
             return false
@@ -631,18 +743,20 @@ export default {
     },
     // 筛选专业
     filterChange(obj) {
+      console.log(obj)
       if (obj.filterTag.length == 0) {
         // 重置
-        console.log('重置');
         this.queryInfo.majors = []
         this.majorData = []
         this.getData()
+        this.queryInfo.majors = []
       } else {
         // 筛选
-        obj.filterTag.forEach(item => {
+        obj.filterTag.forEach((item) => {
           this.queryInfo.majors.push(item)
         })
         this.getData()
+        this.queryInfo.majors = []
       }
     },
     // 查询单条
@@ -673,20 +787,41 @@ export default {
     async handleClick(row) {
       this.editStudent = row
       // 请求年级 学院
-      let res = await getAllGrade('')
+
+      // 获取当前专业年级
+      this.majorData.forEach((item) => {
+        if (row.major == item.text) {
+          this.editStudentId = item.id
+        }
+      })
+      let res = await getAllGrade(this.editStudentId)
       let resDep = await getAllDept()
       if (res.code == '' && resDep.code == '') {
         // 获取年级后渲染到表单里
         this.allGrade = res.data
         // 获取全部学院渲染到表单里
         this.allDepartment = resDep.data
-        resDep.data.forEach(item => {
+        resDep.data.forEach((item) => {
           if (this.editStudent.department == item.organizationName) {
             this.getSomeMajors(item.id)
             this.currentDept = item.id
           }
         })
+        console.log(row)
+        for (let i in this.majorData) {
+          if (this.majorData[i].text == row.major) {
+            this.addStudentGetMj(this.majorData[i].id)
+          }
+        }
+        setTimeout(() => {
+          for (let i in this.addMajorData) {
+            if (this.addMajorData[i].organizationName == row.grade) {
+              this.addStudentGetMjClass(this.addMajorData[i].id)
+            }
+          }
+        }, 800)
         this.centerDialogVisibleEdit = true
+        // 123
       }
     },
     // 获取某学院下的专业
@@ -698,6 +833,13 @@ export default {
         if (this.currentDept != id) {
           this.editStudent.major = ''
         }
+      }
+    },
+    // 编辑领导时，切换专业重新获取年级
+    async updatedGrade(id) {
+      let res = await getAllGrade(id)
+      if (res.code == '') {
+        this.allGrade = res.data
       }
     },
     // 获取数据接口
@@ -712,8 +854,12 @@ export default {
           // 赋值新增领导学院
           this.newStudent.department = res.data.records[0].department
         }
-        resMyDept.data.forEach(item => {
-          this.majorData.push({ text: item.organizationName, value: item.organizationName })
+        resMyDept.data.forEach((item) => {
+          this.majorData.push({
+            text: item.organizationName,
+            value: item.organizationName,
+            id: item.id,
+          })
         })
       }
     },
@@ -734,5 +880,11 @@ export default {
 <style scoped>
 /deep/.el-card__body {
   padding: 0 20px 10px 20px;
+}
+
+.uploadContent {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>
