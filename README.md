@@ -1,39 +1,103 @@
-# 项目名称：学生休假管理系统
+<p align="center">
+	<img alt="logo" width="80" src="https://gitee.com/donghe-li/images/raw/master/student-mangement/logo.png">
+</p>
+<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">学生后台管理系统</h1>
+<h4 align="center">基于 SpringBoot + Vue2 前后端分离的后台系统</h4>
 
-## 下载依赖：
+## 系统简介
 
-```bash
-    npm i
-```
+小团队开发系统
 
-## 运行：
+- 前端采用 Vue2、Element UI。
+- 后端采用 Spring Boot、Spring Security、Redis & Jwt。
+- 权限认证使用 Jwt，支持多终端认证系统。
+- 支持加载动态权限菜单，多方式轻松权限控制。
+- 高效率开发，使用代码生成器可以一键生成后端代码。
+- 同步开发的还有移动端（[Uniapp + uViewUi](https://gitee.com/link?target=https%3A%2F%2Fv3.cn.vuejs.org) [Element Plus](https://gitee.com/link?target=https%3A%2F%2Felement-plus.org%2Fzh-CN)）。
 
-```bash
-    npm run serve
-```
+## 内置功能
 
-## 打包
+1. 用户管理：用户是系统操作者，该功能主要完成系统用户配置。
+2. 部门管理：配置系统组织机构（公司、部门、小组），树结构展现支持数据权限。
+3. 岗位管理：配置系统用户所属担任职务。
+4. 菜单管理：配置系统菜单，操作权限，按钮权限标识等。
+5. 角色管理：角色菜单权限分配、设置角色按机构进行数据范围权限划分。
+6. 字典管理：对系统中经常使用的一些较为固定的数据进行维护。
+7. 参数管理：对系统动态配置常用参数。
+8. 通知公告：系统通知公告信息发布维护。
+9. 操作日志：系统正常操作日志记录和查询；系统异常信息日志记录和查询。
+10. 登录日志：系统登录日志记录查询包含登录异常。
+11. 定时任务：在线（添加、修改、删除)任务调度包含执行结果日志。
+12. 系统接口：根据业务代码自动生成相关的 api 接口文档。
 
-```bash
-    npm run build
-```
+## 在线体验
 
-## 前端
+- admin/admin123
+- 陆陆续续收到一些打赏，为了更好的体验已用于演示服务器升级。谢谢各位小伙伴。
 
--- 框架：Vue2 + elementUi <br>
+演示地址：[http://vue.ruoyi.vip](https://gitee.com/link?target=http%3A%2F%2Fvue.ruoyi.vip)
+文档地址：[http://doc.ruoyi.vip](https://gitee.com/link?target=http%3A%2F%2Fdoc.ruoyi.vip)
 
--- 使用到的插件：<br>
-nprogress<br>
-element-resize-detector<br>
-echarts<br>
+## 演示图
 
----项目优化：<br> 1.路由懒加载 --优化性能<br> 2.接口封装 --方便管理接口<br> 3.防抖封装 --便于优化性能<br>
-4.animate 动画 --优化 elementUi 的过渡动画<br>
-5.web 端响应式 --窗口变化时布局改变，不影响操作<br>
+<table>
+    <tr>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/login.png"/>
 
-### 当前进度
+</td>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/head.png"/></td>
+    </tr>
 
---1.登陆页已完成。<br>
-![Image text](https://gitee.com/donghe-li/images/raw/master/images/Student-system-index/Student-system-login.png)
---2.主页大致布局已完成<br>
-![Image text](https://gitee.com/donghe-li/images/raw/master/images/Student-system-index/Student-system-index.png)
+</td>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/menu.png"/></td>
+    </tr>
+
+<tr>
+        <td>
+
+<img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/menu1.png"/>
+
+</td>
+    </tr>
+
+​ <tr>
+
+<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/role.png"/></td>
+<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/role1.png"/></td>
+</tr>
+<tr>
+<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/log.png"/></td>
+<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/log1.png"/></td>
+</tr>
+<tr>
+<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/file.png"/></td>
+<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/dit.png"/></td>
+</tr>
+<tr>
+<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/student.png"/>
+<tr>
+<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/student1.png"/></td>
+<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/tutor.png"/></td>
+</tr>
+<tr>
+<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/school.png"/></td>
+<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/school1.png"/></td>
+</tr>
+<tr>
+<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/class.png"/></td>
+<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/class1.png"/></td>
+</tr>
+
+</td>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/class2.png"/></td>
+    </tr>
+
+</td>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/class3.png"/></td>
+    </tr>
+
+</td>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/class4.png"/></td>
+    </tr>
+
+</table>

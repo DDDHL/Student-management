@@ -1,6 +1,14 @@
 // 导入封装好的axios请求文件
 import requests from './request'
 
+// 获取休假单
+export const getVacation = (data) => {
+  return requests({
+    url: '/leave/getAll',
+    method: 'POST',
+    data: data,
+  })
+}
 // 辅导员管理修改绑定专业
 export const editTutorMajor = (data) => {
   return requests({
