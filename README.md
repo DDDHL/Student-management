@@ -42,62 +42,43 @@
 
 <table>
     <tr>
-        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/login.png"/>
-
-</td>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/login.png"/></td>
         <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/head.png"/></td>
     </tr>
-
-</td>
+    <tr>
         <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/menu.png"/></td>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/menu1.png"/></td>
     </tr>
-
-<tr>
-        <td>
-
-<img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/menu1.png"/>
-
-</td>
+    ​<tr>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/role.png"/></td>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/role1.png"/></td>
     </tr>
-
-​ <tr>
-
-<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/role.png"/></td>
-<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/role1.png"/></td>
-</tr>
-<tr>
-<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/log.png"/></td>
-<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/log1.png"/></td>
-</tr>
-<tr>
-<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/file.png"/></td>
-<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/dit.png"/></td>
-</tr>
-<tr>
-<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/student.png"/>
-<tr>
-<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/student1.png"/></td>
-<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/tutor.png"/></td>
-</tr>
-<tr>
-<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/school.png"/></td>
-<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/school1.png"/></td>
-</tr>
-<tr>
-<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/class.png"/></td>
-<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/class1.png"/></td>
-</tr>
-
-</td>
+    <tr>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/log.png"/></td>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/log1.png"/></td>
+    </tr>
+    <tr>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/file.png"/></td>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/dit.png"/></td>
+    </tr>
+    <tr>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/student.png"/></td>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/student1.png"/></td>
+    </tr>
+    <tr>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/tutor.png"/></td>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/school.png"/></td>
+    </tr>
+    <tr>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/school1.png"/></td>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/class.png"/></td>
+    </tr>
+    <tr>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/class1.png"/></td>
         <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/class2.png"/></td>
     </tr>
-
-</td>
+    <tr>
         <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/class3.png"/></td>
-    </tr>
-
-</td>
         <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/class4.png"/></td>
     </tr>
-
 </table>
