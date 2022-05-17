@@ -11,18 +11,18 @@
 - 前端采用 Vue2、Element UI。
 - 后端采用 Spring Boot、Spring Security、Redis & Jwt。
 - 权限认证使用 Jwt，支持多终端认证系统。
-- 支持加载动态权限菜单，多方式轻松权限控制。
+- 支持加载动态权限菜单，可对用户类别进行权限控制。
 - 高效率开发，使用代码生成器可以一键生成后端代码。
-- 同步开发的还有移动端（[Uniapp + uViewUi](https://gitee.com/link?target=https%3A%2F%2Fv3.cn.vuejs.org) [Element Plus](https://gitee.com/link?target=https%3A%2F%2Felement-plus.org%2Fzh-CN)）。
+- 同步开发的还有一个移动端（[Uniapp + uViewUi](https://gitee.com/link?target=https%3A%2F%2Fv3.cn.vuejs.org)）。
 
-## 内置功能
+## 系统功能
 
 1. 用户管理：用户是系统操作者，该功能主要完成系统用户配置。
 2. 部门管理：配置系统组织机构（公司、部门、小组），树结构展现支持数据权限。
 3. 岗位管理：配置系统用户所属担任职务。
 4. 菜单管理：配置系统菜单，操作权限，按钮权限标识等。
 5. 角色管理：角色菜单权限分配、设置角色按机构进行数据范围权限划分。
-6. 字典管理：对系统中经常使用的一些较为固定的数据进行维护。
+6. 字典管理：对系统中经常使用的一些较为固定数据进行维护。
 7. 参数管理：对系统动态配置常用参数。
 8. 通知公告：系统通知公告信息发布维护。
 9. 操作日志：系统正常操作日志记录和查询；系统异常信息日志记录和查询。
@@ -42,62 +42,43 @@
 
 <table>
     <tr>
-        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/login.png"/>
-
-</td>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/login.png"/></td>
         <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/head.png"/></td>
     </tr>
-
-</td>
+    <tr>
         <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/menu.png"/></td>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/menu1.png"/></td>
     </tr>
-
-<tr>
-        <td>
-
-<img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/menu1.png"/>
-
-</td>
+    ​<tr>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/role.png"/></td>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/role1.png"/></td>
     </tr>
-
-​ <tr>
-
-<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/role.png"/></td>
-<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/role1.png"/></td>
-</tr>
-<tr>
-<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/log.png"/></td>
-<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/log1.png"/></td>
-</tr>
-<tr>
-<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/file.png"/></td>
-<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/dit.png"/></td>
-</tr>
-<tr>
-<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/student.png"/>
-<tr>
-<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/student1.png"/></td>
-<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/tutor.png"/></td>
-</tr>
-<tr>
-<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/school.png"/></td>
-<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/school1.png"/></td>
-</tr>
-<tr>
-<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/class.png"/></td>
-<td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/class1.png"/></td>
-</tr>
-
-</td>
+    <tr>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/log.png"/></td>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/log1.png"/></td>
+    </tr>
+    <tr>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/file.png"/></td>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/dit.png"/></td>
+    </tr>
+    <tr>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/student.png"/></td>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/student1.png"/></td>
+    </tr>
+    <tr>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/tutor.png"/></td>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/school.png"/></td>
+    </tr>
+    <tr>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/school1.png"/></td>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/class.png"/></td>
+    </tr>
+    <tr>
+        <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/class1.png"/></td>
         <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/class2.png"/></td>
     </tr>
-
-</td>
+    <tr>
         <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/class3.png"/></td>
-    </tr>
-
-</td>
         <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/class4.png"/></td>
     </tr>
-
 </table>
