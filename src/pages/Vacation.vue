@@ -79,7 +79,7 @@
 </template>
 
 <script>
-import { getVacation, approval, getData } from '../api/'
+import { getVacation, approval } from '../api/'
 export default {
   name: 'Vacation',
   data() {
@@ -118,8 +118,6 @@ export default {
   methods: {
     async getData() {
       let res = await getVacation(this.queryInfo)
-      let res2 = await getData()
-      console.log(res2)
       if (res.code == '') {
         this.data = res.data.records
         this.total = res.data.total

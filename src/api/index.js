@@ -2,7 +2,7 @@
 import requests from './request'
 
 // 获取数据
-export const getData = () => {
+export const getEchartData = () => {
   return requests({
     url: '/echarts/count',
     method: 'GET',

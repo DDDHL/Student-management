@@ -246,6 +246,7 @@ let elementResizeDetectorMaker = require("element-resize-detector");
 
 /* echarts动态修改大小 */
 import { resize } from "../echarts/online";
+import { resizeGrade } from "../echarts/gradeNum";
 /* 防抖 */
 import { Debounce } from "../utils/common";
 
@@ -390,6 +391,7 @@ export default {
         // 直接修改echarts
         if (this.$store.state.currentPathName == '系统主页') {
           resize();
+          resizeGrade()
         }
       },
       false
@@ -402,6 +404,7 @@ export default {
         that.$nextTick(function () {
           //使echarts尺寸重置
           resize();
+          resizeGrade()
         });
       });
     }
