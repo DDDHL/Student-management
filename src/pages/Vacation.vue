@@ -17,7 +17,17 @@
         ></el-button>
       </el-input>
       <!-- 表格 -->
-      <el-table :data="data" border style="width: 100%">
+      <el-table
+        :header-cell-style="{
+          background: '#ebeef5',
+          color: '#282c34',
+        }"
+        :data="data"
+        highlight-current-row
+        border
+        style="width: 100%"
+        stripe
+      >
         <el-table-column fixed prop="id" label="ID" width="50" align="center">
         </el-table-column>
         <el-table-column prop="nickName" label="姓名" align="center">
@@ -32,12 +42,24 @@
         </el-table-column>
         <el-table-column prop="leaveReason" label="休假原因" align="center">
         </el-table-column>
-        <el-table-column fixed="right" label="操作" width="100" align="center">
+        <el-table-column prop="approvalResult" label="休假状态" align="center">
+        </el-table-column>
+        <el-table-column fixed="right" label="审批" align="center" width="160">
           <template slot-scope="scope">
-            <el-button @click="handleClick(scope.row)" type="text" size="small"
-              >查看</el-button
+            <el-button
+              @click="handleClick(scope.row.id, true)"
+              type="success"
+              size="small"
+              :disabled="isApproval(scope.row.approvalResult)"
+              >同意</el-button
             >
-            <el-button type="text" size="small">编辑</el-button>
+            <el-button
+              type="danger"
+              size="small"
+              :disabled="isApproval(scope.row.approvalResult)"
+              @click="handleClick(scope.row.id, false)"
+              >不同意</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
@@ -49,7 +71,7 @@
         :page-sizes="[1, 2, 5, 10]"
         :page-size="queryInfo.pageSize"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="this.data.length"
+        :total="total"
       >
       </el-pagination>
     </el-card>
@@ -57,7 +79,7 @@
 </template>
 
 <script>
-import { getVacation } from '../api/'
+import { getVacation, approval, getData } from '../api/'
 export default {
   name: 'Vacation',
   data() {
@@ -74,7 +96,18 @@ export default {
         "state": "",
         "userAccount": ""
       },
-      data: []
+      data: [],
+      total: 0
+    }
+  },
+  computed: {
+    isApproval() {
+      return (e) => {
+        if (e == '审批通过' || e == '审批不通过') {
+          return true
+        }
+        return false
+      }
     }
   },
   created() {
@@ -85,12 +118,18 @@ export default {
   methods: {
     async getData() {
       let res = await getVacation(this.queryInfo)
+      let res2 = await getData()
+      console.log(res2)
       if (res.code == '') {
         this.data = res.data.records
+        this.total = res.data.total
       }
     },
-    handleClick(row) {
-      console.log(row);
+    async handleClick(id, result) {
+      let res = await approval({ id: id, result: result })
+      if (res.code == '') {
+        this.$Message.success(res.message)
+      }
     },
     // 查询单条
     find() {

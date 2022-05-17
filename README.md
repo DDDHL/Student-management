@@ -13,7 +13,7 @@
 - 权限认证使用 Jwt，支持多终端认证系统。
 - 支持加载动态权限菜单，可对用户类别进行权限控制。
 - 高效率开发，使用代码生成器可以一键生成后端代码。
-- 同步开发的还有一个移动端（[Uniapp + uViewUi](https://gitee.com/link?target=https%3A%2F%2Fv3.cn.vuejs.org)）。
+- 同步开发的还有一个移动端（[Uniapp + uViewUi](https://gitee.com/donghe-li/student-management-mobile)）。
 
 ## 系统功能
 
@@ -26,7 +26,7 @@
 7. 老师管理：管理老师、辅导员和领导，基本功能与学生基本一致。
 8. 学校管理：管理学院、专业、年级、支持新增、编辑、删除。年级由后端自动更新。
 9. 班级管理：管理学校班级，支持新增、删除、查看班级，用户需要权限才能修改。
-10. 休假管理：查看小程序休假单，进行审核。
+10. 休假管理：查看小程序休假单，进行查询或者审核，审核通过后通知学生和老师。
 
 ## 演示图
 
@@ -71,8 +71,4 @@
         <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/class3.png"/></td>
         <td><img src="https://gitee.com/donghe-li/images/raw/master/student-mangement/class4.png"/></td>
     </tr>
-<<<<<<< HEAD
 </table>
-=======
-</table>
->>>>>>> d0ef867ace6e284914cbe972cb2a7ea2c592bdf8

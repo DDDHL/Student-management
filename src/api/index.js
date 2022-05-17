@@ -1,6 +1,21 @@
 // 导入封装好的axios请求文件
 import requests from './request'
 
+// 获取数据
+export const getData = () => {
+  return requests({
+    url: '/echarts/count',
+    method: 'GET',
+  })
+}
+// 审批假单
+export const approval = (data) => {
+  return requests({
+    url: '/leave/approval',
+    method: 'POST',
+    data: data,
+  })
+}
 // 获取休假单
 export const getVacation = (data) => {
   return requests({
