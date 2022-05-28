@@ -9,8 +9,8 @@
 小团队开发系统
 
 - 前端采用 Vue2、Element UI。
-- 后端采用 Spring Boot、Spring Security、Redis & Jwt。
-- 权限认证使用 Jwt，支持多终端认证系统。
+- 后端采用 Spring Boot、Redis、Jwt、Mybatis-plus、mysql。
+- 权限认证使用 无状态的 Jwt，支持多终端认证系统。
 - 支持加载动态权限菜单，可对用户类别进行权限控制。
 - 高效率开发，使用代码生成器可以一键生成后端代码。
 - 同步开发的还有一个移动端（[Uniapp + uViewUi](https://gitee.com/donghe-li/student-management-mobile)）。

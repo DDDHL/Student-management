@@ -44,7 +44,13 @@
         </el-table-column>
         <el-table-column prop="approvalResult" label="休假状态" align="center">
         </el-table-column>
-        <el-table-column fixed="right" label="审批" align="center" width="160">
+        <el-table-column
+          fixed="right"
+          label="审批"
+          align="center"
+          width="160"
+          v-if="canApproval"
+        >
           <template slot-scope="scope">
             <el-button
               @click="handleClick(scope.row.id, true)"
@@ -97,7 +103,8 @@ export default {
         "userAccount": ""
       },
       data: [],
-      total: 0
+      total: 0,
+      canApproval: false
     }
   },
   computed: {
@@ -114,6 +121,13 @@ export default {
     // 设置查询课程的id
     this.queryInfo.curriculumId = this.$store.state.curriculumId
     this.getData()
+    let roles = JSON.parse(localStorage.getItem('user')).roles
+    roles.forEach(item => {
+      if (item.roleName == '院系领导' || item.roleName == '导员') {
+        this.canApproval = true
+        return
+      }
+    })
   },
   methods: {
     async getData() {
@@ -127,6 +141,7 @@ export default {
       let res = await approval({ id: id, result: result })
       if (res.code == '') {
         this.$Message.success(res.message)
+        this.getData()
       }
     },
     // 查询单条

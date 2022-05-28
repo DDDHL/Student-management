@@ -193,8 +193,8 @@ export default {
   },
   methods: {
     // 查看班级
-    checkClass(id) {
-      console.log(id)
+    async checkClass(id) {
+      this.$router.push({ path: '/classItem', query: { id: id } })
     },
     // 懒加载数据
     async loadSomeData(tree, treeNode, resolve) {

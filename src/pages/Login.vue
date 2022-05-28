@@ -150,7 +150,8 @@ export default {
               avatarUrl: res.data.avatarUrl,
               nickName: res.data.nickName,
               token: res.data.token,
-              major: res.data.major
+              major: res.data.major,
+              roles: res.data.roles
             }
             localStorage.setItem('user', JSON.stringify(user))
             localStorage.setItem("menus", JSON.stringify(res.data.menus));

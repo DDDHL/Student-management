@@ -52,6 +52,7 @@
         type="primary"
         style="margin: 20px 0 0 20px"
         @click="dialogVisibleEdit = true"
+        v-if="changInfoBtn"
         >修改课程信息 <i class="el-icon-edit"></i
       ></el-button>
 
@@ -60,6 +61,7 @@
         type="primary"
         style="margin: 20px 0 0 20px"
         @click="dialogVisibleEditTime = true"
+        v-if="changClassTimeBtn"
         >修改上课时间 <i class="el-icon-edit-outline"></i
       ></el-button>
       <!-- 导入导出 -->
@@ -318,7 +320,7 @@
 </template>
 
 <script>
-import { getClassStudents, delClassStudent, addSomeStudent, editClassTime, getClass, editClassInfo } from '../api'
+import { getClassStudents, delClassStudent, addSomeStudent, editClassTime, getClass, editClassInfo, getClassInfo } from '../api'
 export default {
   name: 'ClassItem',
   data() {
@@ -370,16 +372,33 @@ export default {
       uploadData: {},
       // 修改课程信息
       className: '',
-      classInfo: ''
+      classInfo: '',
+      changInfoBtn: false,
+      changClassTimeBtn: false,
     }
   },
   created() {
+    if (this.$route.query.id) {
+      this.getClassBySchool(this.$route.query.id)
+      return
+    }
+    this.changInfoBtn = true
+    this.changClassTimeBtn = true
     this.initData()
     // 文件上传token
     this.upLoadHeader = { token: JSON.parse(localStorage.getItem('user')).token }
     this.uploadData = { curriculumId: this.queryInfo.curriculumId }
   },
   methods: {
+    // 获取学校跳转班级
+    async getClassBySchool(id) {
+      let res = await getClassInfo(id)
+      if (res.code == '') {
+        this.teacherName = '辅导员 : ' + res.data.counselor.nickName
+        this.name = res.data.className
+        this.tableData = res.data.students
+      }
+    },
     // 导入成功
     handleExcelImportSuccess(res) {
       console.log(res);
@@ -406,7 +425,7 @@ export default {
       }
     },
     // 初始化数据
-    initData() {
+    async initData() {
       // 设置查询课程的id
       this.className = this.name = this.$store.state.classInfo.curriculumName
       //this.teacherName = this.$store.state.classInfo.curricu
@@ -417,7 +436,7 @@ export default {
       this.allClassTime = this.$store.state.allClassTime
       if (this.queryInfo.curriculumId == 0) {
         this.$Message.error('请在班级管理页面重新进入');
-        this.$router.push('/class')
+        //this.$router.push('/class')
         return
       }
       this.getData()

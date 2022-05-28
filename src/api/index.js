@@ -1,6 +1,14 @@
 // 导入封装好的axios请求文件
 import requests from './request'
 
+// 获取某班级信息
+export const getClassInfo = (id) => {
+  return requests({
+    url: '/organization/getStudentsByClass',
+    method: 'POST',
+    data: { classId: id },
+  })
+}
 // 获取数据
 export const getEchartData = () => {
   return requests({
